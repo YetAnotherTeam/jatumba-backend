@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('is_leader', models.BooleanField()),
-                ('instrument', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.Instruments')),
+                ('instrument', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Instruments')),
             ],
         ),
         migrations.CreateModel(
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='profile',
             name='team',
-            field=models.ManyToManyField(to='users.Team'),
+            field=models.ManyToManyField(to='api.Team'),
         ),
         migrations.AddField(
             model_name='profile',
@@ -61,16 +61,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='member',
             name='team',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.Team'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Team'),
         ),
         migrations.AddField(
             model_name='member',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.Profile'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Profile'),
         ),
         migrations.AddField(
             model_name='instruments',
             name='players',
-            field=models.ManyToManyField(to='users.Profile'),
+            field=models.ManyToManyField(to='api.Profile'),
         ),
     ]

@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'TPD',
     'rest_framework',
-    'users',
+    'api',
     'oauth2_provider',
     'social.apps.django_app.default',
     'rest_framework_social_oauth2',
@@ -114,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
+    # or allow read-only access for unauthenticated api.
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.ext.rest_framework.OAuth2Authentication',
         'rest_framework_social_oauth2.authentication.SocialAuthentication',
@@ -136,13 +136,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 
 )
-
-# Facebook configuration
-SOCIAL_AUTH_FACEBOOK_KEY = 'jatumba'
-SOCIAL_AUTH_FACEBOOK_SECRET = '12345asd'
-
-# Define SOCIAL_AUTH_FACEBOOK_SCOPE to get extra permissions from facebook. Email is not sent by default, to get it, you must request the email permission:
-SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/

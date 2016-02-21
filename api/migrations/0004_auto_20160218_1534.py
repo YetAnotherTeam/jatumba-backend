@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0003_remove_profile_team'),
+        ('api', '0003_remove_profile_team'),
     ]
 
     operations = [
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='member',
             name='instrument',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.Instrument'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Instrument'),
         ),
         migrations.DeleteModel(
             name='Instruments',

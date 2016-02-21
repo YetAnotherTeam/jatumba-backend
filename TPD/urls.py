@@ -16,10 +16,10 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from users import views
+from api.views import VkAuth
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^auth/', include('rest_framework_social_oauth2.urls')),
-    url(r'^hello/', views.HelloView.as_view())
+    url(r'^vk_info/', VkAuth.as_view()),
+    url(r'^api/', include('api.urls'))
 ]

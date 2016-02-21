@@ -1,6 +1,13 @@
 from django.db import models
 
 
+class Session(models.Model):
+    user = models.ForeignKey('auth.User')
+    access_token = models.CharField(max_length=32)
+    refresh_token = models.CharField(max_length=32)
+    time = models.FloatField()
+
+
 class Team(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=200)

@@ -18,6 +18,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+jatdb
 lib64/
 parts/
 sdist/
