@@ -3,10 +3,12 @@ from django.http import HttpResponse
 from oauth2_provider.views import ProtectedResourceView
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
+from django.db import IntegrityError
 
 from api.auth.auth_providers.vk_api import Vk
-from api.serializers import UserSerializer
+from api.serializers import SessionSerializer
 from api.models import Session
+from api.auth.session_generator import generate_identity
 
 
 class HelloView(ProtectedResourceView):
@@ -24,9 +26,16 @@ class SignUpView(APIView):
         password = request.POST['password']
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
-        user = User.objects.create_user(username, password=password, first_name=first_name, last_name=last_name).save()
-
-        return HttpResponse(JSONRenderer().render(UserSerializer(user).data))
+        try:
+            user = User.objects.create_user(username, password=password, first_name=first_name, last_name=last_name)
+            user.save()
+        except IntegrityError:
+            return HttpResponse('already registrated')
+        identity = generate_identity()
+        session = Session.objects.create(access_token=identity['access_token'], refresh_token=identity['refresh_token'],
+                                         time=identity['last_update'], user=user)
+        session.save()
+        return HttpResponse(JSONRenderer().render(SessionSerializer(session).data))
 
 
 class VkAuth(APIView):
