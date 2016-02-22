@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from oauth2_provider.views import ProtectedResourceView
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
@@ -30,12 +30,12 @@ class SignUpView(APIView):
             user = User.objects.create_user(username, password=password, first_name=first_name, last_name=last_name)
             user.save()
         except IntegrityError:
-            return HttpResponse('already registrated')
+            return JsonResponse({'error': 'already registered'}, status=400)
         identity = generate_identity()
         session = Session.objects.create(access_token=identity['access_token'], refresh_token=identity['refresh_token'],
                                          time=identity['last_update'], user=user)
         session.save()
-        return HttpResponse(JSONRenderer().render(SessionSerializer(session).data))
+        return HttpResponse(JSONRenderer().render(SessionSerializer(session).data), content_type="application/json")
 
 
 class VkAuth(APIView):

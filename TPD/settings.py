@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'TPD',
     'rest_framework',
     'api',
+    'oauth2_provider',
+    'social.apps.django_app.default',
+    'rest_framework_social_oauth2',
 ]
 
 MIDDLEWARE_CLASSES = [
