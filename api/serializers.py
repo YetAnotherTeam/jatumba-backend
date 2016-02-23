@@ -14,10 +14,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', 'first_name', 'last_name', 'public_username', 'phone')
 
     def get_public_username(self, obj):
-        return Profile.objects.filter(user=obj).first().public_username
+        profile = Profile.objects.filter(user=obj).first()
+        if profile:
+            return profile.public_username
+        else:
+            return ''
 
     def get_phone(self, obj):
-        return Profile.objects.filter(user=obj).first().phone
+        profile = Profile.objects.filter(user=obj).first()
+        if profile:
+            return profile.phone
+        else:
+            return ''
 
 
 class ProfileSerializer(serializers.ModelSerializer):

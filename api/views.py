@@ -3,6 +3,7 @@ import os
 import binascii
 from django.http import HttpResponse, JsonResponse
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from api.auth.auth_providers.fb_api import Fb
 from api.auth.authentication import TokenAuthentication
@@ -29,10 +30,7 @@ class SignUpView(APIView):
             user.save()
         except IntegrityError:
             return JsonResponse({'error': 'already registered'}, status=400)
-        identity = generate_identity()
-        session = Session.objects.create(access_token=identity['access_token'], refresh_token=identity['refresh_token'],
-                                         time=identity['last_update'], user=user)
-        session.save()
+        session = generate_session(user)
         return HttpResponse(JSONRenderer().render(SessionSerializer(session).data), content_type="application/json")
 
 
@@ -40,20 +38,20 @@ class VkAuth(APIView):
     def post(self, request):
         token = request.POST['token']
         vk_api = Vk()
-        social_auth(vk_api, token)
+        return social_auth(vk_api, token)
 
 
 class FbAuth(APIView):
     def post(self, request):
         token = request.POST['token']
         fb_api = Fb()
-        social_auth(fb_api, token)
+        return social_auth(fb_api, token)
 
 
 def social_auth(api, token):
     user_data = api.get_user_data(token)
     username = user_data['user_id']
-    user = User.objects.filter(username=username)
+    user = User.objects.filter(username=username).first()
     if user is None:
         try:
             user = User.objects.create_user(username, password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
@@ -61,11 +59,16 @@ def social_auth(api, token):
             user.save()
         except IntegrityError:
             return JsonResponse({'error': 'already registered'}, status=400)
+    session = generate_session(user)
+    return HttpResponse(JSONRenderer().render(SessionSerializer(session).data), content_type="application/json")
+
+
+def generate_session(user):
     identity = generate_identity()
     session = Session.objects.create(access_token=identity['access_token'], refresh_token=identity['refresh_token'],
                                      time=identity['last_update'], user=user)
     session.save()
-    return HttpResponse(JSONRenderer().render(SessionSerializer(session).data), content_type="application/json")
+    return session
 
 
 class RefreshToken(APIView):
