@@ -1,6 +1,6 @@
 import binascii
-import time
 import os
+import time
 
 
 def generate_identity():

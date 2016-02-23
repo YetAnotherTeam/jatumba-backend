@@ -1,7 +1,9 @@
 import time
-from rest_framework.authentication import BaseAuthentication
-from api.models import Session
+
 from rest_framework import exceptions
+from rest_framework.authentication import BaseAuthentication
+
+from api.models import Session
 
 
 class TokenAuthentication(BaseAuthentication):

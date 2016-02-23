@@ -1,7 +1,7 @@
-from api import models
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
+from api import models
 from api.models import Profile
 
 

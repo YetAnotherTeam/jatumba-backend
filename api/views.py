@@ -1,20 +1,18 @@
+import binascii
 import os
 
-import binascii
+from django.db import IntegrityError
 from django.http import HttpResponse, JsonResponse
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-
-from api.auth.auth_providers.fb_api import Fb
-from api.auth.authentication import TokenAuthentication
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
-from django.db import IntegrityError
 
+from api.auth.auth_providers.fb_api import Fb
 from api.auth.auth_providers.vk_api import Vk
-from api.serializers import *
-from api.models import Session
+from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_identity
+from api.models import Session
+from api.serializers import *
 
 
 class SignUpView(APIView):
