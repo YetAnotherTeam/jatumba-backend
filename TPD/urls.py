@@ -16,10 +16,8 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from api.views import VkAuth
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^vk_info/', VkAuth.as_view()),
     url(r'^api/', include('api.urls'))
 ]
