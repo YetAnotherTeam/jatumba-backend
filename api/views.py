@@ -3,6 +3,8 @@ import os
 import binascii
 from django.http import HttpResponse, JsonResponse
 from rest_framework.permissions import IsAuthenticated
+
+from api.auth.auth_providers.fb_api import Fb
 from api.auth.authentication import TokenAuthentication
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
@@ -21,7 +23,8 @@ class SignUpView(APIView):
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
         try:
-            user = User.objects.create_user('rg' + username, password=password, first_name=first_name, last_name=last_name)
+            user = User.objects.create_user('rg' + username, password=password, first_name=first_name,
+                                            last_name=last_name)
             user.profile.public_username = username
             user.save()
         except IntegrityError:
@@ -37,21 +40,32 @@ class VkAuth(APIView):
     def post(self, request):
         token = request.POST['token']
         vk_api = Vk()
-        user_data = vk_api.get_user_data(token)
-        username = 'vk' + user_data['user_id']
-        user = User.objects.filter(username=username)
-        if user is None:
-            try:
-                user = User.objects.create_user(username, password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
-                                                first_name=user_data['first_name'], last_name=user_data['last_name'])
-                user.save()
-            except IntegrityError:
-                return JsonResponse({'error': 'already registered'}, status=400)
-        identity = generate_identity()
-        session = Session.objects.create(access_token=identity['access_token'], refresh_token=identity['refresh_token'],
-                                         time=identity['last_update'], user=user)
-        session.save()
-        return HttpResponse(JSONRenderer().render(SessionSerializer(session).data), content_type="application/json")
+        social_auth(vk_api, token)
+
+
+class FbAuth(APIView):
+    def post(self, request):
+        token = request.POST['token']
+        fb_api = Fb()
+        social_auth(fb_api, token)
+
+
+def social_auth(api, token):
+    user_data = api.get_user_data(token)
+    username = user_data['user_id']
+    user = User.objects.filter(username=username)
+    if user is None:
+        try:
+            user = User.objects.create_user(username, password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
+                                            first_name=user_data['first_name'], last_name=user_data['last_name'])
+            user.save()
+        except IntegrityError:
+            return JsonResponse({'error': 'already registered'}, status=400)
+    identity = generate_identity()
+    session = Session.objects.create(access_token=identity['access_token'], refresh_token=identity['refresh_token'],
+                                     time=identity['last_update'], user=user)
+    session.save()
+    return HttpResponse(JSONRenderer().render(SessionSerializer(session).data), content_type="application/json")
 
 
 class RefreshToken(APIView):

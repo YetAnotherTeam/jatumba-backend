@@ -1,5 +1,4 @@
 from requests import request
-
 from api.excpetions.api_exceptions import AuthException
 
 
