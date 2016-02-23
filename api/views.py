@@ -1,27 +1,27 @@
 import os
 
 import binascii
-from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
-from oauth2_provider.views import ProtectedResourceView
+from rest_framework.permissions import IsAuthenticated
+from api.auth.authentication import TokenAuthentication
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 from django.db import IntegrityError
 
 from api.auth.auth_providers.vk_api import Vk
-from api.serializers import SessionSerializer
+from api.serializers import *
 from api.models import Session
 from api.auth.session_generator import generate_identity
 
 
 class SignUpView(APIView):
     def post(self, request):
-        username = '@' + request.POST['username']
+        username = request.POST['username']
         password = request.POST['password']
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
         try:
-            user = User.objects.create_user(username, password=password, first_name=first_name, last_name=last_name)
+            user = User.objects.create_user('rg' + username, password=password, first_name=first_name, last_name=last_name)
             user.profile.public_username = username
             user.save()
         except IntegrityError:
@@ -67,3 +67,14 @@ class RefreshToken(APIView):
         new_session.save()
         session.delete()
         return HttpResponse(JSONRenderer().render(SessionSerializer(new_session).data), content_type="application/json")
+
+
+class ProfileView(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, username):
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            return JsonResponse({'error': 'no such user'}, status=404)
+        return HttpResponse(JSONRenderer().render(UserSerializer(user).data), content_type="application/json")

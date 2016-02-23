@@ -19,4 +19,4 @@ class TokenAuthentication(BaseAuthentication):
         if session['time'] - time.time() > 3600:
             return None
 
-        return session['user'], None
+        return session['user'], session['access_token']
