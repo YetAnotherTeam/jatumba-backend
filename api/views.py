@@ -91,7 +91,7 @@ class ProfileView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, username):
-        profile = Profile.objects.filter(public_username=username)
+        profile = Profile.objects.filter(public_username=username).first()
         if profile is None:
             user = User.objects.filter(username=username).first()
             if user is None:
