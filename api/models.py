@@ -16,6 +16,9 @@ class Session(models.Model):
     refresh_token = models.CharField(max_length=32)
     time = models.FloatField()
 
+    def __str__(self):
+        return 'Token of user: %s' % self.user.username
+
 
 class Team(models.Model):
     name = models.CharField(max_length=50)
