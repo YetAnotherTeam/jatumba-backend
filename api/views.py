@@ -1,9 +1,13 @@
 import os
 
 import binascii
+
+from django.contrib.auth import authenticate
+from django.db import IntegrityError
 from django.http import HttpResponse, JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.auth.auth_providers.fb_api import Fb
