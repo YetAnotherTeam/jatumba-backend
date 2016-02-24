@@ -7,6 +7,7 @@ class Profile(models.Model):
     public_username = models.CharField(max_length=30)
     phone = models.CharField(max_length=15)
 
+
 User.profile = property(lambda u: Profile.objects.get_or_create(user=u)[0])
 
 
