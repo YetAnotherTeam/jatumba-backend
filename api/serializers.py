@@ -2,26 +2,17 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from api import models
-from api.models import Profile
 
 
 class UserSerializer(serializers.ModelSerializer):
-    public_username = serializers.SerializerMethodField()
     phone = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'public_username', 'phone')
-
-    def get_public_username(self, obj):
-        profile = Profile.objects.filter(user=obj).first()
-        if profile:
-            return profile.public_username
-        else:
-            return ''
+        fields = ('username', 'first_name', 'last_name', 'phone')
 
     def get_phone(self, obj):
-        profile = Profile.objects.filter(user=obj).first()
+        profile = models.Profile.objects.filter(user=obj).first()
         if profile:
             return profile.phone
         else:

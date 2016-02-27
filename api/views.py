@@ -27,12 +27,11 @@ class SignUpView(APIView):
         try:
             user = User.objects.create_user(username, password=password, first_name=first_name,
                                             last_name=last_name)
-            user.profile.public_username = username
             user.save()
         except IntegrityError:
             return JsonResponse({'error': 'already registered'}, status=400)
         session = generate_session(user)
-        return Response(JSONRenderer().render(SessionSerializer(session).data), content_type="application/json")
+        return Response(SessionSerializer(session).data, content_type="application/json")
 
 
 class SignInView(APIView):
@@ -73,7 +72,7 @@ def social_auth(api, token, request):
         except IntegrityError:
             return JsonResponse({'error': 'already registered'}, status=400)
     session = generate_session(user)
-    return HttpResponse(JSONRenderer().render(SessionSerializer(session).data), content_type="application/json")
+    return HttpResponse(SessionSerializer(session).data, content_type="application/json")
 
 
 def generate_session(user):
@@ -96,7 +95,7 @@ class RefreshToken(APIView):
                                              time=identity['last_update'], user=session.user)
         new_session.save()
         session.delete()
-        return Response(JSONRenderer().render(SessionSerializer(new_session).data), content_type="application/json")
+        return Response(SessionSerializer(new_session).data, content_type="application/json")
 
 
 class ProfileView(APIView):
@@ -111,4 +110,4 @@ class ProfileView(APIView):
                 return JsonResponse({'error': 'no such user'}, status=404)
         else:
             user = profile.user
-        return Response(JSONRenderer().render(UserSerializer(user).data), content_type="application/json")
+        return Response(UserSerializer(user).data, content_type="application/json")
