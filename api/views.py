@@ -10,9 +10,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from api.auth.auth_providers.fb_api import Fb
 from api.auth.auth_providers.vk_api import Vk
+
 from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_identity
 from api.models import Session
@@ -30,7 +30,7 @@ class SignUpView(APIView):
                                             last_name=last_name)
             user.save()
         except IntegrityError:
-            return JsonResponse({'error': 'already registered'}, status=400)
+            return JsonResponse({'error': 'username already taken'}, status=400)
         session = generate_session(user)
         return Response(SessionSerializer(session).data, content_type="application/json")
 
@@ -76,19 +76,18 @@ def social_auth(user_data, request):
     except MultiValueDictKeyError:
         return Response({'error': 'user not found, register new by including username in request'}, status=404)
     user = User.objects.filter(username=username).first()
-    if user is None:
-        try:
-            user = User.objects.create_user(username, password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
-                                            first_name=user_data['first_name'], last_name=user_data['last_name'])
-            profile = user.profile
-            if user_data['network'] is 'fb':
-                profile.fb_profile = user_data['user_id']
-            elif user_data['network'] is 'vk':
-                profile.vk_profile = user_data['user_id']
-            profile.save()
-            user.save()
-        except IntegrityError:
-            return JsonResponse({'error': 'already registered'}, status=400)
+    if user:
+        return JsonResponse({'error': 'username already taken'}, status=400)
+    user = User.objects.create_user(username, password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
+                                    first_name=user_data['first_name'], last_name=user_data['last_name'])
+
+    profile = user.profile
+    if user_data['network'] is 'fb':
+        profile.fb_profile = user_data['user_id']
+    elif user_data['network'] is 'vk':
+        profile.vk_profile = user_data['user_id']
+    profile.save()
+    user.save()
     session = generate_session(user)
     return Response(SessionSerializer(session).data, content_type="application/json")
 
