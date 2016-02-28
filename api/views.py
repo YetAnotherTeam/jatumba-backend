@@ -120,11 +120,7 @@ class ProfileView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, username):
-        profile = Profile.objects.filter(public_username=username).first()
-        if profile is None:
-            user = User.objects.filter(username=username).first()
-            if user is None:
-                return JsonResponse({'error': 'no such user'}, status=404)
-        else:
-            user = profile.user
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            return JsonResponse({'error': 'no such user'}, status=404)
         return Response(UserSerializer(user).data, content_type="application/json")
