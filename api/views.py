@@ -63,7 +63,7 @@ class FbAuth(APIView):
         token = request.POST['token']
         fb_api = Fb()
         user_data = fb_api.get_user_data(token)
-        profile = models.Profile.objects.filter(vk_profile=user_data['user_id']).first()
+        profile = models.Profile.objects.filter(fb_profile=user_data['user_id']).first()
         if profile:
             return Response(SessionSerializer(generate_session(profile.user)).data, content_type="application/json")
         else:
@@ -80,10 +80,12 @@ def social_auth(user_data, request):
         try:
             user = User.objects.create_user(username, password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
                                             first_name=user_data['first_name'], last_name=user_data['last_name'])
-            if user_data['network'] == 'fb':
-                user.profile.fb_profile = user_data['user_id']
-            elif user_data['network'] == 'vk':
-                user.profile.vk_profile = user_data['user_id']
+            profile = user.profile
+            if user_data['network'] is 'fb':
+                profile.fb_profile = user_data['user_id']
+            elif user_data['network'] is 'vk':
+                profile.vk_profile = user_data['user_id']
+            profile.save()
             user.save()
         except IntegrityError:
             return JsonResponse({'error': 'already registered'}, status=400)

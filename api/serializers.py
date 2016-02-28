@@ -22,15 +22,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_vk_profile(self, obj):
         profile = models.Profile.objects.filter(user=obj).first()
-        if profile:
+        if profile.vk_profile:
             return 'http://vk.com/' + profile.vk_profile
         else:
             return ''
 
     def get_fb_profile(self, obj):
         profile = models.Profile.objects.filter(user=obj).first()
-        if profile:
-            return 'http://facebook.com/' + profile.vk_profile
+        if profile.fb_profile:
+            return 'http://facebook.com/' + profile.fb_profile
         else:
             return ''
 
