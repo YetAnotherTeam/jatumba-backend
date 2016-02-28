@@ -5,8 +5,8 @@ from django.db import models
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15)
-    vk_profile = models.CharField(max_length=20)
-    fb_profile = models.CharField(max_length=20)
+    vk_profile = models.CharField(max_length=20, null=True)
+    fb_profile = models.CharField(max_length=20, null=True)
 
     def __str__(self):
         return 'Profile of user: %s' % self.user.username
