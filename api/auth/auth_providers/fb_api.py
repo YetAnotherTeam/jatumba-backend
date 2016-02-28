@@ -21,7 +21,8 @@ class Fb(BaseProvider):
             raise AuthException('FB doesn\'t return user data')
 
         user_id = user_data.pop('id')
-        user_data['user_id'] = 'fb' + str(user_id)
+        user_data['user_id'] = str(user_id)
+        user_data['network'] = 'fb'
 
         return user_data
 

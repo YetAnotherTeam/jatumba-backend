@@ -22,7 +22,8 @@ class Vk(BaseProvider):
 
         user_data = data['response'][0]
         user_id = user_data.pop('id')
-        user_data['user_id'] = 'vk' + str(user_id)
+        user_data['user_id'] = str(user_id)
+        user_data['network'] = 'vk'
 
         return user_data
 

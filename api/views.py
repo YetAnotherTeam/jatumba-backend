@@ -40,8 +40,7 @@ class SignInView(APIView):
         password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user:
-            return Response(JSONRenderer().render(SessionSerializer(generate_session(user)).data),
-                            content_type="application/json")
+            return Response(SessionSerializer(generate_session(user)).data, content_type="application/json")
         else:
             return Response({'error': 'wrong username or password'}, status=401, content_type="application/json")
 
@@ -50,29 +49,44 @@ class VkAuth(APIView):
     def post(self, request):
         token = request.POST['token']
         vk_api = Vk()
-        return social_auth(vk_api, token, request)
+        user_data = vk_api.get_user_data(token)
+        profile = models.Profile.objects.filter(vk_profile=user_data['user_id']).first()
+        if profile:
+            return Response(SessionSerializer(generate_session(profile.user)).data, content_type="application/json")
+        else:
+            return social_auth(user_data, request)
 
 
 class FbAuth(APIView):
     def post(self, request):
         token = request.POST['token']
         fb_api = Fb()
-        return social_auth(fb_api, token, request)
+        user_data = fb_api.get_user_data(token)
+        profile = models.Profile.objects.filter(vk_profile=user_data['user_id']).first()
+        if profile:
+            return Response(SessionSerializer(generate_session(profile.user)).data, content_type="application/json")
+        else:
+            return social_auth(user_data, request)
 
 
-def social_auth(api, token, request):
-    user_data = api.get_user_data(token)
+def social_auth(user_data, request):
     username = request.POST['username']
+    if not username:
+        return Response({'error': 'user not found, register new by including username in request'}, status=404)
     user = User.objects.filter(username=username).first()
     if user is None:
         try:
             user = User.objects.create_user(username, password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
                                             first_name=user_data['first_name'], last_name=user_data['last_name'])
+            if user_data['network'] == 'fb':
+                user.profile.fb_profile = user_data['user_id']
+            elif user_data['network'] == 'vk':
+                user.profile.vk_profile = user_data['user_id']
             user.save()
         except IntegrityError:
             return JsonResponse({'error': 'already registered'}, status=400)
     session = generate_session(user)
-    return HttpResponse(SessionSerializer(session).data, content_type="application/json")
+    return Response(SessionSerializer(session).data, content_type="application/json")
 
 
 def generate_session(user):
