@@ -32,7 +32,7 @@ class SignUpView(APIView):
         except IntegrityError:
             return JsonResponse({'error': 'username already taken'}, status=400)
         session = generate_session(user)
-        return Response(SessionSerializer(session).data, content_type="application/json")
+        return Response(SessionSerializer(session).data)
 
 
 class SignInView(APIView):
@@ -41,9 +41,9 @@ class SignInView(APIView):
         password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user:
-            return Response(SessionSerializer(generate_session(user)).data, content_type="application/json")
+            return Response(SessionSerializer(generate_session(user)).data)
         else:
-            return Response({'error': 'wrong username or password'}, status=401, content_type="application/json")
+            return Response({'error': 'wrong username or password'}, status=403)
 
 
 class VkAuth(APIView):
@@ -53,7 +53,7 @@ class VkAuth(APIView):
         user_data = vk_api.get_user_data(token)
         profile = models.Profile.objects.filter(vk_profile=user_data['user_id']).first()
         if profile:
-            return Response(SessionSerializer(generate_session(profile.user)).data, content_type="application/json")
+            return Response(SessionSerializer(generate_session(profile.user)).data)
         else:
             return social_auth(user_data, request)
 
@@ -65,7 +65,7 @@ class FbAuth(APIView):
         user_data = fb_api.get_user_data(token)
         profile = models.Profile.objects.filter(fb_profile=user_data['user_id']).first()
         if profile:
-            return Response(SessionSerializer(generate_session(profile.user)).data, content_type="application/json")
+            return Response(SessionSerializer(generate_session(profile.user)).data)
         else:
             return social_auth(user_data, request)
 
@@ -89,7 +89,7 @@ def social_auth(user_data, request):
     profile.save()
     user.save()
     session = generate_session(user)
-    return Response(SessionSerializer(session).data, content_type="application/json")
+    return Response(SessionSerializer(session).data)
 
 
 def generate_session(user):
@@ -112,7 +112,7 @@ class RefreshToken(APIView):
                                              time=identity['last_update'], user=session.user)
         new_session.save()
         session.delete()
-        return Response(SessionSerializer(new_session).data, content_type="application/json")
+        return Response(SessionSerializer(new_session).data)
 
 
 class ProfileView(APIView):
