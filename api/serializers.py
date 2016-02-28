@@ -6,15 +6,31 @@ from api import models
 
 class UserSerializer(serializers.ModelSerializer):
     phone = serializers.SerializerMethodField()
+    vk_profile = serializers.SerializerMethodField()
+    fb_profile = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'phone')
+        fields = ('username', 'first_name', 'last_name', 'phone', 'vk_profile', 'fb_profile')
 
     def get_phone(self, obj):
         profile = models.Profile.objects.filter(user=obj).first()
         if profile:
             return profile.phone
+        else:
+            return ''
+
+    def get_vk_profile(self, obj):
+        profile = models.Profile.objects.filter(user=obj).first()
+        if profile:
+            return 'http://vk.com/' + profile.vk_profile
+        else:
+            return ''
+
+    def get_fb_profile(self, obj):
+        profile = models.Profile.objects.filter(user=obj).first()
+        if profile:
+            return 'http://facebook.com/' + profile.vk_profile
         else:
             return ''
 

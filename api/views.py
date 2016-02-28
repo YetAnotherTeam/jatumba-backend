@@ -5,6 +5,7 @@ import binascii
 from django.contrib.auth import authenticate
 from django.db import IntegrityError
 from django.http import HttpResponse, JsonResponse
+from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -70,8 +71,9 @@ class FbAuth(APIView):
 
 
 def social_auth(user_data, request):
-    username = request.POST['username']
-    if not username:
+    try:
+        username = request.POST['username']
+    except MultiValueDictKeyError:
         return Response({'error': 'user not found, register new by including username in request'}, status=404)
     user = User.objects.filter(username=username).first()
     if user is None:
