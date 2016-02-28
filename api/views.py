@@ -123,4 +123,4 @@ class ProfileView(APIView):
         user = User.objects.filter(username=username).first()
         if user is None:
             return JsonResponse({'error': 'no such user'}, status=404)
-        return Response(UserSerializer(user).data, content_type="application/json")
+        return Response(UserSerializer(user).data)

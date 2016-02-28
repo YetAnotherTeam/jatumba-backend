@@ -8,13 +8,14 @@ from api.models import Session
 
 class TokenAuthentication(BaseAuthentication):
     def authenticate(self, request):
-        token = request.META.token
+        token = request.META.get('HTTP_TOKEN')
+        print(token)
         if not token:
             return None
         try:
-            session = Session.objects.filter(access_token=token)
+            session = Session.objects.filter(access_token=token).first()
         except Session.DoesNotExist:
             raise exceptions.AuthenticationFailed('No such token')
-        if session['time'] - time.time() > 3600:
+        if session.time - time.time() > 3600:
             return None
-        return session['user'], session['access_token']
+        return session.user, session.access_token
