@@ -4,13 +4,12 @@ from django.db import models
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(max_length=15, blank=True)
     vk_profile = models.CharField(max_length=30, blank=True, default='')
     fb_profile = models.CharField(max_length=30, blank=True, default='')
 
     def __str__(self):
         return 'Profile of user: %s' % self.user.username
-
 
 User.profile = property(lambda u: Profile.objects.get_or_create(user=u)[0])
 

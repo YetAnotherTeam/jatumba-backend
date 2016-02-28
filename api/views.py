@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate
 from django.db import IntegrityError
 from django.http import HttpResponse, JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -21,18 +22,12 @@ from api.serializers import *
 
 class SignUpView(APIView):
     def post(self, request):
-        username = request.POST['username']
-        password = request.POST['password']
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        try:
-            user = User.objects.create_user(username, password=password, first_name=first_name,
-                                            last_name=last_name)
-            user.save()
-        except IntegrityError:
-            return JsonResponse({'error': 'username already taken'}, status=400)
-        session = generate_session(user)
-        return Response(SessionSerializer(session).data)
+        serializer = SignUpSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            session = generate_session(user)
+            return Response(SessionSerializer(session).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SignInView(APIView):
