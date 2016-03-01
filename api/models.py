@@ -11,8 +11,6 @@ class Profile(models.Model):
     def __str__(self):
         return 'Profile of user: %s' % self.user.username
 
-User.profile = property(lambda u: Profile.objects.get_or_create(user=u)[0])
-
 
 class Session(models.Model):
     user = models.ForeignKey('auth.User')
@@ -24,7 +22,7 @@ class Session(models.Model):
         return 'Token of user: %s' % self.user.username
 
 
-class Team(models.Model):
+class Band(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=200)
 
@@ -41,10 +39,10 @@ class Instrument(models.Model):
 
 class Member(models.Model):
     user = models.ForeignKey('auth.User')
-    team = models.ForeignKey(Team)
+    band = models.ForeignKey(Band)
     instrument = models.ForeignKey(Instrument)
     is_leader = models.BooleanField()
 
     def __str__(self):
-        return '%s; Team: %s; Instrument: %s; Is leader? %s;' % (
-            self.user.username, self.team.name, self.instrument.name, self.is_leader)
+        return '%s; Band: %s; Instrument: %s; Is leader? %s;' % (
+            self.user.username, self.band.name, self.instrument.name, self.is_leader)

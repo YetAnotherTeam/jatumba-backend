@@ -1,13 +1,16 @@
 from api.auth.auth_providers.base import BaseProvider
-from api.excpetions.api_exceptions import AuthException
+from api.exceptions.api_exceptions import AuthException
 
 
-class Vk(BaseProvider):
+class VK(BaseProvider):
+    request_data = ('first_name', 'last_name', 'email', 'photo', 'id')
+
+    def __init__(self, *args, **kwargs):
+        super(VK, self).__init__(args, kwargs)
+
     def get_user_data(self, token):
-        request_data = ['first_name', 'last_name', 'email', 'photo', 'id']
-
-        fields = ','.join(set(request_data))
-        data = vk_api(self, 'users.get', {
+        fields = ','.join(self.request_data)
+        data = VK_API().request(self, 'users.get', {
             'access_token': token,
             'fields': fields,
         })
@@ -28,11 +31,13 @@ class Vk(BaseProvider):
         return user_data
 
 
-def vk_api(backend, method, data):
-    data['v'] = '5.45'
-    url = 'https://api.vk.com/method/' + method
+class VK_API:
+    version = '5.45'
+    url = 'https://api.vk.com/method/%s'
 
-    try:
-        return backend.get_json(url, params=data)
-    except (TypeError, KeyError, IOError, ValueError, IndexError):
-        return None
+    def request(self, backend, method, data):
+        data['v'] = self.version
+        try:
+            return backend.get_json(self.url, params=data)
+        except (TypeError, KeyError, IOError, ValueError, IndexError):
+            return None

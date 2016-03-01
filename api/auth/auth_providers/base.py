@@ -1,6 +1,6 @@
 from requests import request
 
-from api.excpetions.api_exceptions import AuthException
+from api.exceptions.api_exceptions import AuthException
 
 
 class BaseProvider:
