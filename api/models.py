@@ -46,3 +46,17 @@ class Member(models.Model):
     def __str__(self):
         return '%s; Band: %s; Instrument: %s; Is leader? %s;' % (
             self.user.username, self.band.name, self.instrument.name, self.is_leader)
+
+
+class Composition(models.Model):
+    name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return 'Composition %s' % self.name
+
+
+class Track(models.Model):
+    instrument = models.ForeignKey(Instrument)
+    track = models.TextField()
+    composition = models.ForeignKey(Composition)
+
