@@ -24,7 +24,7 @@ class Session(models.Model):
 
 class Band(models.Model):
     name = models.CharField(max_length=50)
-    description = models.TextField(max_length=200)
+    description = models.TextField(max_length=200, blank=True, default='')
 
     def __str__(self):
         return 'Name: %s; Description: %s;' % (self.name, self.description)
@@ -40,7 +40,7 @@ class Instrument(models.Model):
 class Member(models.Model):
     user = models.ForeignKey('auth.User')
     band = models.ForeignKey(Band)
-    instrument = models.ForeignKey(Instrument)
+    instrument = models.ForeignKey(Instrument, null=True, default=None)
     is_leader = models.BooleanField()
 
     def __str__(self):

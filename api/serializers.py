@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from api import models
+from api.models import Profile
 
 from api.models import *
 
@@ -43,6 +45,38 @@ class UserSerializer(serializers.ModelSerializer):
             return 'http://facebook.com/%s' % profile.fb_profile
         else:
             return ''
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'first_name', 'last_name')
+
+    def create(self, validated_data):
+        user = User.objects.create(**validated_data)
+        Profile.objects.create(user=user)
+        return user
+
+
+class TeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Team
+        fields = ('name', 'description')
+
+    def create(self, validated_data):
+        team = models.Team.objects.create(**validated_data)
+        return team
+
+
+class MemberSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+    first_name = serializers.SerializerMethodField()
+    second_name = serializers.SerializerMethodField()
+    instrument = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Member
+        fields = ('')
 
 
 class ProfileSerializer(serializers.ModelSerializer):

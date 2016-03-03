@@ -14,5 +14,6 @@ urlpatterns = [
     url(r'^sign_in/', SignInView.as_view()),
     url(r'^token/refresh/', RefreshToken.as_view()),
     url(r'^profile/(?P<username>\w+)/$', ProfileView.as_view()),
+    url(r'^team/create', CreateBandView.as_view()),
     url(r'^', include(router.urls))
 ]

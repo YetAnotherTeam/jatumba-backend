@@ -13,6 +13,7 @@ from api.auth.auth_providers.fb_api import Fb
 from api.auth.auth_providers.vk_api import VK
 from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_identity
+from api.models import *
 from api.serializers import *
 
 
@@ -121,6 +122,27 @@ class ProfileView(APIView):
         if user is None:
             return JsonResponse({'error': 'no such user'}, status=404)
         return Response(UserSerializer(user).data)
+
+
+class CreateBandView(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = TeamSerializer(data=request.data)
+        if serializer.is_valid():
+            team = serializer.save()
+            Member.objects.create(user=request.user, team=team, is_leader=True).save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BandMembersView(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        name = request.POST['name']
 
 
 class BandViewSet(viewsets.ModelViewSet):
