@@ -11,10 +11,14 @@ class Fb(BaseProvider):
         self.fb_api = FB_API()
 
     def get_user_data(self, token):
-        user_data = self.fb_api.request(self, 'me', {
-            'access_token': token,
-            'fields': self.fields,
-        })
+        user_data = self.fb_api.request(
+            self,
+            'me',
+            {
+                'access_token': token,
+                'fields': self.fields,
+            }
+        )
 
         if user_data and user_data.get('error'):
             error = user_data['error']
@@ -32,11 +36,9 @@ class Fb(BaseProvider):
 
 
 class FB_API:
-    version = '5.45'
     URL = 'https://graph.facebook.com/v2.5/%s'
 
     def request(self, backend, method, data):
-        data['v'] = self.version
         try:
             return backend.get_json(self.URL % method, params=data)
         except (TypeError, KeyError, IOError, ValueError, IndexError):
