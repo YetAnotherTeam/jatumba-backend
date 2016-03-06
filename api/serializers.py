@@ -30,3 +30,9 @@ class SessionSerializer(serializers.ModelSerializer):
 class BandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Band
+
+
+# noinspection PyAbstractClass
+class BandMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member

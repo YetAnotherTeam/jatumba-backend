@@ -141,25 +141,10 @@ class ProfileView(APIView):
         return Response(UserSerializer(user).data)
 
 
-class CreateBandView(APIView):
-    authentication_classes = (TokenAuthentication,)
+class BandMembersViewSet(viewsets.ModelViewSet):
+    queryset = Band.objects.all()
+    serializer_class = BandMemberSerializer
     permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        serializer = TeamSerializer(data=request.data)
-        if serializer.is_valid():
-            team = serializer.save()
-            Member.objects.create(user=request.user, team=team, is_leader=True).save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class BandMembersView(APIView):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        name = request.POST['name']
 
 
 class BandViewSet(viewsets.ModelViewSet):
