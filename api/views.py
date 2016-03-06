@@ -142,7 +142,7 @@ class ProfileView(APIView):
 
 
 class BandMembersViewSet(viewsets.ModelViewSet):
-    queryset = Band.objects.all()
+    queryset = Member.objects.all()
     serializer_class = BandMemberSerializer
     permission_classes = (IsAuthenticated,)
 

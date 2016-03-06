@@ -24,7 +24,11 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return self.get_full_name()
+        full_name = self.get_full_name()
+        if full_name:
+            return "full_name: %s (id: %d)" % (full_name, self.id)
+        else:
+            return "username: %s (id: %d)" % (self.username, self.id)
 
 
 class Session(models.Model):
