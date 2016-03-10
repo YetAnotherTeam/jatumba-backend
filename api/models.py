@@ -47,7 +47,7 @@ class Session(models.Model):
 
 class Band(models.Model):
     leader = models.ForeignKey(User, verbose_name='Лидер группы', null=True, blank=True)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, blank=False)
     description = models.TextField(max_length=200, blank=True, default='')
 
     class Meta:

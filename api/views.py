@@ -22,7 +22,6 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
 
     # TODO add permissions
     @list_route(methods=['post'], permission_classes=(AllowAny,))
@@ -141,3 +140,12 @@ class BandMembersViewSet(viewsets.ModelViewSet):
 class BandViewSet(viewsets.ModelViewSet):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.POST.copy()
+        data['leader'] = request.user.id
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            band = serializer.save()
+            return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -13,7 +13,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'phone', 'vk_profile', 'fb_profile')
+        fields = ('id', 'username', 'first_name', 'last_name', 'phone', 'vk_profile', 'fb_profile')
 
 
 # noinspection PyAbstractClass
@@ -27,6 +27,8 @@ class SessionSerializer(serializers.ModelSerializer):
 
 # noinspection PyAbstractClass
 class BandSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(allow_blank=False)
+
     class Meta:
         model = Band
 
