@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import status, viewsets
+from rest_framework.decorators import detail_route
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -129,7 +130,7 @@ class CreateBandView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        serializer = TeamSerializer(data=request.data)
+        serializer = BandSerializer(data=request.data)
         if serializer.is_valid():
             team = serializer.save()
             Member.objects.create(user=request.user, team=team, is_leader=True).save()
@@ -146,5 +147,12 @@ class BandMembersView(APIView):
 
 
 class BandViewSet(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
     queryset = Band.objects.all()
     serializer_class = BandSerializer
+
+    @detail_route(methods=['get'])
+    def get_band(self):
+         pass
+

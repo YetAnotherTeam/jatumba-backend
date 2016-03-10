@@ -1,7 +1,4 @@
 from rest_framework import serializers
-from api import models
-from api.models import Profile
-
 from api.models import *
 
 
@@ -47,36 +44,43 @@ class UserSerializer(serializers.ModelSerializer):
             return ''
 
 
-class SignUpSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username', 'password', 'first_name', 'last_name')
-
-    def create(self, validated_data):
-        user = User.objects.create(**validated_data)
-        Profile.objects.create(user=user)
-        return user
-
-
-class TeamSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Team
-        fields = ('name', 'description')
-
-    def create(self, validated_data):
-        team = models.Team.objects.create(**validated_data)
-        return team
-
-
 class MemberSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
     first_name = serializers.SerializerMethodField()
-    second_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
     instrument = serializers.SerializerMethodField()
 
     class Meta:
-        model = models.Member
-        fields = ('')
+        model = Member
+        fields = ('username', 'first_name', 'last_name', 'instrument')
+
+    def get_username(self, member):
+        user = member.user
+        if user:
+            return user.username
+        else:
+            return ''
+
+    def get_first_name(self, member):
+        user = member.user
+        if user:
+            return user.first_name
+        else:
+            return ''
+
+    def get_last_name(self, member):
+        user = member.user
+        if user:
+            return user.last_name
+        else:
+            return ''
+
+    def get_instrument(self, member):
+        instrument = member.instrument
+        if instrument:
+            return instrument.name
+        else:
+            return ''
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -96,3 +100,15 @@ class SessionSerializer(serializers.ModelSerializer):
 class BandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Band
+        fields = ('name', 'description')
+
+    def create(self, validated_data):
+        return Band.objects.create(**validated_data)
+
+
+class BandDetailSerializer(serializers.ModelSerializer):
+    members = MemberSerializer(many=True)
+
+    class Meta:
+        model = Band
+        fields = ('name', 'description', 'members')
