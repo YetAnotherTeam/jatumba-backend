@@ -39,5 +39,16 @@ class CompositionSerializer(serializers.ModelSerializer):
 
 # noinspection PyAbstractClass
 class BandMemberSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    instrument = serializers.SerializerMethodField()
+
     class Meta:
         model = Member
+        fields = ('user', 'instrument')
+
+    def get_instrument(self, member):
+        instrument = member.instrument
+        if instrument:
+            return instrument.name
+        else:
+            return ''

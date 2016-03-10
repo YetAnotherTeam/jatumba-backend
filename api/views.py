@@ -12,9 +12,7 @@ from rest_framework.views import APIView
 
 from api.auth.auth_providers.fb_api import Fb
 from api.auth.auth_providers.vk_api import VK
-from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_identity
-from api.models import *
 from api.serializers import *
 
 
@@ -130,33 +128,16 @@ class RefreshToken(APIView):
         return Response(SessionSerializer(new_session).data)
 
 
-class ProfileView(APIView):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, username):
-        user = User.objects.filter(username=username).first()
-        if user is None:
-            return JsonResponse({'error': 'no such user'}, status=404)
-        return Response(UserSerializer(user).data)
-
-
 class CompositionViewSet(viewsets.ModelViewSet):
     queryset = Composition.objects.all()
     serializer_class = CompositionSerializer
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated,)
 
 
 class BandMembersViewSet(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = BandMemberSerializer
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated,)
 
 
 class BandViewSet(viewsets.ModelViewSet):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated,)
