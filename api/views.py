@@ -137,7 +137,10 @@ class BandMembersViewSet(viewsets.ModelViewSet):
     serializer_class = BandMemberSerializer
 
 
-class BandViewSet(viewsets.ModelViewSet):
+class BandViewSet(mixins.RetrieveModelMixin,
+                  mixins.CreateModelMixin,
+                  mixins.ListModelMixin,
+                  viewsets.GenericViewSet):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
 

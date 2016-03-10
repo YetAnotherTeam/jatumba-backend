@@ -27,7 +27,7 @@ class SessionSerializer(serializers.ModelSerializer):
 
 # noinspection PyAbstractClass
 class BandSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(allow_blank=False)
+    name = serializers.CharField(allow_blank=False, max_length=50)
 
     class Meta:
         model = Band
