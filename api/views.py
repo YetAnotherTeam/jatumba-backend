@@ -141,13 +141,22 @@ class ProfileView(APIView):
         return Response(UserSerializer(user).data)
 
 
+class CompositionViewSet(viewsets.ModelViewSet):
+    queryset = Composition.objects.all()
+    serializer_class = CompositionSerializer
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAuthenticated,)
+
+
 class BandMembersViewSet(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = BandMemberSerializer
+    authentication_classes = (TokenAuthentication, )
     permission_classes = (IsAuthenticated,)
 
 
 class BandViewSet(viewsets.ModelViewSet):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
+    authentication_classes = (TokenAuthentication, )
     permission_classes = (IsAuthenticated,)

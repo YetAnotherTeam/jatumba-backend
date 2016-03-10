@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from api.models import *
 
 
@@ -30,6 +29,12 @@ class SessionSerializer(serializers.ModelSerializer):
 class BandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Band
+
+
+# noinspection PyAbstractClass
+class CompositionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Composition
 
 
 # noinspection PyAbstractClass

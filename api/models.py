@@ -33,7 +33,7 @@ class User(AbstractUser):
 
 class Session(models.Model):
     user = models.ForeignKey(User, verbose_name='Пользователь')
-    access_token = models.CharField(max_length=32, db_index=True)
+    access_token = models.CharField(max_length=32, unique=True)
     refresh_token = models.CharField(max_length=32)
     time = models.FloatField()
 
@@ -87,6 +87,7 @@ class Member(models.Model):
 
 
 class Composition(models.Model):
+    band = models.ForeignKey(Band)
     name = models.CharField(max_length=30)
 
     def __str__(self):
