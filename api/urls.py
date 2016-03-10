@@ -5,15 +5,12 @@ from api.views import *
 
 router = DefaultRouter()
 router.register(r'band', BandViewSet)
-
+router.register(r'band_member', BandMembersViewSet)
+router.register(r'user', UserViewSet)
 
 urlpatterns = [
-    url(r'^sign_up/vk/', VkAuth.as_view()),
-    url(r'^sign_up/fb/', FbAuth.as_view()),
-    url(r'^sign_up/', SignUpView.as_view()),
-    url(r'^sign_in/', SignInView.as_view()),
-    url(r'^token/refresh/', RefreshToken.as_view()),
-    url(r'^profile/(?P<username>\w+)/$', ProfileView.as_view()),
-    url(r'^team/create', CreateBandView.as_view()),
-    url(r'^', include(router.urls))
+    url(r'sign_up/vk/', VkAuth.as_view()),
+    url(r'sign_up/fb/', FbAuth.as_view()),
+    url(r'token/refresh/', RefreshToken.as_view()),
+    url(r'', include(router.urls))
 ]

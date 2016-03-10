@@ -7,23 +7,24 @@ class VK(BaseProvider):
 
     def __init__(self, *args, **kwargs):
         super(VK, self).__init__(args, kwargs)
+        self.fields = ','.join(self.request_data)
+        self.vk_api = VK_API()
 
     def get_user_data(self, token):
-        fields = ','.join(self.request_data)
-        data = VK_API().request(self, 'users.get', {
+        user_data = self.vk_api.request(self, 'users.get', {
             'access_token': token,
-            'fields': fields,
+            'fields': self.fields,
         })
 
-        if data and data.get('error'):
-            error = data['error']
+        if user_data and user_data.get('error'):
+            error = user_data['error']
             msg = error.get('error_msg', 'VK API error')
             raise AuthException(msg)
 
-        if data is None:
+        if user_data is None:
             raise AuthException('VK doesn\'t return user data')
 
-        user_data = data['response'][0]
+        user_data = user_data['response'][0]
         user_id = user_data.pop('id')
         user_data['user_id'] = str(user_id)
         user_data['network'] = 'vk'

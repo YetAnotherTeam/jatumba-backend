@@ -62,4 +62,5 @@ target/
 
 .idea
 
-static
+static/
+media/
