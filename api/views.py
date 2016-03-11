@@ -1,9 +1,10 @@
 import binascii
 import os
+import django_filters
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
-from rest_framework import status, viewsets, mixins
+from rest_framework import status, viewsets, mixins, filters
 from rest_framework.decorators import list_route
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -130,6 +131,8 @@ class RefreshToken(APIView):
 class CompositionViewSet(viewsets.ModelViewSet):
     queryset = Composition.objects.all()
     serializer_class = CompositionSerializer
+    # filter_backends = (filters.DjangoFilterBackend,)
+    # filter_fields = ('member_ set__user')
 
 
 class InstrumentViewSet(mixins.ListModelMixin,
@@ -145,6 +148,8 @@ class BandMembersViewSet(mixins.RetrieveModelMixin,
                          viewsets.GenericViewSet):
     queryset = Member.objects.all()
     serializer_class = BandMemberSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('band_id',)
 
     def create(self, request, *args, **kwargs):
         data = request.POST.copy()

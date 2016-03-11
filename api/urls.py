@@ -5,7 +5,7 @@ from api.views import *
 
 router = DefaultRouter()
 router.register(r'band', BandViewSet)
-router.register(r'band_member', BandMembersViewSet)
+router.register(r'member', BandMembersViewSet)
 router.register(r'composition', CompositionViewSet)
 router.register(r'user', UserViewSet)
 router.register(r'instrument', InstrumentViewSet)
