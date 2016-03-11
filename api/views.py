@@ -1,6 +1,5 @@
 import binascii
 import os
-
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
@@ -9,7 +8,6 @@ from rest_framework.decorators import list_route
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from api.auth.auth_providers.fb_api import Fb
 from api.auth.auth_providers.vk_api import VK
 from api.auth.session_generator import generate_identity
@@ -110,6 +108,8 @@ def generate_session(user):
 
 
 class RefreshToken(APIView):
+    permission_classes = (AllowAny,)
+
     def post(self, request):
         refresh_token = request.POST['refresh_token']
         session = Session.objects.filter(refresh_token=refresh_token).first()
@@ -132,9 +132,28 @@ class CompositionViewSet(viewsets.ModelViewSet):
     serializer_class = CompositionSerializer
 
 
-class BandMembersViewSet(viewsets.ModelViewSet):
+class InstrumentViewSet(mixins.ListModelMixin,
+                        mixins.RetrieveModelMixin,
+                        viewsets.GenericViewSet):
+    queryset = Instrument.objects.all()
+    serializer_class = InstrumentSerializer
+
+
+class BandMembersViewSet(mixins.RetrieveModelMixin,
+                         mixins.CreateModelMixin,
+                         mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
     queryset = Member.objects.all()
     serializer_class = BandMemberSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.POST.copy()
+        data['user'] = request.user.id
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            member = serializer.save()
+            return Response(self.serializer_class(member).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BandViewSet(mixins.RetrieveModelMixin,

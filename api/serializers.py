@@ -54,3 +54,9 @@ class BandMemberSerializer(serializers.ModelSerializer):
             return instrument.name
         else:
             return ''
+
+
+# noinspection PyAbstractClass
+class InstrumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Instrument
