@@ -128,11 +128,16 @@ class RefreshToken(APIView):
         return Response(SessionSerializer(new_session).data)
 
 
-class CompositionViewSet(viewsets.ModelViewSet):
+class CompositionViewSet(mixins.CreateModelMixin,
+                         mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
     queryset = Composition.objects.all()
     serializer_class = CompositionSerializer
     # filter_backends = (filters.DjangoFilterBackend,)
     # filter_fields = ('member_ set__user')
+
+    def list(self, request, *args, **kwargs):
+        pass
 
 
 class InstrumentViewSet(mixins.ListModelMixin,
