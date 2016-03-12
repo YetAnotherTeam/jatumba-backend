@@ -10,77 +10,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.auth.auth_providers.fb_api import Fb
+from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
 from api.auth.session_generator import generate_session_params
 from api.serializers import *
-
-
-class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin,
-                  viewsets.GenericViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    @list_route(methods=['post'], permission_classes=(AllowAny,))
-    def sign_up(self, request):
-        serializer = SignUpSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            instance = {
-                'user': user,
-                'session': generate_session(user)
-            }
-            return Response(
-                AuthResponseSerializer(instance=instance).data,
-                status=status.HTTP_201_CREATED
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @list_route(methods=['post'], permission_classes=(AllowAny,))
-    def sign_in(self, request):
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(username=username, password=password)
-        if user:
-            instance = {
-                'user': user,
-                'session': generate_session(user)
-            }
-            return Response(AuthResponseSerializer(instance=instance).data)
-        else:
-            return Response({'error': 'wrong username or password'}, status=403)
-
-
-class VkAuth(APIView):
-    def post(self, request):
-        token = request.POST['token']
-        vk_api = VK()
-        user_data = vk_api.get_user_data(token)
-        user = User.objects.filter(vk_profile=user_data['user_id']).first()
-        if user:
-            instance = {
-                'user': user,
-                'session': generate_session(user)
-            }
-            return Response(AuthResponseSerializer(instance=instance).data)
-        else:
-            return social_auth(user_data, request)
-
-
-class FbAuth(APIView):
-    def post(self, request):
-        token = request.POST['token']
-        fb_api = Fb()
-        user_data = fb_api.get_user_data(token)
-        user = User.objects.filter(fb_profile=user_data['user_id']).first()
-        if user:
-            instance = {
-                'user': user,
-                'session': generate_session(user)
-            }
-            return Response(AuthResponseSerializer(instance=instance).data)
-        else:
-            return social_auth(user_data, request)
 
 
 def social_auth(user_data, request):
@@ -110,6 +43,39 @@ def social_auth(user_data, request):
     return Response(SessionSerializer(session).data)
 
 
+# noinspection PyUnresolvedReferences
+class SocialAuthView(APIView):
+    def __init__(self, **kwargs):
+        assert self.social_backend is not None, \
+            "SocialAuthView must provide a `social_backend` field"
+        assert self.user_profile_field is not None, \
+            "SocialAuthView must provide a `user_profile_field` field"
+        super().__init__(**kwargs)
+
+    def post(self, request):
+        token = request.POST.get('token')
+        user_data = self.social_backend.get_user_data(token)
+        user = User.objects.filter(**{self.user_profile_field: user_data['user_id']}).first()
+        if user:
+            instance = {
+                'user': user,
+                'session': generate_session(user)
+            }
+            return Response(AuthResponseSerializer(instance=instance).data)
+        else:
+            return social_auth(user_data, request)
+
+
+class VKAuthView(SocialAuthView):
+    user_profile_field = 'vk_profile'
+    social_backend = VK()
+
+
+class FBAuthView(SocialAuthView):
+    user_profile_field = 'fb_profile'
+    social_backend = FB()
+
+
 def generate_session(user):
     return Session.objects.create(**generate_session_params(user))
 
@@ -127,13 +93,58 @@ class RefreshToken(APIView):
         return Response(AuthResponseSerializer(new_session).data)
 
 
+class UserViewSet(mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.ListModelMixin,
+                  viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    serializers = {
+        'DEFAULT': UserSerializer,
+        'sign_up': SignUpSerializer,
+        'sign_in': SignInSerializer,
+    }
+
+    # для нормального отображения в BrowsableAPIRenderer
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers['DEFAULT'])
+
+    @list_route(methods=['post'], permission_classes=(AllowAny,))
+    def sign_up(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = User.objects.create_user(**serializer.data)
+            instance = {
+                'user': user,
+                'session': generate_session(user)
+            }
+            return Response(
+                AuthResponseSerializer(instance=instance).data,
+                status=status.HTTP_201_CREATED
+            )
+
+    @list_route(methods=['post'], permission_classes=(AllowAny,))
+    def sign_in(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = authenticate(**serializer.data)
+            if user:
+                user.sessions.all().delete()
+                instance = {
+                    'user': user,
+                    'session': generate_session(user)
+                }
+                return Response(AuthResponseSerializer(instance=instance).data)
+            else:
+                return Response({'error': 'wrong username or password'}, status=403)
+
+
 class CompositionViewSet(mixins.CreateModelMixin,
                          mixins.ListModelMixin,
                          viewsets.GenericViewSet):
     queryset = Composition.objects.all()
     serializer_class = CompositionSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('member_ set__user', )
+    filter_fields = ('band__members__user', 'band__members')
 
 
 class InstrumentViewSet(mixins.CreateModelMixin,
@@ -144,15 +155,11 @@ class InstrumentViewSet(mixins.CreateModelMixin,
     serializer_class = InstrumentSerializer
 
 
-class BandMembersViewSet(mixins.CreateModelMixin,
-                         mixins.RetrieveModelMixin,
-                         mixins.ListModelMixin,
-                         viewsets.GenericViewSet):
+class BandMembersViewSet(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = BandMemberSerializer
-
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('band_id',)
+    filter_fields = ('band',)
 
 
 class BandViewSet(mixins.CreateModelMixin,

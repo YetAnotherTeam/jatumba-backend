@@ -2,11 +2,11 @@ from api.auth.auth_providers.base import BaseProvider
 from api.exceptions.api_exceptions import AuthException
 
 
-class Fb(BaseProvider):
+class FB(BaseProvider):
     request_data = ('first_name', 'last_name', 'email', 'id')
 
     def __init__(self, *args, **kwargs):
-        super(Fb, self).__init__(args, kwargs)
+        super(FB, self).__init__(args, kwargs)
         self.fields = ','.join(self.request_data)
         self.fb_api = FB_API()
 

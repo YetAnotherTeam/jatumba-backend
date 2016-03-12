@@ -12,6 +12,12 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 # noinspection PyAbstractClass
+class SignInSerializer(serializers.Serializer):
+    username = serializers.CharField(label='Юзернейм')
+    password = serializers.CharField(style={'input_type': 'password'}, label='Пароль')
+
+
+# noinspection PyAbstractClass
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

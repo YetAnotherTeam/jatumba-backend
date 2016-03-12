@@ -35,7 +35,7 @@ class Session(models.Model):
     user = models.ForeignKey(User, verbose_name='Пользователь', related_name='sessions')
     access_token = models.CharField(max_length=32, unique=True)
     refresh_token = models.CharField(max_length=32)
-    time = models.FloatField()
+    time = models.FloatField(verbose_name='Время создания сессии')
 
     class Meta:
         verbose_name = 'Сессия'
@@ -47,8 +47,8 @@ class Session(models.Model):
 
 class Band(models.Model):
     leader = models.ForeignKey(User, verbose_name='Лидер группы', null=True, blank=True)
-    name = models.CharField(max_length=50, blank=False)
-    description = models.TextField(max_length=200, blank=True, default='')
+    name = models.CharField(max_length=50, verbose_name='Название')
+    description = models.TextField(max_length=200, blank=True, default='', verbose_name='Описание')
 
     class Meta:
         verbose_name = 'Музыкальная группа'
@@ -69,15 +69,19 @@ class Instrument(models.Model):
         return self.name
 
 
+# def upload_to():
+#
+#
+#
 # class Sound(models.Model):
 #     instrument = models.ForeignKey(Instrument, related_name='sounds')
 #     file = models.FileField(upload_to=)
 
 
 class Member(models.Model):
-    user = models.ForeignKey(User)
-    band = models.ForeignKey(Band, related_name='members')
-    instrument = models.ForeignKey(Instrument)
+    user = models.ForeignKey(User, verbose_name='Пользователь')
+    band = models.ForeignKey(Band, related_name='members', verbose_name='Группа')
+    instrument = models.ForeignKey(Instrument, related_name='members', verbose_name='Инструмент')
 
     class Meta:
         verbose_name = 'Участник музыкальной группы'
@@ -92,14 +96,22 @@ class Member(models.Model):
 
 
 class Composition(models.Model):
-    band = models.ForeignKey(Band)
-    name = models.CharField(max_length=30)
+    band = models.ForeignKey(Band, related_name='compositions', verbose_name='Группа')
+    name = models.CharField(max_length=30, verbose_name='Название')
+
+    class Meta:
+        verbose_name = 'Композиция'
+        verbose_name_plural = 'Композиции'
 
     def __str__(self):
         return 'Composition %s' % self.name
 
 
 class Track(models.Model):
-    instrument = models.ForeignKey(Instrument)
-    track = models.TextField()
-    composition = models.ForeignKey(Composition)
+    instrument = models.ForeignKey(Instrument, related_name='tracks', verbose_name='Инструмент')
+    track = models.TextField(verbose_name='Дорожка')
+    composition = models.ForeignKey(Composition, related_name='tracks', verbose_name='Композиция')
+
+    class Meta:
+        verbose_name = 'Дорожка'
+        verbose_name_plural = 'Дорожки'
