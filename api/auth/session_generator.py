@@ -3,10 +3,10 @@ import os
 import time
 
 
-def generate_identity():
+def generate_session_params(user):
     return {
         'access_token': binascii.hexlify(os.urandom(10)).decode('utf-8'),
         'refresh_token': binascii.hexlify(os.urandom(10)).decode('utf-8'),
-        'last_update': int(time.time()),
-        'expires': 3600,
+        'time': int(time.time()),
+        'user': user
     }

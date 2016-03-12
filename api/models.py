@@ -32,7 +32,7 @@ class User(AbstractUser):
 
 
 class Session(models.Model):
-    user = models.ForeignKey(User, verbose_name='Пользователь')
+    user = models.ForeignKey(User, verbose_name='Пользователь', related_name='sessions')
     access_token = models.CharField(max_length=32, unique=True)
     refresh_token = models.CharField(max_length=32)
     time = models.FloatField()
@@ -69,9 +69,14 @@ class Instrument(models.Model):
         return self.name
 
 
+# class Sound(models.Model):
+#     instrument = models.ForeignKey(Instrument, related_name='sounds')
+#     file = models.FileField(upload_to=)
+
+
 class Member(models.Model):
     user = models.ForeignKey(User)
-    band = models.ForeignKey(Band)
+    band = models.ForeignKey(Band, related_name='members')
     instrument = models.ForeignKey(Instrument)
 
     class Meta:
@@ -98,4 +103,3 @@ class Track(models.Model):
     instrument = models.ForeignKey(Instrument)
     track = models.TextField()
     composition = models.ForeignKey(Composition)
-
