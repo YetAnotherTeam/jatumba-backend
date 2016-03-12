@@ -136,11 +136,12 @@ class CompositionViewSet(mixins.CreateModelMixin,
     # filter_backends = (filters.DjangoFilterBackend,)
     # filter_fields = ('member_ set__user')
 
-    def list(self, request, *args, **kwargs):
-        pass
+    # def list(self, request, *args, **kwargs):
+    #     pass
 
 
-class InstrumentViewSet(mixins.ListModelMixin,
+class InstrumentViewSet(mixins.CreateModelMixin,
+                        mixins.ListModelMixin,
                         mixins.RetrieveModelMixin,
                         viewsets.GenericViewSet):
     queryset = Instrument.objects.all()
@@ -153,17 +154,9 @@ class BandMembersViewSet(mixins.RetrieveModelMixin,
                          viewsets.GenericViewSet):
     queryset = Member.objects.all()
     serializer_class = BandMemberSerializer
+
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band_id',)
-
-    def create(self, request, *args, **kwargs):
-        data = request.POST.copy()
-        data['user'] = request.user.id
-        serializer = self.serializer_class(data=data)
-        if serializer.is_valid():
-            member = serializer.save()
-            return Response(self.serializer_class(member).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BandViewSet(mixins.RetrieveModelMixin,

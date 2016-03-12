@@ -3,6 +3,9 @@ from api.models import *
 
 
 # noinspection PyAbstractClass
+from utils.django_rest_framework_utils import DeserializePrimaryKeyRelatedField
+
+
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -40,23 +43,18 @@ class CompositionSerializer(serializers.ModelSerializer):
 
 
 # noinspection PyAbstractClass
-class BandMemberSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    instrument = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Member
-        fields = ('user', 'instrument')
-
-    def get_instrument(self, member):
-        instrument = member.instrument
-        if instrument:
-            return instrument.name
-        else:
-            return ''
-
-
-# noinspection PyAbstractClass
 class InstrumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Instrument
+        fields = ('name', )
+
+
+# noinspection PyAbstractClass
+class BandMemberSerializer(serializers.ModelSerializer):
+    user = DeserializePrimaryKeyRelatedField(queryset=User.objects.all(), serializer=UserSerializer)
+    band = DeserializePrimaryKeyRelatedField(queryset=Band.objects.all(), serializer=BandSerializer)
+    instrument = DeserializePrimaryKeyRelatedField(queryset=Instrument.objects.all(), serializer=InstrumentSerializer)
+
+    class Meta:
+        model = Member
+        fields = ('user', 'band', 'instrument')
