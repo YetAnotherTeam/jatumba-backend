@@ -22,6 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'phone', 'vk_profile', 'fb_profile')
+        extra_kwargs = {'vk_profile': {'read_only': True}, 'fb_profile': {'read_only': True}}
 
 
 # noinspection PyAbstractClass

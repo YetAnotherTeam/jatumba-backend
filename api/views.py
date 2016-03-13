@@ -91,8 +91,9 @@ class RefreshToken(APIView):
         return Response(AuthResponseSerializer(new_session).data)
 
 
-class UserViewSet(mixins.ListModelMixin,
-                  viewsets.GenericViewSet):
+class UserViewSet(mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.ListModelMixin):
     queryset = User.objects.all()
     permission_classes = (DjangoObjectPermissions,)
     serializers = {
