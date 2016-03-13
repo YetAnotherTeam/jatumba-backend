@@ -16,6 +16,7 @@ class DeserializePrimaryKeyRelatedField(RelatedField):
 
     def __init__(self, **kwargs):
         self.serializer = kwargs.pop('serializer', None)
+        self.serializer_params = kwargs.pop('serializer_params', dict())
         assert self.serializer is not None, (
             'DeserializePrimaryKeyRelatedField field must provide a `serializer` argument'
         )
@@ -34,4 +35,5 @@ class DeserializePrimaryKeyRelatedField(RelatedField):
             self.fail('incorrect_type', data_type=type(data).__name__)
 
     def to_representation(self, value):
-        return self.serializer(instance=value).data
+        self.serializer_params['instance'] = value
+        return self.serializer(**self.serializer_params).data

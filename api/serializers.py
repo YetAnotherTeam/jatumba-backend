@@ -80,8 +80,11 @@ class InstrumentSerializer(serializers.ModelSerializer):
 class BandMemberSerializer(serializers.ModelSerializer):
     user = DeserializePrimaryKeyRelatedField(queryset=User.objects.all(), serializer=UserSerializer)
     band = DeserializePrimaryKeyRelatedField(queryset=Band.objects.all(), serializer=BandSerializer)
-    instrument = DeserializePrimaryKeyRelatedField(queryset=Instrument.objects.all(),
-                                                   serializer=InstrumentSerializer)
+    instrument = DeserializePrimaryKeyRelatedField(
+        queryset=Instrument.objects.all(),
+        serializer=InstrumentSerializer,
+        serializer_params={'fields': ('name',)},
+    )
 
     class Meta:
         model = Member
