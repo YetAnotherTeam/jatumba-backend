@@ -4,6 +4,7 @@ defusedxml==0.4.1
 Django==1.9.2
 django-braces==1.8.1
 django-filter==0.12.0
+django-guardian==1.4.2
 django-oauth-toolkit==0.10.0
 django-rest-framework-social-oauth2==1.0.3
 djangorestframework==3.3.2

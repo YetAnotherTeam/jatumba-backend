@@ -89,8 +89,9 @@ class Instrument(models.Model):
 #
 #
 # class Sound(models.Model):
+#     name = models.CharField()
 #     instrument = models.ForeignKey(Instrument, related_name='sounds')
-#     file = models.FileField(upload_to=)
+#     file = models.FileField(upload_to=upload_to)
 
 
 class Member(models.Model):
