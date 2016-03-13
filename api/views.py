@@ -96,7 +96,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
     queryset = User.objects.all()
-    permission_classes = (DjangoObjectPermissions, )
+    permission_classes = (DjangoObjectPermissions,)
     serializers = {
         'DEFAULT': UserSerializer,
         'sign_up': SignUpSerializer,
@@ -158,6 +158,8 @@ class BandViewSet(mixins.CreateModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
     queryset = Band.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name', 'description')
     serializer_class = BandSerializer
 
     def create(self, request, *args, **kwargs):
