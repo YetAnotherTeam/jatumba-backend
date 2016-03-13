@@ -36,9 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'api',
     'django_filters',
     'guardian',
+    'audiofield',
+    'api',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -50,6 +51,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'audiofield.middleware.threadlocals.ThreadLocals'
 ]
 
 ROOT_URLCONF = 'TPD.urls'
@@ -143,3 +145,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Группы пользователей
 DEFAULT_USER_GROUP = "Обычные пользователи"
+
+# Аудио-поле
+CHANNEL_TYPE_VALUE = 0
+FREQ_TYPE_VALUE = 0
+CONVERT_TYPE_VALUE = 0

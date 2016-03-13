@@ -1,3 +1,6 @@
+import os
+
+from audiofield.fields import AudioField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
@@ -74,7 +77,7 @@ class Band(models.Model):
 
 
 class Instrument(models.Model):
-    name = models.CharField(max_length=25, verbose_name='Название')
+    name = models.CharField(max_length=25, verbose_name='Название', unique=True)
 
     class Meta:
         verbose_name = 'Музыкальный инструмент'
@@ -84,14 +87,53 @@ class Instrument(models.Model):
         return self.name
 
 
-# def upload_to():
-#
-#
-#
-# class Sound(models.Model):
-#     name = models.CharField()
-#     instrument = models.ForeignKey(Instrument, related_name='sounds')
-#     file = models.FileField(upload_to=upload_to)
+def instrument_sounds_path(instance, filename):
+    return os.path.join(
+        'instrument',
+        instance.instrument.name,
+        "%s.%s" % (instance.name, filename.split('.')[-1])
+    )
+
+
+class Sound(models.Model):
+    name = models.CharField(max_length=50, verbose_name='Название')
+    instrument = models.ForeignKey(Instrument, related_name='sounds', verbose_name='Инструмент')
+    file = AudioField(
+        upload_to=instrument_sounds_path,
+        ext_whitelist=(".mp3", ".wav", ".ogg"),
+        verbose_name='Audio-файл',
+        help_text="Allowed type - .mp3, .wav, .ogg"
+    )
+
+    def audio_file_player(self):
+        """Audio player tag for admin"""
+        if self.file:
+            file_url = settings.MEDIA_URL + str(self.file)
+            player_string = '<ul class="playlist"><li style="width:250px;">\
+            <a href="%s">%s</a></li></ul>' % (file_url, os.path.basename(self.file.name))
+            return player_string
+
+    audio_file_player.allow_tags = True
+    audio_file_player.short_description = 'Audio file player'
+
+    class Meta:
+        unique_together = (('instrument', 'name'),)
+        verbose_name = 'Звук'
+        verbose_name_plural = 'Звуки'
+
+    def __str__(self):
+        return self.name
+
+
+class Genre(models.Model):
+    name = models.CharField(max_length=50, verbose_name="Название")
+
+    class Meta:
+        verbose_name = 'Музыкальный жанр'
+        verbose_name_plural = 'Музыкальные жанры'
+
+    def __str__(self):
+        return self.name
 
 
 class Member(models.Model):
@@ -114,13 +156,19 @@ class Member(models.Model):
 class Composition(models.Model):
     band = models.ForeignKey(Band, related_name='compositions', verbose_name='Группа')
     name = models.CharField(max_length=30, verbose_name='Название')
+    genres = models.ManyToManyField(
+        Genre,
+        related_name='compositions',
+        verbose_name='Жанры',
+        blank=True,
+    )
 
     class Meta:
         verbose_name = 'Композиция'
         verbose_name_plural = 'Композиции'
 
     def __str__(self):
-        return 'Composition %s' % self.name
+        return self.name
 
 
 class Track(models.Model):
