@@ -39,6 +39,6 @@ class VK_API:
     def request(self, backend, method, data):
         data['v'] = self.version
         try:
-            return backend.get_json(self.url, params=data)
+            return backend.get_json(self.url % method, params=data)
         except (TypeError, KeyError, IOError, ValueError, IndexError):
             return None
