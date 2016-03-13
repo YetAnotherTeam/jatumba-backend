@@ -44,6 +44,8 @@ def social_auth(user_data, request):
 
 # noinspection PyUnresolvedReferences
 class SocialAuthView(APIView):
+    permission_classes = (AllowAny,)
+
     def __init__(self, **kwargs):
         assert self.social_backend is not None, \
             "SocialAuthView must provide a `social_backend` field"
