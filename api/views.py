@@ -1,5 +1,4 @@
 import binascii
-import os
 
 from django.contrib.auth import authenticate
 from django.http import JsonResponse

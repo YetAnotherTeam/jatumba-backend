@@ -19,6 +19,7 @@ class DeserializePrimaryKeyRelatedField(RelatedField):
         assert self.serializer is not None, (
             'DeserializePrimaryKeyRelatedField field must provide a `serializer` argument'
         )
+        kwargs['style'] = {'base_template': 'input.html', 'input_type': 'numeric'}
         super(DeserializePrimaryKeyRelatedField, self).__init__(**kwargs)
 
     def use_pk_only_optimization(self):

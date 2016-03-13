@@ -52,11 +52,28 @@ class CompositionSerializer(serializers.ModelSerializer):
         model = Composition
 
 
+class SoundSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sound
+        fields = ('id', 'name', 'file')
+
+
 # noinspection PyAbstractClass
 class InstrumentSerializer(serializers.ModelSerializer):
+    sounds = SoundSerializer(many=True)
+
     class Meta:
         model = Instrument
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'sounds')
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+        super(InstrumentSerializer, self).__init__(*args, **kwargs)
+        if fields is not None:
+            allowed = set(fields)
+            existing = set(self.fields.keys())
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
 
 
 # noinspection PyAbstractClass
