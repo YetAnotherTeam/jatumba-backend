@@ -1,5 +1,7 @@
-from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
+from guardian.shortcuts import assign_perm
 
 
 class User(AbstractUser):
@@ -29,6 +31,19 @@ class User(AbstractUser):
             return "full_name: %s (id: %d)" % (full_name, self.id)
         else:
             return "username: %s (id: %d)" % (self.username, self.id)
+
+    def save(self, *args, **kwargs):
+        is_new = True
+        if self.pk:
+            is_new = False
+        super(User, self).save(*args, **kwargs)
+        if is_new:
+            Group.objects.get(name=settings.DEFAULT_USER_GROUP).user_set.add(self)
+            assign_perm('api.change_user', self, self)
+
+
+def get_anonymous_user_instance(User):
+    return User(id=-1, username='Anonymous')
 
 
 class Session(models.Model):

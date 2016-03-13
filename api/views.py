@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import status, viewsets, mixins, filters
 from rest_framework.decorators import list_route
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -39,8 +39,7 @@ def social_auth(user_data, request):
     elif user_data['network'] is 'vk':
         user.vk_profile = user_data['user_id']
     user.save()
-    session = generate_session(user)
-    return Response(SessionSerializer(session).data)
+    return Response(AuthResponseSerializer(generate_auth_response(user)).data)
 
 
 # noinspection PyUnresolvedReferences
@@ -57,11 +56,7 @@ class SocialAuthView(APIView):
         user_data = self.social_backend.get_user_data(token)
         user = User.objects.filter(**{self.user_profile_field: user_data['user_id']}).first()
         if user:
-            instance = {
-                'user': user,
-                'session': generate_session(user)
-            }
-            return Response(AuthResponseSerializer(instance=instance).data)
+            return Response(AuthResponseSerializer(instance=generate_auth_response(user)).data)
         else:
             return social_auth(user_data, request)
 
@@ -76,8 +71,11 @@ class FBAuthView(SocialAuthView):
     social_backend = FB()
 
 
-def generate_session(user):
-    return Session.objects.create(**generate_session_params(user))
+def generate_auth_response(user):
+    return {
+        'user': user,
+        'session': Session.objects.create(**generate_session_params(user)),
+    }
 
 
 class RefreshToken(APIView):
@@ -88,7 +86,7 @@ class RefreshToken(APIView):
         old_session = Session.objects.filter(refresh_token=refresh_token).first()
         if old_session is None:
             return Response({'error': 'invalid token'}, status=403)
-        new_session = generate_session(old_session.user)
+        new_session = generate_auth_response(old_session.user)
         old_session.delete()
         return Response(AuthResponseSerializer(new_session).data)
 
@@ -98,6 +96,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
     queryset = User.objects.all()
+    permission_classes = (DjangoObjectPermissions, )
     serializers = {
         'DEFAULT': UserSerializer,
         'sign_up': SignUpSerializer,
@@ -111,31 +110,23 @@ class UserViewSet(mixins.RetrieveModelMixin,
     @list_route(methods=['post'], permission_classes=(AllowAny,))
     def sign_up(self, request):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user = User.objects.create_user(**serializer.data)
-            instance = {
-                'user': user,
-                'session': generate_session(user)
-            }
-            return Response(
-                AuthResponseSerializer(instance=instance).data,
-                status=status.HTTP_201_CREATED
-            )
+        serializer.is_valid(raise_exception=True)
+        user = User.objects.create_user(**serializer.data)
+        return Response(
+            AuthResponseSerializer(instance=generate_auth_response(user)).data,
+            status=status.HTTP_201_CREATED
+        )
 
     @list_route(methods=['post'], permission_classes=(AllowAny,))
     def sign_in(self, request):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user = authenticate(**serializer.data)
-            if user:
-                user.sessions.all().delete()
-                instance = {
-                    'user': user,
-                    'session': generate_session(user)
-                }
-                return Response(AuthResponseSerializer(instance=instance).data)
-            else:
-                return Response({'error': 'wrong username or password'}, status=403)
+        serializer.is_valid(raise_exception=True)
+        user = authenticate(**serializer.data)
+        if user:
+            user.sessions.all().delete()
+            return Response(AuthResponseSerializer(instance=generate_auth_response(user)).data)
+        else:
+            return Response({'error': 'wrong username or password'}, status=403)
 
 
 class CompositionViewSet(mixins.CreateModelMixin,
@@ -173,7 +164,6 @@ class BandViewSet(mixins.CreateModelMixin,
         data = request.POST.copy()
         data['leader'] = request.user.id
         serializer = self.serializer_class(data=data)
-        if serializer.is_valid():
-            band = serializer.save()
-            return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        band = serializer.save()
+        return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)

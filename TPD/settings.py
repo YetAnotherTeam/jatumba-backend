@@ -35,13 +35,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'TPD',
     'rest_framework',
     'api',
-    'oauth2_provider',
-    'social.apps.django_app.default',
-    'rest_framework_social_oauth2',
     'django_filters',
+    'guardian',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -69,8 +66,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'social.apps.django_app.context_processors.backends',
-                'social.apps.django_app.context_processors.login_redirect',
             ],
         },
     },
@@ -119,9 +114,11 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
 )
 
 AUTH_USER_MODEL = 'api.User'
+GUARDIAN_GET_INIT_ANONYMOUS_USER = 'api.models.get_anonymous_user_instance'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -144,3 +141,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Группы пользователей
+DEFAULT_USER_GROUP = "Обычные пользователи"
