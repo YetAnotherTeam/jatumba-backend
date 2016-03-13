@@ -93,7 +93,8 @@ class RefreshToken(APIView):
 
 class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
-                  mixins.ListModelMixin):
+                  mixins.ListModelMixin,
+                  viewsets.GenericViewSet):
     queryset = User.objects.all()
     permission_classes = (DjangoObjectPermissions,)
     serializers = {
