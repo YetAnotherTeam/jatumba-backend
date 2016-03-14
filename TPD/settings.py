@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Django settings for TPD project.
 
@@ -79,8 +81,12 @@ WSGI_APPLICATION = 'TPD.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'jatdb'
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'jatumba',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
@@ -142,6 +148,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Группы пользователей
 DEFAULT_USER_GROUP = "Обычные пользователи"

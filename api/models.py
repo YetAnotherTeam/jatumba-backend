@@ -3,6 +3,7 @@ import os
 from audiofield.fields import AudioField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from guardian.shortcuts import assign_perm
 
@@ -173,7 +174,7 @@ class Composition(models.Model):
 
 class Track(models.Model):
     instrument = models.ForeignKey(Instrument, related_name='tracks', verbose_name='Инструмент')
-    track = models.TextField(verbose_name='Дорожка')
+    track = JSONField(verbose_name='Дорожка')
     composition = models.ForeignKey(Composition, related_name='tracks', verbose_name='Композиция')
 
     class Meta:
