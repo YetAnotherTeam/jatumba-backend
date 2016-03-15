@@ -43,6 +43,7 @@ class BandSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Band
+        fields = ('id', 'name', 'description', 'leader')
 
 
 # noinspection PyAbstractClass

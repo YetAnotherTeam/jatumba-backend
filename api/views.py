@@ -162,7 +162,7 @@ class BandViewSet(mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
     queryset = Band.objects.all()
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', 'description')
+    search_fields = ('band_name', 'description')
     serializer_class = BandSerializer
     permission_classes = (DjangoObjectPermissions,)
 

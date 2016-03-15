@@ -64,9 +64,8 @@ class Session(models.Model):
         return 'user - %s' % self.user.username
 
 
-class Band(models.Model):
+class Band(Group):
     leader = models.ForeignKey(User, verbose_name='Лидер группы', null=True, blank=True)
-    name = models.CharField(max_length=50, verbose_name='Название')
     description = models.TextField(max_length=200, blank=True, default='', verbose_name='Описание')
 
     class Meta:
@@ -158,7 +157,7 @@ class Member(models.Model):
     def __str__(self):
         return '%s; Band: %s; Instrument: %s' % (
             self.user.username,
-            self.band.name,
+            self.band.band_name,
             self.instrument.name
         )
 
@@ -170,6 +169,7 @@ class Member(models.Model):
         if is_new:
             assign_perm('api.delete_member', self.user, self)
             assign_perm('api.delete_member', self.band.leader, self)
+            self.user.groups.add(self.band)
 
 
 class Composition(models.Model):
@@ -198,3 +198,12 @@ class Track(models.Model):
     class Meta:
         verbose_name = 'Дорожка'
         verbose_name_plural = 'Дорожки'
+
+    def save(self, *args, **kwargs):
+        is_new = True
+        if self.pk:
+            is_new = False
+        super(Track, self).save(*args, **kwargs)
+        if is_new:
+            assign_perm('api.change_track', self.composition.band, self)
+            assign_perm('api.delete_track', self.composition.band, self)
