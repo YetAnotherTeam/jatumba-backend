@@ -76,6 +76,15 @@ class Band(models.Model):
     def __str__(self):
         return 'Name: %s; Description: %s;' % (self.name, self.description)
 
+    def save(self, *args, **kwargs):
+        is_new = True
+        if self.pk:
+            is_new = False
+        super(Band, self).save(*args, **kwargs)
+        if is_new:
+            assign_perm('api.change_band', self.leader, self)
+            assign_perm('api.delete_band', self.leader, self)
+
 
 class Instrument(models.Model):
     name = models.CharField(max_length=25, verbose_name='Название', unique=True)
@@ -152,6 +161,15 @@ class Member(models.Model):
             self.band.name,
             self.instrument.name
         )
+
+    def save(self, *args, **kwargs):
+        is_new = True
+        if self.pk:
+            is_new = False
+        super(Member, self).save(*args, **kwargs)
+        if is_new:
+            assign_perm('api.delete_member', self.user, self)
+            assign_perm('api.delete_member', self.band.leader, self)
 
 
 class Composition(models.Model):

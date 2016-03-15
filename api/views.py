@@ -152,16 +152,19 @@ class BandMembersViewSet(viewsets.ModelViewSet):
     serializer_class = BandMemberSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band',)
+    permission_classes = (DjangoObjectPermissions,)
 
 
 class BandViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
     queryset = Band.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'description')
     serializer_class = BandSerializer
+    permission_classes = (DjangoObjectPermissions,)
 
     def create(self, request, *args, **kwargs):
         data = request.POST.copy()
