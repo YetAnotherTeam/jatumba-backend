@@ -170,3 +170,15 @@ class BandViewSet(mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
         band = serializer.save()
         return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)
+
+
+class TrackViewSet(mixins.CreateModelMixin,
+                   mixins.UpdateModelMixin,
+                   mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin,
+                   viewsets.GenericViewSet):
+    queryset = Track.objects.all()
+    serializer_class = TrackSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('composition',)
+

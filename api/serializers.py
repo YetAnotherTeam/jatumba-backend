@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from api.models import *
 from utils.django_rest_framework_utils import DeserializePrimaryKeyRelatedField
 
@@ -89,3 +88,21 @@ class BandMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
         fields = ('id', 'user', 'band', 'instrument')
+
+
+# noinspection PyAbstractClass
+class TrackSerializer(serializers.ModelSerializer):
+    composition = DeserializePrimaryKeyRelatedField(queryset=Composition.objects.all(),
+                                                    serializer=CompositionSerializer)
+    instrument = DeserializePrimaryKeyRelatedField(
+        queryset=Instrument.objects.all(),
+        serializer=InstrumentSerializer,
+        serializer_params={'fields': ('name',)},
+    )
+    track = serializers.ListField(
+        child=serializers.ListField(child=serializers.CharField())
+    )
+
+    class Meta:
+        model = Track
+        fields = ('id', 'composition', 'track', 'instrument')
