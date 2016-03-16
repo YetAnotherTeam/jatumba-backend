@@ -152,8 +152,7 @@ class BandMembersViewSet(viewsets.ModelViewSet):
     serializer_class = BandMemberSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band',)
-    permission_classes = (DjangoObjectPermissions,)
-
+    permission_classes = (DjangoObjectPermissions,)track
 
 class BandViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
@@ -162,7 +161,7 @@ class BandViewSet(mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
     queryset = Band.objects.all()
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('band_name', 'description')
+    search_fields = ('name', 'description')
     serializer_class = BandSerializer
     permission_classes = (DjangoObjectPermissions,)
 
@@ -184,4 +183,5 @@ class TrackViewSet(mixins.CreateModelMixin,
     serializer_class = TrackSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('composition',)
+    permission_classes = (DjangoObjectPermissions,)
 

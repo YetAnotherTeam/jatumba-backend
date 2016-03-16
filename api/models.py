@@ -157,7 +157,7 @@ class Member(models.Model):
     def __str__(self):
         return '%s; Band: %s; Instrument: %s' % (
             self.user.username,
-            self.band.band_name,
+            self.band.name,
             self.instrument.name
         )
 
