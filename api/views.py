@@ -1,5 +1,4 @@
 import binascii
-
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
@@ -8,7 +7,6 @@ from rest_framework.decorators import list_route
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
 from api.auth.session_generator import generate_session_params
@@ -152,7 +150,8 @@ class BandMembersViewSet(viewsets.ModelViewSet):
     serializer_class = BandMemberSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band',)
-    permission_classes = (DjangoObjectPermissions,)track
+    permission_classes = (DjangoObjectPermissions,)
+
 
 class BandViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
@@ -184,4 +183,3 @@ class TrackViewSet(mixins.CreateModelMixin,
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('composition',)
     permission_classes = (DjangoObjectPermissions,)
-
