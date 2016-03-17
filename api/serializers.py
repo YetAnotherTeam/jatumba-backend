@@ -107,3 +107,14 @@ class TrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
         fields = ('id', 'composition', 'track', 'instrument')
+
+
+# noinspection PyAbstractClass
+class TrackHistorySerializer(serializers.ModelSerializer):
+    track = serializers.ListField(
+        child=serializers.ListField(child=serializers.CharField())
+    )
+
+    class Meta:
+        model = TrackHistory
+        fields = ('track', 'track_key')

@@ -206,6 +206,7 @@ class TrackViewSet(mixins.CreateModelMixin,
 
         if self.validate_track(data['track'], data['instrument']):
             track = serializer.save()
+            TrackHistory.objects.create(track=track.track, track_key=track)
             return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid sounds in track'}, status=400)
 
@@ -219,6 +220,7 @@ class TrackViewSet(mixins.CreateModelMixin,
             serializer = self.serializer_class(track, data={'track': new_track}, partial=True)
             serializer.is_valid(raise_exception=True)
             track = serializer.save()
+            TrackHistory.objects.create(track=track.track, track_key=track)
             return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid sounds in track'}, status=400)
 
@@ -230,3 +232,12 @@ class TrackViewSet(mixins.CreateModelMixin,
                 if sound not in sounds and sound != '0':
                     validation_flag = False
         return validation_flag
+
+
+class TrackHistoryView(mixins.RetrieveModelMixin,
+                       mixins.ListModelMixin,
+                       viewsets.GenericViewSet):
+    queryset = TrackHistory.objects.all()
+    serializer_class = TrackHistorySerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('track_id',)
