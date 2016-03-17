@@ -1,5 +1,4 @@
 import os
-
 from audiofield.fields import AudioField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
@@ -207,3 +206,16 @@ class Track(models.Model):
         if is_new:
             assign_perm('api.change_track', self.composition.band, self)
             assign_perm('api.delete_track', self.composition.band, self)
+
+
+class TrackHistory(models.Model):
+    track = JSONField(verbose_name='Дорожка')
+    current_track = models.ForeignKey(Track, related_name='track_history', verbose_name='Текущая версия дорожки')
+    version = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'Старая версия дорожки'
+        verbose_name_plural = 'Старые версии дорожки'
+
+    def save(self, *args, **kwargs):
+        self.version = len(TrackHistory.objects.filter(current_track_id=self.current_track.id))

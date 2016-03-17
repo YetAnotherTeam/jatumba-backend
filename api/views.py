@@ -1,4 +1,6 @@
 import binascii
+import json
+
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
@@ -207,12 +209,15 @@ class TrackViewSet(mixins.CreateModelMixin,
             return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid sounds in track'}, status=400)
 
-    def update(self, request, *args, **kwargs):
-        data = request.data
-        serializer = self.serializer_class(data=data)
-        serializer.is_valid(raise_exception=True)
+    def partial_update(self, request, *args, **kwargs):
+        request_body = json.loads(request.body.decode('utf-8'))
+        track_id = kwargs.pop('pk')
+        new_track = request_body['track']
+        track = Track.objects.get(id=track_id)
 
-        if self.validate_track(data['track'], data['instrument']):
+        if self.validate_track(new_track, track.instrument_id):
+            serializer = self.serializer_class(track, data={'track': new_track}, partial=True)
+            serializer.is_valid(raise_exception=True)
             track = serializer.save()
             return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid sounds in track'}, status=400)
