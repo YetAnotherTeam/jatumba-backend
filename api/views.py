@@ -152,6 +152,14 @@ class BandMembersViewSet(viewsets.ModelViewSet):
     filter_fields = ('band',)
     permission_classes = (DjangoObjectPermissions,)
 
+    def create(self, request, *args, **kwargs):
+        data = request.POST.copy()
+        data['user'] = request.user.id
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        band = serializer.save()
+        return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)
+
 
 class BandViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
@@ -183,3 +191,37 @@ class TrackViewSet(mixins.CreateModelMixin,
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('composition',)
     permission_classes = (DjangoObjectPermissions,)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        composition = Composition.objects.get(id=data['composition'])
+        membership = Member.objects.filter(user=request.user, band=composition.band).first()
+        if membership is None:
+            return Response({'error': 'you are not member of this band'}, status=403)
+
+        if self.validate_track(data['track'], data['instrument']):
+            track = serializer.save()
+            return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
+        return Response({'error': 'invalid sounds in track'}, status=400)
+
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        if self.validate_track(data['track'], data['instrument']):
+            track = serializer.save()
+            return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
+        return Response({'error': 'invalid sounds in track'}, status=400)
+
+    def validate_track(self, track, instrument_id):
+        sounds = Sound.objects.filter(instrument_id=instrument_id).values_list("name", flat=True)
+        validation_flag = True
+        for block in track:
+            for sound in block:
+                if sound not in sounds:
+                    validation_flag = False
+        return validation_flag
