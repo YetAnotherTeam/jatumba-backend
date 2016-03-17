@@ -9,6 +9,7 @@ router.register(r'member', BandMembersViewSet)
 router.register(r'composition', CompositionViewSet)
 router.register(r'user', UserViewSet)
 router.register(r'instrument', InstrumentViewSet)
+router.register(r'track/history', TrackHistoryView)
 router.register(r'track', TrackViewSet)
 
 urlpatterns = [

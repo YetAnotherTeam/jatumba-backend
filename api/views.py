@@ -180,6 +180,7 @@ class BandViewSet(mixins.CreateModelMixin,
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         band = serializer.save()
+        Member.objects.create(band=band, user_id=request.user.id, instrument_id=data['instrument'])
         return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)
 
 
@@ -234,10 +235,18 @@ class TrackViewSet(mixins.CreateModelMixin,
         return validation_flag
 
 
+class TrackHistoryFilter(filters.FilterSet):
+    track = filters.django_filters.NumberFilter(name='track_key', required=True)
+
+    class Meta:
+        model = TrackHistory
+        fields = ['track']
+
+
 class TrackHistoryView(mixins.RetrieveModelMixin,
                        mixins.ListModelMixin,
                        viewsets.GenericViewSet):
     queryset = TrackHistory.objects.all()
     serializer_class = TrackHistorySerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('track_id',)
+    filter_class = TrackHistoryFilter

@@ -117,4 +117,4 @@ class TrackHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TrackHistory
-        fields = ('track', 'track_key')
+        fields = ('id', 'track', 'track_key')

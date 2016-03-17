@@ -211,11 +211,12 @@ class Track(models.Model):
 class TrackHistory(models.Model):
     track = JSONField(verbose_name='Дорожка')
     track_key = models.ForeignKey(Track, related_name='track_history', verbose_name='Текущая версия дорожки')
-    version = models.IntegerField()
 
     class Meta:
         verbose_name = 'Старая версия дорожки'
         verbose_name_plural = 'Старые версии дорожки'
 
-    def save(self, *args, **kwargs):
-        self.version = len(TrackHistory.objects.filter(track_key=self.track_key))
+    # def save(self, *args, **kwargs):
+    #     super(TrackHistory, self).save(*args, **kwargs)
+    #     self.version = len(TrackHistory.objects.filter(track_key=self.track_key))
+    #     self.save()
