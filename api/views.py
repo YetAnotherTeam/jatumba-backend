@@ -222,6 +222,6 @@ class TrackViewSet(mixins.CreateModelMixin,
         validation_flag = True
         for block in track:
             for sound in block:
-                if sound not in sounds:
+                if sound not in sounds and sound != '0':
                     validation_flag = False
         return validation_flag
