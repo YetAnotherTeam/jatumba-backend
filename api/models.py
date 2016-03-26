@@ -147,7 +147,7 @@ class Genre(models.Model):
 class Member(models.Model):
     user = models.ForeignKey(User, verbose_name='Пользователь')
     band = models.ForeignKey(Band, related_name='members', verbose_name='Группа')
-    instrument = models.ForeignKey(Instrument, related_name='members', verbose_name='Инструмент')
+    instrument = models.ForeignKey(Instrument, related_name='members', verbose_name='Инструмент', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Участник музыкальной группы'

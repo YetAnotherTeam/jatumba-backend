@@ -84,6 +84,7 @@ class BandMemberSerializer(serializers.ModelSerializer):
         queryset=Instrument.objects.all(),
         serializer=InstrumentSerializer,
         serializer_params={'fields': ('name',)},
+        required=False
     )
 
     class Meta:

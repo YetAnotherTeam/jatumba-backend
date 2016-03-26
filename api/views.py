@@ -3,6 +3,7 @@ import json
 
 import time
 from django.contrib.auth import authenticate
+from django.db import transaction
 from django.http import JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import status, viewsets, mixins, filters
@@ -19,7 +20,7 @@ from api.serializers import *
 
 def social_auth(user_data, request):
     try:
-        username = request.POST['username']
+        username = request.data['username']
     except MultiValueDictKeyError:
         return Response(
             {'error': 'user not found, register new by including username in request'},
@@ -55,7 +56,7 @@ class SocialAuthView(APIView):
         super().__init__(**kwargs)
 
     def post(self, request):
-        token = request.POST.get('token')
+        token = request.data.get('token')
         user_data = self.social_backend.get_user_data(token)
         user = User.objects.filter(**{self.user_profile_field: user_data['user_id']}).first()
         if user:
@@ -98,7 +99,6 @@ class IsAuth(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        print(request.data)
         token = request.data.get('access_token')
         if not token:
             return Response({'details': 'access_token is required field'}, status=status.HTTP_400_BAD_REQUEST)
@@ -171,7 +171,7 @@ class BandMembersViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
 
     def create(self, request, *args, **kwargs):
-        data = request.POST.copy()
+        data = request.data.copy()
         data['user'] = request.user.id
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
@@ -190,13 +190,14 @@ class BandViewSet(mixins.CreateModelMixin,
     serializer_class = BandSerializer
     permission_classes = (DjangoObjectPermissions,)
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
-        data = request.POST.copy()
+        data = request.data.copy()
         data['leader'] = request.user.id
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         band = serializer.save()
-        Member.objects.create(band=band, user_id=request.user.id, instrument_id=data['instrument'])
+        Member.objects.create(band=band, user=request.user)
         return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)
 
 
