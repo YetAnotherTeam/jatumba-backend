@@ -98,7 +98,8 @@ class IsAuth(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        token = request.POST.get('access_token')
+        request_body = json.loads(request.body.decode('utf-8'))
+        token = request_body.get('access_token')
         session = Session.objects.filter(access_token=token).first()
         if session is None or (time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME):
             return Response({'details': 'access token not valid of expired'}, status=status.HTTP_401_UNAUTHORIZED)
