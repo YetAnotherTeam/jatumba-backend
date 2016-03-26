@@ -102,7 +102,7 @@ class IsAuth(APIView):
         session = Session.objects.filter(access_token=token).first()
         if session is None or (time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME):
             return Response({'details': 'access token not valid of expired'}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response(AuthResponseSerializer(generate_auth_response(session.user)).data)
+        return Response(AuthResponseSerializer({'user': session.user, 'session': session}).data)
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
