@@ -85,7 +85,7 @@ class RefreshToken(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        refresh_token = request.POST.get('refresh_token')
+        refresh_token = request.data.get('refresh_token')
         old_session = Session.objects.filter(refresh_token=refresh_token).first()
         if old_session is None:
             return Response({'error': 'invalid token'}, status=403)
@@ -98,11 +98,13 @@ class IsAuth(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        request_body = json.loads(request.body.decode('utf-8'))
-        token = request_body.get('access_token')
+        print(request.data)
+        token = request.data.get('access_token')
+        if not token:
+            return Response({'details': 'access_token is required field'}, status=status.HTTP_400_BAD_REQUEST)
         session = Session.objects.filter(access_token=token).first()
         if session is None or (time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME):
-            return Response({'details': 'access token not valid of expired'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'details': 'access token not valid or expired'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(AuthResponseSerializer({'user': session.user, 'session': session}).data)
 
 
