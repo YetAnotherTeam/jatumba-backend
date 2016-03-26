@@ -1,6 +1,7 @@
 import binascii
 import json
 
+import time
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
@@ -11,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
+from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
 from api.serializers import *
 
@@ -90,6 +92,17 @@ class RefreshToken(APIView):
         new_session = generate_auth_response(old_session.user)
         old_session.delete()
         return Response(AuthResponseSerializer(new_session).data)
+
+
+class IsAuth(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        token = request.POST.get('access_token')
+        session = Session.objects.filter(access_token=token).first()
+        if session is None or (time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME):
+            return Response({'is_authenticated': False}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'is_authenticated': True}, status=status.HTTP_200_OK)
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -184,11 +197,7 @@ class BandViewSet(mixins.CreateModelMixin,
         return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)
 
 
-class TrackViewSet(mixins.CreateModelMixin,
-                   mixins.UpdateModelMixin,
-                   mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin,
-                   viewsets.GenericViewSet):
+class TrackViewSet(viewsets.ModelViewSet):
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
     filter_backends = (filters.DjangoFilterBackend,)
@@ -213,9 +222,8 @@ class TrackViewSet(mixins.CreateModelMixin,
 
     def partial_update(self, request, *args, **kwargs):
         request_body = json.loads(request.body.decode('utf-8'))
-        track_id = kwargs.pop('pk')
         new_track = request_body['track']
-        track = Track.objects.get(id=track_id)
+        track = self.get_object()
 
         if self.validate_track(new_track, track.instrument_id):
             serializer = self.serializer_class(track, data={'track': new_track}, partial=True)
