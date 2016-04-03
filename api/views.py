@@ -114,6 +114,8 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     queryset = User.objects.all()
     permission_classes = (DjangoObjectPermissions,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('id', 'username', 'first_name', 'last_name')
     serializers = {
         'DEFAULT': UserSerializer,
         'sign_up': SignUpSerializer,
@@ -170,13 +172,8 @@ class BandMembersViewSet(viewsets.ModelViewSet):
     filter_fields = ('band',)
     permission_classes = (DjangoObjectPermissions,)
 
-    def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        data['user'] = request.user.id
-        serializer = self.serializer_class(data=data)
-        serializer.is_valid(raise_exception=True)
-        band = serializer.save()
-        return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class BandViewSet(mixins.CreateModelMixin,
@@ -233,7 +230,7 @@ class TrackViewSet(viewsets.ModelViewSet):
             serializer = self.serializer_class(track, data={'track': new_track}, partial=True)
             serializer.is_valid(raise_exception=True)
             track = serializer.save()
-            TrackHistory.objects.create(track=track.track, track_key=track)
+            TrackHistory.objects.create(track=track.track, track_key=track, modified_by=request.user)
             return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid sounds in track'}, status=400)
 

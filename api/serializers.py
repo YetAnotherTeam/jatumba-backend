@@ -78,7 +78,7 @@ class InstrumentSerializer(serializers.ModelSerializer):
 
 # noinspection PyAbstractClass
 class BandMemberSerializer(serializers.ModelSerializer):
-    user = DeserializePrimaryKeyRelatedField(queryset=User.objects.all(), serializer=UserSerializer)
+    user = UserSerializer(read_only=True)
     band = DeserializePrimaryKeyRelatedField(queryset=Band.objects.all(), serializer=BandSerializer)
     instrument = DeserializePrimaryKeyRelatedField(
         queryset=Instrument.objects.all(),
@@ -115,7 +115,8 @@ class TrackHistorySerializer(serializers.ModelSerializer):
     track = serializers.ListField(
         child=serializers.ListField(child=serializers.CharField())
     )
+    modified_by = DeserializePrimaryKeyRelatedField(queryset=User.objects.all(), serializer=UserSerializer)
 
     class Meta:
         model = TrackHistory
-        fields = ('id', 'track', 'track_key')
+        fields = ('id', 'track', 'track_key', 'modified_by')

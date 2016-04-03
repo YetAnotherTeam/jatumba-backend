@@ -212,6 +212,7 @@ class Track(models.Model):
 class TrackHistory(models.Model):
     track = JSONField(verbose_name='Дорожка')
     track_key = models.ForeignKey(Track, related_name='track_history', verbose_name='Текущая версия дорожки')
+    modified_by = models.ForeignKey(User, related_name='tracks_modified', verbose_name='Автор изменения')
 
     class Meta:
         verbose_name = 'Старая версия дорожки'
