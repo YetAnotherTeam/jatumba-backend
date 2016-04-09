@@ -19,9 +19,9 @@ from api.serializers import *
 
 
 def social_auth(user_data, request):
-    try:
-        username = request.data['username']
-    except MultiValueDictKeyError:
+
+    username = request.data.get('username')
+    if username is None:
         return Response(
             {'error': 'user not found, register new by including username in request'},
             status=404
@@ -46,7 +46,7 @@ def social_auth(user_data, request):
 
 # noinspection PyUnresolvedReferences
 class SocialAuthView(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = ()
 
     def __init__(self, **kwargs):
         assert self.social_backend is not None, \
@@ -66,11 +66,13 @@ class SocialAuthView(APIView):
 
 
 class VKAuthView(SocialAuthView):
+    permission_classes = ()
     user_profile_field = 'vk_profile'
     social_backend = VK()
 
 
 class FBAuthView(SocialAuthView):
+    permission_classes = ()
     user_profile_field = 'fb_profile'
     social_backend = FB()
 
