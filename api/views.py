@@ -21,7 +21,7 @@ from api.serializers import *
 def social_auth(user_data, request):
 
     username = request.data.get('username')
-    if username is None:
+    if username is None or username == '':
         return Response(
             {'error': 'user not found, register new by including username in request'},
             status=404
