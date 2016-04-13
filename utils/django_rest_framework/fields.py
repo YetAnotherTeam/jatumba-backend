@@ -7,7 +7,7 @@ from rest_framework.relations import RelatedField
 
 
 # noinspection PyAbstractClass,PyCallingNonCallable
-class DeserializePrimaryKeyRelatedField(RelatedField):
+class SerializableRelatedField(RelatedField):
     default_error_messages = {
         'required': _('This field is required.'),
         'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
@@ -21,7 +21,7 @@ class DeserializePrimaryKeyRelatedField(RelatedField):
             'DeserializePrimaryKeyRelatedField field must provide a `serializer` argument'
         )
         kwargs['style'] = {'base_template': 'input.html', 'input_type': 'numeric'}
-        super(DeserializePrimaryKeyRelatedField, self).__init__(**kwargs)
+        super(SerializableRelatedField, self).__init__(**kwargs)
 
     def use_pk_only_optimization(self):
         return False

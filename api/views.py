@@ -1,20 +1,21 @@
 import binascii
 import json
-
 import time
+
 from django.contrib.auth import authenticate
 from django.db import transaction
 from django.http import JsonResponse
-from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import status, viewsets, mixins, filters
 from rest_framework.decorators import list_route
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
 from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
+from api.filters import TrackHistoryFilter
 from api.serializers import *
 
 
@@ -53,7 +54,7 @@ class SocialAuthView(APIView):
             "SocialAuthView must provide a `social_backend` field"
         assert self.user_profile_field is not None, \
             "SocialAuthView must provide a `user_profile_field` field"
-        super().__init__(**kwargs)
+        super(SocialAuthView, self).__init__(**kwargs)
 
     def post(self, request):
         token = request.data.get('token')
@@ -84,7 +85,7 @@ def generate_auth_response(user):
     }
 
 
-class RefreshToken(APIView):
+class RefreshTokenView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -97,7 +98,7 @@ class RefreshToken(APIView):
         return Response(AuthResponseSerializer(new_session).data)
 
 
-class IsAuth(APIView):
+class IsAuthView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -159,14 +160,6 @@ class CompositionViewSet(mixins.CreateModelMixin,
     filter_fields = ('band__members__user', 'band__members')
 
 
-class InstrumentViewSet(mixins.CreateModelMixin,
-                        mixins.RetrieveModelMixin,
-                        mixins.ListModelMixin,
-                        viewsets.GenericViewSet):
-    queryset = Instrument.objects.all()
-    serializer_class = InstrumentSerializer
-
-
 class BandMembersViewSet(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = BandMemberSerializer
@@ -190,14 +183,9 @@ class BandViewSet(mixins.CreateModelMixin,
     permission_classes = (DjangoObjectPermissions,)
 
     @transaction.atomic
-    def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        data['leader'] = request.user.id
-        serializer = self.serializer_class(data=data)
-        serializer.is_valid(raise_exception=True)
-        band = serializer.save()
-        Member.objects.create(band=band, user=request.user)
-        return Response(self.serializer_class(band).data, status=status.HTTP_201_CREATED)
+    def perform_create(self, serializer):
+        band = serializer.save(leader=self.request.user)
+        Member.objects.create(band=band, user=self.request.user)
 
 
 class TrackViewSet(viewsets.ModelViewSet):
@@ -246,17 +234,9 @@ class TrackViewSet(viewsets.ModelViewSet):
         return validation_flag
 
 
-class TrackHistoryFilter(filters.FilterSet):
-    track = filters.django_filters.NumberFilter(name='track_key', required=True)
-
-    class Meta:
-        model = TrackHistory
-        fields = ['track']
-
-
-class TrackHistoryView(mixins.RetrieveModelMixin,
-                       mixins.ListModelMixin,
-                       viewsets.GenericViewSet):
+class TrackHistoryViewSet(mixins.RetrieveModelMixin,
+                          mixins.ListModelMixin,
+                          viewsets.GenericViewSet):
     queryset = TrackHistory.objects.all()
     serializer_class = TrackHistorySerializer
     filter_backends = (filters.DjangoFilterBackend,)

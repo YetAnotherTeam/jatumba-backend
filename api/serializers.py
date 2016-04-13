@@ -1,9 +1,12 @@
 from rest_framework import serializers
-from api.models import *
-from utils.django_rest_framework_utils import DeserializePrimaryKeyRelatedField
 
+from api.models import *
+from utils.django_rest_framework.fields import SerializableRelatedField
 
 # noinspection PyAbstractClass
+from utils.django_rest_framework.serializers import DynamicFieldsMixin
+
+
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -59,28 +62,19 @@ class SoundSerializer(serializers.ModelSerializer):
 
 
 # noinspection PyAbstractClass
-class InstrumentSerializer(serializers.ModelSerializer):
+class InstrumentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     sounds = SoundSerializer(many=True)
 
     class Meta:
         model = Instrument
         fields = ('id', 'name', 'sounds')
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super(InstrumentSerializer, self).__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields.keys())
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
-
 
 # noinspection PyAbstractClass
 class BandMemberSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    band = DeserializePrimaryKeyRelatedField(queryset=Band.objects.all(), serializer=BandSerializer)
-    instrument = DeserializePrimaryKeyRelatedField(
+    band = SerializableRelatedField(queryset=Band.objects.all(), serializer=BandSerializer)
+    instrument = SerializableRelatedField(
         queryset=Instrument.objects.all(),
         serializer=InstrumentSerializer,
         serializer_params={'fields': ('name',)},
@@ -94,16 +88,18 @@ class BandMemberSerializer(serializers.ModelSerializer):
 
 # noinspection PyAbstractClass
 class TrackSerializer(serializers.ModelSerializer):
-    composition = DeserializePrimaryKeyRelatedField(queryset=Composition.objects.all(),
-                                                    serializer=CompositionSerializer)
-    instrument = DeserializePrimaryKeyRelatedField(
+    class NestedInstrumentSerializer(InstrumentSerializer):
+        required_fields = ('name',)
+
+    composition = SerializableRelatedField(
+        queryset=Composition.objects.all(),
+        serializer=CompositionSerializer
+    )
+    instrument = SerializableRelatedField(
         queryset=Instrument.objects.all(),
-        serializer=InstrumentSerializer,
-        serializer_params={'fields': ('name',)},
+        serializer=NestedInstrumentSerializer
     )
-    track = serializers.ListField(
-        child=serializers.ListField(child=serializers.CharField())
-    )
+    track = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
 
     class Meta:
         model = Track
@@ -112,10 +108,8 @@ class TrackSerializer(serializers.ModelSerializer):
 
 # noinspection PyAbstractClass
 class TrackHistorySerializer(serializers.ModelSerializer):
-    track = serializers.ListField(
-        child=serializers.ListField(child=serializers.CharField())
-    )
-    modified_by = DeserializePrimaryKeyRelatedField(queryset=User.objects.all(), serializer=UserSerializer)
+    track = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
+    modified_by = SerializableRelatedField(queryset=User.objects.all(), serializer=UserSerializer)
 
     class Meta:
         model = TrackHistory

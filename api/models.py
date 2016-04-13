@@ -157,7 +157,7 @@ class Member(models.Model):
         return '%s; Band: %s; Instrument: %s' % (
             self.user.username,
             self.band.name,
-            self.instrument.name
+            self.instrument.name if self.instrument else ''
         )
 
     def save(self, *args, **kwargs):
