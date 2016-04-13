@@ -145,3 +145,6 @@ DEFAULT_USER_GROUP = "Обычные пользователи"
 CHANNEL_TYPE_VALUE = 0
 FREQ_TYPE_VALUE = 0
 CONVERT_TYPE_VALUE = 0
+
+# crossbar.io
+CROSSBAR_BRIDGE_URL = "http://127.0.0.1:9000/notify"

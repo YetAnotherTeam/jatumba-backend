@@ -2,15 +2,18 @@ import binascii
 import json
 import time
 
+import requests
 from django.contrib.auth import authenticate
 from django.db import transaction
+from django.forms import model_to_dict
 from django.http import JsonResponse
 from rest_framework import status, viewsets, mixins, filters
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from TPD.settings import CROSSBAR_BRIDGE_URL
 from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
 from api.auth.authentication import TokenAuthentication
@@ -158,6 +161,24 @@ class CompositionViewSet(mixins.CreateModelMixin,
     serializer_class = CompositionSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band__members__user', 'band__members')
+
+    @detail_route(methods=('post',))
+    def edit(self, request, pk=None):
+        composition = self.get_object()
+        try:
+            response = requests.post(
+                CROSSBAR_BRIDGE_URL,
+                json={
+                    'topic': 'composition.%d' % composition.id,
+                    'args': [model_to_dict(composition)]
+                }
+            )
+            return Response(response.json())
+        except:
+            return Response(
+                {"error": "Crossbar.io unavailable."},
+                status.HTTP_406_NOT_ACCEPTABLE
+            )
 
 
 class BandMembersViewSet(viewsets.ModelViewSet):
