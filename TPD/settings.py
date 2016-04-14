@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'guardian',
     'audiofield',
     'api',
+    'channels',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -128,6 +129,16 @@ USE_L10N = True
 
 USE_TZ = True
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+        },
+        "ROUTING": "TPD.routing.channel_routing",
+    },
+}
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
@@ -146,5 +157,7 @@ CHANNEL_TYPE_VALUE = 0
 FREQ_TYPE_VALUE = 0
 CONVERT_TYPE_VALUE = 0
 
-# crossbar.io
-CROSSBAR_BRIDGE_URL = "http://127.0.0.1:9000/notify"
+try:
+    from .local import *
+except ImportError:
+    pass
