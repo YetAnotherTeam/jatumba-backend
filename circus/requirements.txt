@@ -1,0 +1,19 @@
+# Пришлось установить версию с гита, потому что в Pypi стоит устаревшая версия с багой
+git+https://github.com/circus-tent/circus-web
+anyjson==0.3.3
+backports-abc==0.4
+backports.ssl-match-hostname==3.5.0.1
+certifi==2016.2.28
+circus==0.13.0
+circus-web==1.1.0.dev0
+iowait==0.2
+Mako==1.0.4
+MarkupSafe==0.23
+psutil==4.1.0
+pyzmq==15.2.0
+simplejson==3.8.2
+singledispatch==3.4.0.3
+six==1.10.0
+tomako==0.1.0
+TornadIO2==0.0.3
+tornado==4.3
