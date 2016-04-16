@@ -1,5 +1,5 @@
 import json
-
+from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
 from channels.sessions import channel_session
 from channels import Group
 
@@ -13,10 +13,13 @@ def ws_connect(message):
     )
 
 
+@http_session_user
 @channel_session
 def ws_receive(message):
     print("receive")
-    Group('band-%d' % 123).send({'text': message.content['text'] + "123"})
+    user = message.user
+    user_full_name = message.user.get_full_name() if user.is_authenticated() else 'Anonymous'
+    Group('band-%d' % 123).send({'text': message.content['text'] + "- from: " + user_full_name})
 
 
 @channel_session
