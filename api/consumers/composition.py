@@ -44,4 +44,4 @@ def ws_receive(message, composition_id):
 @channel_session
 def ws_disconnect(message, composition_id):
     print('disconnect')
-    Group('composition-%s' % composition_id).discard(message.reply_channel)
+    Group(COMPOSITION_GROUP_TEMPLATE % composition_id).discard(message.reply_channel)
