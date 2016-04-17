@@ -15,6 +15,5 @@ urlpatterns = [
     url(r'sign_up/vk/', VKAuthView.as_view()),
     url(r'sign_up/fb/', FBAuthView.as_view()),
     url(r'token/refresh/', RefreshTokenView.as_view()),
-    url(r'token/is_auth', IsAuthView.as_view()),
     url(r'', include(router.urls))
 ]

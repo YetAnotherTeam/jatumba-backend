@@ -11,11 +11,11 @@ from rest_framework.views import APIView
 
 from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
-from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
 from api.models import Session
 from api.serializers import (
-    AuthResponseSerializer, UserSerializer, SignUpSerializer, SignInSerializer
+    AuthResponseSerializer, UserSerializer, SignUpSerializer, SignInSerializer,
+    IsAuthenticatedSerializer
 )
 
 User = get_user_model()
@@ -48,13 +48,15 @@ def social_auth(user_data, request):
 
 # noinspection PyUnresolvedReferences
 class SocialAuthView(APIView):
-    permission_classes = ()
-
     def __init__(self, **kwargs):
-        assert self.social_backend is not None, \
+        assert (
+            self.social_backend is not None,
             "SocialAuthView must provide a `social_backend` field"
-        assert self.user_profile_field is not None, \
+        )
+        assert (
+            self.user_profile_field is not None,
             "SocialAuthView must provide a `user_profile_field` field"
+        )
         super(SocialAuthView, self).__init__(**kwargs)
 
     def post(self, request):
@@ -99,24 +101,6 @@ class RefreshTokenView(APIView):
         return Response(AuthResponseSerializer(new_session).data)
 
 
-class IsAuthView(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request):
-        token = request.data.get('access_token')
-        if not token:
-            return Response(
-                {'details': 'access_token is required field'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        session = Session.objects.filter(access_token=token).first()
-        if session is None or (
-                    time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME):
-            return Response({'details': 'access token not valid or expired'},
-                            status=status.HTTP_401_UNAUTHORIZED)
-        return Response(AuthResponseSerializer({'user': session.user, 'session': session}).data)
-
-
 class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.ListModelMixin,
@@ -129,6 +113,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
         'DEFAULT': UserSerializer,
         'sign_up': SignUpSerializer,
         'sign_in': SignInSerializer,
+        'is_authenticated': IsAuthenticatedSerializer,
     }
 
     # для нормального отображения в BrowsableAPIRenderer
@@ -158,3 +143,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
                 {'error': 'wrong username or password'},
                 status=status.HTTP_403_FORBIDDEN
             )
+
+    @list_route(methods=['post'], permission_classes=(AllowAny,))
+    def is_authenticated(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        access_token = serializer.data['access_token']
+        session = Session.objects.filter(access_token=access_token).first()
+        return Response(AuthResponseSerializer({'user': session.user, 'session': session}).data)

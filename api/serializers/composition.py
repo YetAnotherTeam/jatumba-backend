@@ -17,16 +17,9 @@ class CompositionSerializer(serializers.ModelSerializer):
 
 # noinspection PyAbstractClass
 class TrackSerializer(serializers.ModelSerializer):
-    class NestedInstrumentSerializer(InstrumentSerializer):
-        required_fields = ('name',)
-
-    composition = SerializableRelatedField(
-        queryset=Composition.objects.all(),
-        serializer=CompositionSerializer
-    )
+    composition = SerializableRelatedField(serializer=CompositionSerializer)
     instrument = SerializableRelatedField(
-        queryset=Instrument.objects.all(),
-        serializer=NestedInstrumentSerializer
+        serializer=InstrumentSerializer(required_fields=('name',))
     )
     track = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
 

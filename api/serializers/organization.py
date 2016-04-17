@@ -15,10 +15,9 @@ class BandSerializer(serializers.ModelSerializer):
 
 # noinspection PyAbstractClass
 class MemberSerializer(serializers.ModelSerializer):
-    user = SerializableRelatedField(queryset=User.objects.all(), serializer=UserSerializer)
-    band = SerializableRelatedField(queryset=Band.objects.all(), serializer=BandSerializer)
+    user = SerializableRelatedField(serializer=UserSerializer)
+    band = SerializableRelatedField(serializer=BandSerializer)
     instrument = SerializableRelatedField(
-        queryset=Instrument.objects.all(),
         allow_null=True,
         required=False,
         serializer=InstrumentSerializer,
@@ -27,6 +26,4 @@ class MemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Member
-        validators = []
-        fields = ('id', 'user', 'band', 'instrument', 'leader')
-        extra_kwargs = {'leader': {'read_only': True}}
+        fields = ('id', 'user', 'band', 'instrument')

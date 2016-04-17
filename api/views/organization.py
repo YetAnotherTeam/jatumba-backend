@@ -2,7 +2,7 @@ from django.db.transaction import atomic
 from rest_framework import viewsets, filters
 from rest_framework.permissions import DjangoObjectPermissions
 
-from api.models import Band, Member
+from api.models import Band, Member, Leader
 from api.serializers import BandSerializer, MemberSerializer
 
 
@@ -18,7 +18,7 @@ class BandViewSet(viewsets.ModelViewSet):
         user = self.request.user
         band = serializer.save()
         member = Member.objects.create(band=band, user=user)
-        band.lead_members.add(member)
+        Leader.objects.create(band=band, member=member)
 
 
 class MemberViewSet(viewsets.ModelViewSet):

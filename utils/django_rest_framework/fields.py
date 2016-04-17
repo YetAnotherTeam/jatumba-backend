@@ -16,15 +16,14 @@ class SerializableRelatedField(RelatedField):
 
     def __init__(self, **kwargs):
         self.serializer = kwargs.pop('serializer', None)
-        self.serializer_params = kwargs.pop('serializer_params', dict())
         assert self.serializer is not None, (
-            'DeserializePrimaryKeyRelatedField field must provide a `serializer` argument'
+            'SerializableRelatedField field must provide a `serializer` argument'
         )
+        self.serializer_params = kwargs.pop('serializer_params', dict())
+        if 'queryset' not in kwargs:
+            kwargs['queryset'] = self.serializer.Meta.model.objects.all()
         kwargs['style'] = {'base_template': 'input.html', 'input_type': 'numeric'}
         super(SerializableRelatedField, self).__init__(**kwargs)
-
-    def use_pk_only_optimization(self):
-        return False
 
     def to_internal_value(self, data):
         try:

@@ -51,6 +51,9 @@ class Track(models.Model):
         verbose_name = 'Дорожка'
         verbose_name_plural = 'Дорожки'
 
+    def __str__(self):
+        return str(self.composition)
+
     @atomic
     def save(self, *args, **kwargs):
         is_new = True

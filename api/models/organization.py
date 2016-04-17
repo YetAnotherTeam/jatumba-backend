@@ -68,10 +68,7 @@ class Member(models.Model):
         verbose_name_plural = 'Участники музыкальных групп'
 
     def __str__(self):
-        return '%s (%s)' % (
-            self.user.get_full_name(),
-            self.band.name
-        )
+        return '%s (%s)' % (str(self.user), self.band.name)
 
     @atomic
     def save(self, *args, **kwargs):
@@ -105,12 +102,12 @@ class Leader(models.Model):
         verbose_name='Музыкальная группа'
     )
 
-    def __str__(self):
-        return self.member
-
     class Meta:
         verbose_name = 'Лидер музыкальной группы'
         verbose_name_plural = 'Лидеры музыкальных групп'
+
+    def __str__(self):
+        return str(self.member)
 
     @atomic
     def save(self, *args, **kwargs):
@@ -119,13 +116,15 @@ class Leader(models.Model):
         super(Leader, self).save(*args, **kwargs)
 
         if is_new:
-            assign_perm('api.change_band', self.user, self.band)
-            assign_perm('api.delete_band', self.user, self.band)
+            user = self.member.user
+            assign_perm('api.change_band', user, self.band)
+            assign_perm('api.delete_band', user, self.band)
 
     @atomic
     def delete(self, using=None, keep_parents=False):
-        remove_perm('api.change_band', self.user, self.band)
-        remove_perm('api.delete_band', self.user, self.band)
+        user = self.member.user
+        remove_perm('api.change_band', user, self.band)
+        remove_perm('api.delete_band', user, self.band)
 
-        self.user.groups.remove(self.band.group)
+        user.groups.remove(self.band.group)
         super(Leader, self).delete(using, keep_parents)

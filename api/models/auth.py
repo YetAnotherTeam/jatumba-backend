@@ -61,4 +61,4 @@ class Session(models.Model):
         verbose_name_plural = 'Сессии'
 
     def __str__(self):
-        return self.user
+        return str(self.user)
