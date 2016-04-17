@@ -1,5 +1,6 @@
+from rest_framework.exceptions import AuthenticationFailed
+
 from api.auth.auth_providers.base import BaseProvider
-from api.exceptions.api_exceptions import AuthException
 
 
 class FB(BaseProvider):
@@ -23,10 +24,10 @@ class FB(BaseProvider):
         if user_data and user_data.get('error'):
             error = user_data['error']
             msg = error.get('error_msg', 'FB API error')
-            raise AuthException(msg)
+            raise AuthenticationFailed(msg)
 
         if user_data is None:
-            raise AuthException('FB doesn\'t return user data')
+            raise AuthenticationFailed('FB doesn\'t return user data')
 
         user_id = user_data.pop('id')
         user_data['user_id'] = str(user_id)

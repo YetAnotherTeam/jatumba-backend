@@ -1,6 +1,5 @@
 from requests import request
-
-from api.exceptions.api_exceptions import AuthException
+from rest_framework.exceptions import AuthenticationFailed
 
 
 class BaseProvider:
@@ -15,7 +14,7 @@ class BaseProvider:
         try:
             response = request(method, url, **kwargs)
         except ConnectionError as err:
-            raise AuthException(str(err))
+            raise AuthenticationFailed(str(err))
         response.raise_for_status()
         return response
 

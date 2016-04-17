@@ -1,5 +1,6 @@
+from rest_framework.exceptions import AuthenticationFailed
+
 from api.auth.auth_providers.base import BaseProvider
-from api.exceptions.api_exceptions import AuthException
 
 
 class VK(BaseProvider):
@@ -19,10 +20,10 @@ class VK(BaseProvider):
         if user_data and user_data.get('error'):
             error = user_data['error']
             msg = error.get('error_msg', 'VK API error')
-            raise AuthException(msg)
+            raise AuthenticationFailed(msg)
 
         if user_data is None:
-            raise AuthException('VK doesn\'t return user data')
+            raise AuthenticationFailed('VK doesn\'t return user data')
 
         user_data = user_data['response'][0]
         user_id = user_data.pop('id')
