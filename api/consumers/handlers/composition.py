@@ -9,6 +9,7 @@ User = get_user_model()
 COMPOSITION_GROUP_TEMPLATE = 'composition-%s'
 NOT_VALID_ACCESS_TOKEN_MESSAGE = 'Not valid access token.'
 
+
 def check_composition_perms(data, composition_id):
     access_token = data.get('access_token')
     if access_token:
@@ -21,14 +22,13 @@ def check_composition_perms(data, composition_id):
 
 
 def sign_in(message, composition_id, data):
-    check_composition_perms(data, composition_id)
-    user = check_composition_perms(message, composition_id)
+    user = check_composition_perms(data, composition_id)
     if user is not None:
         message.channel_session['user'] = user.id
         Group(COMPOSITION_GROUP_TEMPLATE % composition_id).add(message.reply_channel)
         composition = Composition.objects.get(id=composition_id)
         (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
-            .send({"text": ujson.dumps(CompositionSerializer(composition).data)}))
+         .send({"text": ujson.dumps(CompositionSerializer(composition).data)}))
     else:
         message.reply_channel.send({"text": ujson.dumps({'error': NOT_VALID_ACCESS_TOKEN_MESSAGE})})
 
