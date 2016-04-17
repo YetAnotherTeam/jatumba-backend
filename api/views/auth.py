@@ -1,10 +1,8 @@
 import binascii
-import json
-import time
+import os
 
-from django.contrib.auth import authenticate
-from django.db import transaction
-from django.http import JsonResponse
+import time
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework import status, viewsets, mixins, filters
 from rest_framework.decorators import list_route
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
@@ -15,12 +13,14 @@ from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
 from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
-from api.filters import TrackHistoryFilter
-from api.serializers import *
+from api.models import Session
+from api.serializers import AuthResponseSerializer, UserSerializer, SignUpSerializer, \
+    SignInSerializer
+
+User = get_user_model()
 
 
 def social_auth(user_data, request):
-
     username = request.data.get('username')
     if username is None or username == '':
         return Response(
@@ -29,7 +29,7 @@ def social_auth(user_data, request):
         )
     user = User.objects.filter(username=username).first()
     if user:
-        return JsonResponse({'error': 'username already taken'}, status=400)
+        return Response({'error': 'username already taken'}, status=400)
     user = User.objects.create_user(
         username,
         password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
@@ -104,10 +104,13 @@ class IsAuthView(APIView):
     def post(self, request):
         token = request.data.get('access_token')
         if not token:
-            return Response({'details': 'access_token is required field'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'details': 'access_token is required field'},
+                            status=status.HTTP_400_BAD_REQUEST)
         session = Session.objects.filter(access_token=token).first()
-        if session is None or (time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME):
-            return Response({'details': 'access token not valid or expired'}, status=status.HTTP_401_UNAUTHORIZED)
+        if session is None or (
+                    time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME):
+            return Response({'details': 'access token not valid or expired'},
+                            status=status.HTTP_401_UNAUTHORIZED)
         return Response(AuthResponseSerializer({'user': session.user, 'session': session}).data)
 
 
@@ -115,8 +118,8 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
-    queryset = User.objects.all()
     permission_classes = (DjangoObjectPermissions,)
+    queryset = User.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('id', 'username', 'first_name', 'last_name')
     serializers = {
@@ -149,95 +152,3 @@ class UserViewSet(mixins.RetrieveModelMixin,
             return Response(AuthResponseSerializer(instance=generate_auth_response(user)).data)
         else:
             return Response({'error': 'wrong username or password'}, status=403)
-
-
-class CompositionViewSet(mixins.CreateModelMixin,
-                         mixins.ListModelMixin,
-                         viewsets.GenericViewSet):
-    queryset = Composition.objects.all()
-    serializer_class = CompositionSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('band__members__user', 'band__members')
-
-
-class BandMembersViewSet(viewsets.ModelViewSet):
-    queryset = Member.objects.all()
-    serializer_class = BandMemberSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('band',)
-    permission_classes = (DjangoObjectPermissions,)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class BandViewSet(mixins.CreateModelMixin,
-                  mixins.RetrieveModelMixin,
-                  mixins.UpdateModelMixin,
-                  mixins.ListModelMixin,
-                  viewsets.GenericViewSet):
-    queryset = Band.objects.all()
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', 'description')
-    serializer_class = BandSerializer
-    permission_classes = (DjangoObjectPermissions,)
-
-    @transaction.atomic
-    def perform_create(self, serializer):
-        band = serializer.save(leader=self.request.user)
-        Member.objects.create(band=band, user=self.request.user)
-
-
-class TrackViewSet(viewsets.ModelViewSet):
-    queryset = Track.objects.all()
-    serializer_class = TrackSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('composition',)
-    permission_classes = (DjangoObjectPermissions,)
-
-    def create(self, request, *args, **kwargs):
-        data = request.data
-        serializer = self.serializer_class(data=data)
-        serializer.is_valid(raise_exception=True)
-
-        composition = Composition.objects.get(id=data['composition'])
-        membership = Member.objects.filter(user=request.user, band=composition.band).first()
-        if membership is None:
-            return Response({'error': 'you are not member of this band'}, status=403)
-
-        if self.validate_track(data['track'], data['instrument']):
-            track = serializer.save()
-            TrackHistory.objects.create(track=track.track, track_key=track)
-            return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
-        return Response({'error': 'invalid sounds in track'}, status=400)
-
-    def partial_update(self, request, *args, **kwargs):
-        request_body = json.loads(request.body.decode('utf-8'))
-        new_track = request_body['track']
-        track = self.get_object()
-
-        if self.validate_track(new_track, track.instrument_id):
-            serializer = self.serializer_class(track, data={'track': new_track}, partial=True)
-            serializer.is_valid(raise_exception=True)
-            track = serializer.save()
-            TrackHistory.objects.create(track=track.track, track_key=track, modified_by=request.user)
-            return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
-        return Response({'error': 'invalid sounds in track'}, status=400)
-
-    def validate_track(self, track, instrument_id):
-        sounds = Sound.objects.filter(instrument_id=instrument_id).values_list("name", flat=True)
-        validation_flag = True
-        for block in track:
-            for sound in block:
-                if sound not in sounds and sound != '0':
-                    validation_flag = False
-        return validation_flag
-
-
-class TrackHistoryViewSet(mixins.RetrieveModelMixin,
-                          mixins.ListModelMixin,
-                          viewsets.GenericViewSet):
-    queryset = TrackHistory.objects.all()
-    serializer_class = TrackHistorySerializer
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_class = TrackHistoryFilter

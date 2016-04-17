@@ -1,28 +1,37 @@
-import json
-from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
-from channels.sessions import channel_session
 from channels import Group
+from channels.sessions import channel_session
+
+from api.auth.channels import token_session_user
+from api.models import Composition
+from api.serializers import CompositionSerializer
+
+COMPOSITION_GROUP_TEMPLATE = 'composition-%s'
 
 
-@channel_session
-def ws_connect(message):
-    print('connect')
-    Group('band-%d' % 123).add(message.reply_channel)
-    Group('band-%d' % 123).send(
-        {'text': json.dumps({'message': "123123", 'sender': message.reply_channel.name})}
-    )
+@token_session_user
+def ws_connect(message, composition_id):
+    user = message.user
+    if Composition.objects.filter(id=composition_id, band__members__user=user).exists():
+        Group(COMPOSITION_GROUP_TEMPLATE % composition_id).add(message.reply_channel)
+        composition = Composition.objects.get(id=composition_id)
+        data = CompositionSerializer(composition).data
+        Group(COMPOSITION_GROUP_TEMPLATE % composition_id).send({"text": "123"})
+        return CompositionSerializer()
+        # message.channel_session['composition'] = composition
+
+        # Group('composition-%d' % COMPOSITION_ID).send(message.content)
 
 
-@http_session_user
-@channel_session
-def ws_receive(message):
+@token_session_user
+def ws_receive(message, composition_id):
     print("receive")
     user = message.user
     user_full_name = message.user.get_full_name() if user.is_authenticated() else 'Anonymous'
-    Group('band-%d' % 123).send({'text': message.content['text'] + "- from: " + user_full_name})
+    Group('composition-%s' % composition_id).send(
+        {'text': message.content['text'] + "- from: " + user_full_name})
 
 
 @channel_session
-def ws_disconnect(message):
+def ws_disconnect(message, composition_id):
     print('disconnect')
-    Group('band-%d' % 123).discard(message.reply_channel)
+    Group('composition-%s' % composition_id).discard(message.reply_channel)

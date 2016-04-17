@@ -1,70 +1,19 @@
 import os
 from audiofield.fields import AudioField
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.auth.models import Group
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from guardian.shortcuts import assign_perm
 
 
-class User(AbstractUser):
-    phone = models.CharField(max_length=15, blank=True, verbose_name='Телефон')
-    vk_profile = models.CharField(
-        max_length=30,
-        blank=True,
-        default='',
-        db_index=True,
-        verbose_name='Профиль Вконтакте'
-    )
-    fb_profile = models.CharField(
-        max_length=30,
-        blank=True,
-        default='',
-        db_index=True,
-        verbose_name='Профиль Facebook'
-    )
-
-    class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-
-    def __str__(self):
-        full_name = self.get_full_name()
-        if full_name:
-            return "full_name: %s (id: %d)" % (full_name, self.id)
-        else:
-            return "username: %s (id: %d)" % (self.username, self.id)
-
-    def save(self, *args, **kwargs):
-        is_new = True
-        if self.pk:
-            is_new = False
-        super(User, self).save(*args, **kwargs)
-        if is_new:
-            Group.objects.get(name=settings.DEFAULT_USER_GROUP).user_set.add(self)
-            assign_perm('api.change_user', self, self)
-
-
-def get_anonymous_user_instance(User):
-    return User(id=-1, username='Anonymous')
-
-
-class Session(models.Model):
-    user = models.ForeignKey(User, verbose_name='Пользователь', related_name='sessions')
-    access_token = models.CharField(max_length=32, unique=True)
-    refresh_token = models.CharField(max_length=32)
-    time = models.FloatField(verbose_name='Время создания сессии')
-
-    class Meta:
-        verbose_name = 'Сессия'
-        verbose_name_plural = 'Сессии'
-
-    def __str__(self):
-        return 'user - %s' % self.user.username
-
-
 class Band(Group):
-    leader = models.ForeignKey(User, verbose_name='Лидер группы', null=True, blank=True)
+    leader = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        verbose_name='Лидер группы'
+    )
     description = models.TextField(max_length=200, blank=True, default='', verbose_name='Описание')
 
     class Meta:
@@ -145,9 +94,15 @@ class Genre(models.Model):
 
 
 class Member(models.Model):
-    user = models.ForeignKey(User, verbose_name='Пользователь')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='Пользователь')
     band = models.ForeignKey(Band, related_name='members', verbose_name='Группа')
-    instrument = models.ForeignKey(Instrument, related_name='members', verbose_name='Инструмент', null=True, blank=True)
+    instrument = models.ForeignKey(
+        Instrument,
+        null=True,
+        blank=True,
+        related_name='members',
+        verbose_name='Инструмент'
+    )
 
     class Meta:
         verbose_name = 'Участник музыкальной группы'
@@ -176,9 +131,9 @@ class Composition(models.Model):
     name = models.CharField(max_length=30, verbose_name='Название')
     genres = models.ManyToManyField(
         Genre,
-        related_name='compositions',
-        verbose_name='Жанры',
         blank=True,
+        related_name='compositions',
+        verbose_name='Жанры'
     )
 
     class Meta:
@@ -193,6 +148,7 @@ class Track(models.Model):
     instrument = models.ForeignKey(Instrument, related_name='tracks', verbose_name='Инструмент')
     track = JSONField(verbose_name='Дорожка')
     composition = models.ForeignKey(Composition, related_name='tracks', verbose_name='Композиция')
+
     # version = models.IntegerField(default=0)
 
     class Meta:
@@ -211,8 +167,16 @@ class Track(models.Model):
 
 class TrackHistory(models.Model):
     track = JSONField(verbose_name='Дорожка')
-    track_key = models.ForeignKey(Track, related_name='track_history', verbose_name='Текущая версия дорожки')
-    modified_by = models.ForeignKey(User, related_name='tracks_modified', verbose_name='Автор изменения')
+    track_key = models.ForeignKey(
+        Track,
+        related_name='track_history',
+        verbose_name='Текущая версия дорожки'
+    )
+    modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='tracks_modified',
+        verbose_name='Автор изменения'
+    )
 
     class Meta:
         verbose_name = 'Старая версия дорожки'
