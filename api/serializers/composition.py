@@ -19,7 +19,8 @@ class CompositionSerializer(serializers.ModelSerializer):
 class TrackSerializer(serializers.ModelSerializer):
     composition = SerializableRelatedField(serializer=CompositionSerializer)
     instrument = SerializableRelatedField(
-        serializer=InstrumentSerializer(required_fields=('name',))
+        serializer=InstrumentSerializer,
+        serializer_params={'required_fields': ('name',)},
     )
     track = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
 

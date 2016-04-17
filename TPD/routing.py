@@ -14,6 +14,6 @@ chat_routing = [
 ]
 
 main_routing = [
-    include(editor_routing, path=r'^/track'),
+    include(editor_routing, path=r'^/composition'),
     include(chat_routing, path=r'^/chat'),
 ]
