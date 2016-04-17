@@ -14,8 +14,9 @@ from api.auth.auth_providers.vk_api import VK
 from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
 from api.models import Session
-from api.serializers import AuthResponseSerializer, UserSerializer, SignUpSerializer, \
-    SignInSerializer
+from api.serializers import (
+    AuthResponseSerializer, UserSerializer, SignUpSerializer, SignInSerializer
+)
 
 User = get_user_model()
 
@@ -104,8 +105,10 @@ class IsAuthView(APIView):
     def post(self, request):
         token = request.data.get('access_token')
         if not token:
-            return Response({'details': 'access_token is required field'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'details': 'access_token is required field'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         session = Session.objects.filter(access_token=token).first()
         if session is None or (
                     time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME):
@@ -151,4 +154,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
             user.sessions.all().delete()
             return Response(AuthResponseSerializer(instance=generate_auth_response(user)).data)
         else:
-            return Response({'error': 'wrong username or password'}, status=403)
+            return Response(
+                {'error': 'wrong username or password'},
+                status=status.HTTP_403_FORBIDDEN
+            )

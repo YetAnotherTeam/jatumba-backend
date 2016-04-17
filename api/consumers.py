@@ -1,3 +1,4 @@
+import ujson
 from channels import Group
 from channels.sessions import channel_session
 
@@ -5,7 +6,7 @@ from api.auth.channels import token_session_user
 from api.models import Composition
 from api.serializers import CompositionSerializer
 
-COMPOSITION_GROUP_TEMPLATE = 'composition-%s'
+COMPOSITION_GROUP_TEMPLATE = 'composition-%d'
 
 
 @token_session_user
@@ -15,11 +16,7 @@ def ws_connect(message, composition_id):
         Group(COMPOSITION_GROUP_TEMPLATE % composition_id).add(message.reply_channel)
         composition = Composition.objects.get(id=composition_id)
         data = CompositionSerializer(composition).data
-        Group(COMPOSITION_GROUP_TEMPLATE % composition_id).send({"text": "123"})
-        return CompositionSerializer()
-        # message.channel_session['composition'] = composition
-
-        # Group('composition-%d' % COMPOSITION_ID).send(message.content)
+        Group(COMPOSITION_GROUP_TEMPLATE % composition_id).send({"text": ujson.dumps(data)})
 
 
 @token_session_user
@@ -27,7 +24,7 @@ def ws_receive(message, composition_id):
     print("receive")
     user = message.user
     user_full_name = message.user.get_full_name() if user.is_authenticated() else 'Anonymous'
-    Group('composition-%s' % composition_id).send(
+    Group(COMPOSITION_GROUP_TEMPLATE % composition_id).send(
         {'text': message.content['text'] + "- from: " + user_full_name})
 
 

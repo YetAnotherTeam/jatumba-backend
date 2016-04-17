@@ -13,6 +13,7 @@ django-celery==3.1.17
 django-filter==0.13.0
 django-guardian==1.4.4
 djangorestframework==3.3.3
+drf-ujson==1.2
 gunicorn==19.4.5
 kombu==3.0.35
 msgpack-python==0.4.7
@@ -25,4 +26,5 @@ requests-oauthlib==0.6.1
 six==1.10.0
 Twisted==16.1.1
 txaio==2.3.1
+ujson==1.35
 zope.interface==4.1.3

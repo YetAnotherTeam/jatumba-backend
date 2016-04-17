@@ -1,42 +1,11 @@
-import json
-
-from django.db import transaction
-from rest_framework import status, viewsets, mixins, filters
+import ujson
+from rest_framework import mixins, viewsets, filters, status
 from rest_framework.permissions import DjangoObjectPermissions
 from rest_framework.response import Response
 
 from api.filters import TrackHistoryFilter
-from api.models import Composition, Member, Band, Track, TrackHistory, Sound
-from api.serializers import CompositionSerializer, BandMemberSerializer, BandSerializer, \
-    TrackSerializer, TrackHistorySerializer
-
-
-class BandViewSet(mixins.CreateModelMixin,
-                  mixins.RetrieveModelMixin,
-                  mixins.UpdateModelMixin,
-                  mixins.ListModelMixin,
-                  viewsets.GenericViewSet):
-    permission_classes = (DjangoObjectPermissions,)
-    queryset = Band.objects.all()
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', 'description')
-    serializer_class = BandSerializer
-
-    @transaction.atomic
-    def perform_create(self, serializer):
-        band = serializer.save(leader=self.request.user)
-        Member.objects.create(band=band, user=self.request.user)
-
-
-class BandMembersViewSet(viewsets.ModelViewSet):
-    permission_classes = (DjangoObjectPermissions,)
-    queryset = Member.objects.all()
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('band',)
-    serializer_class = BandMemberSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+from api.models import Composition, Track, Member, TrackHistory, Sound
+from api.serializers import CompositionSerializer, TrackSerializer, TrackHistorySerializer
 
 
 class CompositionViewSet(mixins.CreateModelMixin,
@@ -72,7 +41,7 @@ class TrackViewSet(viewsets.ModelViewSet):
         return Response({'error': 'invalid sounds in track'}, status=400)
 
     def partial_update(self, request, *args, **kwargs):
-        request_body = json.loads(request.body.decode('utf-8'))
+        request_body = ujson.loads(request.body.decode('utf-8'))
         new_track = request_body['track']
         track = self.get_object()
 

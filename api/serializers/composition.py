@@ -1,55 +1,18 @@
+# noinspection PyAbstractClass
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from api.models import *
+from api.models import Composition, Instrument, Track, TrackHistory
 from api.serializers.auth import UserSerializer
+from api.serializers.dictionary import InstrumentSerializer
 from utils.django_rest_framework.fields import SerializableRelatedField
-from utils.django_rest_framework.serializers import DynamicFieldsMixin
+
+User = get_user_model()
 
 
-# noinspection PyAbstractClass
-class BandSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(allow_blank=False, max_length=50)
-
-    class Meta:
-        model = Band
-        fields = ('id', 'name', 'description', 'leader')
-
-
-# noinspection PyAbstractClass
 class CompositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Composition
-
-
-class SoundSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Sound
-        fields = ('id', 'name', 'file')
-
-
-# noinspection PyAbstractClass
-class InstrumentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    sounds = SoundSerializer(many=True)
-
-    class Meta:
-        model = Instrument
-        fields = ('id', 'name', 'sounds')
-
-
-# noinspection PyAbstractClass
-class BandMemberSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    band = SerializableRelatedField(queryset=Band.objects.all(), serializer=BandSerializer)
-    instrument = SerializableRelatedField(
-        queryset=Instrument.objects.all(),
-        serializer=InstrumentSerializer,
-        serializer_params={'fields': ('name',)},
-        required=False
-    )
-
-    class Meta:
-        model = Member
-        fields = ('id', 'user', 'band', 'instrument')
 
 
 # noinspection PyAbstractClass
