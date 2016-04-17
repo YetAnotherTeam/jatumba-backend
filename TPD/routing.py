@@ -14,6 +14,7 @@ chat_routing = [
 ]
 
 main_routing = [
-    include(editor_routing, path=r'^/composition'),
-    include(chat_routing, path=r'^/chat'),
+    # TODO поправить в настройках nginx
+    include(editor_routing, path=r'^/ws/composition'),
+    include(chat_routing, path=r'^/ws/chat'),
 ]

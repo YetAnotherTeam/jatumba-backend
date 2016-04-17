@@ -40,16 +40,6 @@ def token_auth(func):
 
 
 def token_session_user(func):
-    """
-    Wraps a HTTP or WebSocket consumer (or any consumer of messages
-    that provides a "COOKIES" attribute) to provide both a "session"
-    attribute and a "user" attibute, like AuthMiddleware does.
-
-    This runs http_session() to get a session to hook auth off of.
-    If the user does not have a session cookie set, both "session"
-    and "user" will be None.
-    """
-
     @token_auth
     @functools.wraps(func)
     def inner(message, *args, **kwargs):

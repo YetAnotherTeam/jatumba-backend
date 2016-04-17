@@ -16,7 +16,7 @@ class TokenAuthentication(BaseAuthentication):
 
         session = Session.objects.filter(access_token=token).first()
         if session is None:
-            raise exceptions.AuthenticationFailed('No such token')
+            return None
 
         if time.time() - session.time > self.SESSION_EXPIRE_TIME:
             raise exceptions.AuthenticationFailed('Token expired')
