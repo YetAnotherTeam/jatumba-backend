@@ -87,6 +87,15 @@ class AbstractTrackSnapshot(models.Model):
         verbose_name_plural = 'Снимки дорожки'
 
 
+class AbstractTrackDiff(models.Model):
+    entity = JSONField(verbose_name='Сущность')
+
+    class Meta:
+        abstract = True
+        verbose_name = 'Изменение дорожки'
+        verbose_name_plural = 'Изменения дорожек'
+
+
 class TrackSnapshot(AbstractTrackSnapshot):
     track = models.ForeignKey(
         Track,
@@ -104,15 +113,6 @@ class TrackSnapshot(AbstractTrackSnapshot):
     class Meta:
         verbose_name = 'Снимок дорожки'
         verbose_name_plural = 'Снимки дорожки'
-
-
-class AbstractTrackDiff(models.Model):
-    entity = JSONField(verbose_name='Сущность')
-
-    class Meta:
-        abstract = True
-        verbose_name = 'Изменение дорожки'
-        verbose_name_plural = 'Изменения дорожек'
 
 
 class TrackDiff(AbstractTrackDiff):
@@ -156,7 +156,11 @@ class CollaborateTrackDiff(AbstractTrackDiff):
 
 
 class CollaborateTrackSnapshot(AbstractTrackSnapshot):
-    diff = models.OneToOneField(CollaborateTrackDiff)
+    diff = models.OneToOneField(
+        CollaborateTrackDiff,
+        on_delete=models.CASCADE,
+        related_name='collaborate_snapshot'
+    )
     track = models.ForeignKey(
         Track,
         on_delete=models.CASCADE,

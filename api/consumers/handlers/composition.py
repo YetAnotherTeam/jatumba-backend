@@ -7,10 +7,10 @@ from api.serializers import CompositionSerializer
 
 User = get_user_model()
 COMPOSITION_GROUP_TEMPLATE = 'composition-%s'
+NOT_VALID_ACCESS_TOKEN_MESSAGE = 'Not valid access token.'
 
-
-def check_composition_perms(message, composition_id):
-    access_token = message.content.get('access_token')
+def check_composition_perms(data, composition_id):
+    access_token = data.get('access_token')
     if access_token:
         session = Session.objects.filter(access_token=access_token).select_related('user').first()
         if session is not None:
@@ -20,8 +20,8 @@ def check_composition_perms(message, composition_id):
     return None
 
 
-def sign_in(message, composition_id):
-    check_composition_perms(message, composition_id)
+def sign_in(message, composition_id, data):
+    check_composition_perms(data, composition_id)
     user = check_composition_perms(message, composition_id)
     if user is not None:
         message.channel_session['user'] = user.id
@@ -29,6 +29,8 @@ def sign_in(message, composition_id):
         composition = Composition.objects.get(id=composition_id)
         (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
             .send({"text": ujson.dumps(CompositionSerializer(composition).data)}))
+    else:
+        message.reply_channel.send({"text": ujson.dumps({'error': NOT_VALID_ACCESS_TOKEN_MESSAGE})})
 
 
 def diff(message, composition_id):

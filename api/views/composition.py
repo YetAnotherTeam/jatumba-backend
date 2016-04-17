@@ -1,9 +1,10 @@
 import ujson
+
 from rest_framework import mixins, viewsets, filters, status
-from rest_framework.permissions import DjangoObjectPermissions
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.models import Composition, Track, Member, Sound
+from api.models import Composition, Track, Sound
 from api.serializers import CompositionSerializer, TrackSerializer
 
 
@@ -17,7 +18,7 @@ class CompositionViewSet(mixins.CreateModelMixin,
 
 
 class TrackViewSet(viewsets.ModelViewSet):
-    permission_classes = (DjangoObjectPermissions,)
+    permission_classes = (AllowAny,)
     queryset = Track.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('composition',)
@@ -28,14 +29,8 @@ class TrackViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
 
-        composition = Composition.objects.get(id=data['composition'])
-        membership = Member.objects.filter(user=request.user, band=composition.band).first()
-        if membership is None:
-            return Response({'error': 'you are not member of this band'}, status=403)
-
         if self.validate_track(data['track'], data['instrument']):
             track = serializer.save()
-            # TrackHistory.objects.create(track=track.track, track_key=track)
             return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid sounds in track'}, status=400)
 
@@ -48,8 +43,6 @@ class TrackViewSet(viewsets.ModelViewSet):
             serializer = self.serializer_class(track, data={'track': new_track}, partial=True)
             serializer.is_valid(raise_exception=True)
             track = serializer.save()
-            # TrackHistory.objects.create(track=track.track, track_key=track,
-            #                             modified_by=request.user)
             return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid sounds in track'}, status=400)
 

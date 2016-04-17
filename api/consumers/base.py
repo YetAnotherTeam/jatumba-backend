@@ -1,6 +1,6 @@
 import ujson
 
-NOT_FOUND_MESSAGE = 'Такой путь не найден.'
+NOT_FOUND_MESSAGE = 'Path not found.'
 
 
 def not_found(message):
