@@ -4,7 +4,6 @@ Server-side for `JATumba` application
 ## Required
 * Python Version >=3.5 for `JATumba` application
 * Python Version >=2.7 for `circus`
-* Ruby Version >=1.9.2
 * Nginx
 * Postgresql Version >=9.5
 * NPM

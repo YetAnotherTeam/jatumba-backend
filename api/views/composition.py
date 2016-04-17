@@ -3,9 +3,8 @@ from rest_framework import mixins, viewsets, filters, status
 from rest_framework.permissions import DjangoObjectPermissions
 from rest_framework.response import Response
 
-from api.filters import TrackHistoryFilter
-from api.models import Composition, Track, Member, TrackHistory, Sound
-from api.serializers import CompositionSerializer, TrackSerializer, TrackHistorySerializer
+from api.models import Composition, Track, Member, Sound
+from api.serializers import CompositionSerializer, TrackSerializer
 
 
 class CompositionViewSet(mixins.CreateModelMixin,
@@ -36,7 +35,7 @@ class TrackViewSet(viewsets.ModelViewSet):
 
         if self.validate_track(data['track'], data['instrument']):
             track = serializer.save()
-            TrackHistory.objects.create(track=track.track, track_key=track)
+            # TrackHistory.objects.create(track=track.track, track_key=track)
             return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid sounds in track'}, status=400)
 
@@ -49,8 +48,8 @@ class TrackViewSet(viewsets.ModelViewSet):
             serializer = self.serializer_class(track, data={'track': new_track}, partial=True)
             serializer.is_valid(raise_exception=True)
             track = serializer.save()
-            TrackHistory.objects.create(track=track.track, track_key=track,
-                                        modified_by=request.user)
+            # TrackHistory.objects.create(track=track.track, track_key=track,
+            #                             modified_by=request.user)
             return Response(self.serializer_class(track).data, status=status.HTTP_201_CREATED)
         return Response({'error': 'invalid sounds in track'}, status=400)
 
@@ -62,12 +61,3 @@ class TrackViewSet(viewsets.ModelViewSet):
                 if sound not in sounds and sound != '0':
                     validation_flag = False
         return validation_flag
-
-
-class TrackHistoryViewSet(mixins.RetrieveModelMixin,
-                          mixins.ListModelMixin,
-                          viewsets.GenericViewSet):
-    queryset = TrackHistory.objects.all()
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_class = TrackHistoryFilter
-    serializer_class = TrackHistorySerializer

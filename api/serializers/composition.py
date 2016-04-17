@@ -2,8 +2,9 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from api.models import Composition, Instrument, Track, TrackHistory
-from api.serializers.auth import UserSerializer
+from api.models import (
+    Composition, Track, CompositionBranch, TrackSnapshot, TrackDiff
+)
 from api.serializers.dictionary import InstrumentSerializer
 from utils.django_rest_framework.fields import SerializableRelatedField
 
@@ -15,6 +16,11 @@ class CompositionSerializer(serializers.ModelSerializer):
         model = Composition
 
 
+class CompositionBranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompositionBranch
+
+
 # noinspection PyAbstractClass
 class TrackSerializer(serializers.ModelSerializer):
     composition = SerializableRelatedField(serializer=CompositionSerializer)
@@ -22,18 +28,21 @@ class TrackSerializer(serializers.ModelSerializer):
         serializer=InstrumentSerializer,
         serializer_params={'required_fields': ('name',)},
     )
-    track = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
 
     class Meta:
         model = Track
-        fields = ('id', 'composition', 'track', 'instrument')
+        fields = ('id', 'composition', 'instrument')
 
 
-# noinspection PyAbstractClass
-class TrackHistorySerializer(serializers.ModelSerializer):
-    track = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
-    modified_by = SerializableRelatedField(queryset=User.objects.all(), serializer=UserSerializer)
+class TrackSnapshotSerializer(serializers.ModelSerializer):
+    entity = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
 
     class Meta:
-        model = TrackHistory
-        fields = ('id', 'track', 'track_key', 'modified_by')
+        model = TrackSnapshot
+        fields = '__all__'
+
+
+class TrackDiffSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrackDiff
+        fields = '__all__'

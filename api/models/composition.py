@@ -31,6 +31,23 @@ class Composition(models.Model):
         return self.name
 
 
+class CompositionBranch(models.Model):
+    name = models.CharField(max_length=50)
+    composition = models.ForeignKey(
+        Composition,
+        on_delete=models.CASCADE,
+        related_name='branches',
+        verbose_name='Композиция'
+    )
+
+    class Meta:
+        verbose_name = 'Ветка'
+        verbose_name_plural = 'Ветки'
+
+    def __str__(self):
+        return self.name
+
+
 class Track(models.Model):
     instrument = models.ForeignKey(
         Instrument,
@@ -38,14 +55,12 @@ class Track(models.Model):
         related_name='tracks',
         verbose_name='Инструмент'
     )
-    track = JSONField(verbose_name='Дорожка')
     composition = models.ForeignKey(
         Composition,
         on_delete=models.CASCADE,
         related_name='tracks',
         verbose_name='Композиция'
     )
-    # version = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = 'Дорожка'
@@ -56,30 +71,105 @@ class Track(models.Model):
 
     @atomic
     def save(self, *args, **kwargs):
-        is_new = True
-        if self.pk:
-            is_new = False
+        is_new = not self.pk
         super(Track, self).save(*args, **kwargs)
         if is_new:
             assign_perm('api.change_track', self.composition.band.group, self)
             assign_perm('api.delete_track', self.composition.band.group, self)
 
 
-class TrackHistory(models.Model):
-    track = JSONField(verbose_name='Дорожка')
-    track_key = models.ForeignKey(
+class AbstractTrackSnapshot(models.Model):
+    entity = JSONField(verbose_name='Дорожка')
+
+    class Meta:
+        abstract = True
+        verbose_name = 'Снимок дорожки'
+        verbose_name_plural = 'Снимки дорожки'
+
+
+class TrackSnapshot(AbstractTrackSnapshot):
+    track = models.ForeignKey(
         Track,
         on_delete=models.CASCADE,
-        related_name='track_history',
-        verbose_name='Текущая версия дорожки'
+        related_name='snapshots',
+        verbose_name='Дорожка'
     )
-    modified_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+    branch = models.ForeignKey(
+        CompositionBranch,
         on_delete=models.CASCADE,
-        related_name='tracks_modified',
-        verbose_name='Автор изменения'
+        related_name='snapshots',
+        verbose_name='Ветка'
     )
 
     class Meta:
-        verbose_name = 'Старая версия дорожки'
-        verbose_name_plural = 'Старые версии дорожки'
+        verbose_name = 'Снимок дорожки'
+        verbose_name_plural = 'Снимки дорожки'
+
+
+class AbstractTrackDiff(models.Model):
+    entity = JSONField(verbose_name='Сущность')
+
+    class Meta:
+        abstract = True
+        verbose_name = 'Изменение дорожки'
+        verbose_name_plural = 'Изменения дорожек'
+
+
+class TrackDiff(AbstractTrackDiff):
+    snapshot = models.ForeignKey(
+        TrackSnapshot,
+        on_delete=models.CASCADE,
+        related_name='diffs',
+        verbose_name='Снимок'
+    )
+    track = models.ForeignKey(
+        Track,
+        on_delete=models.CASCADE,
+        related_name='diffs',
+        verbose_name='Дорожка'
+    )
+    branch = models.ForeignKey(
+        CompositionBranch,
+        on_delete=models.CASCADE,
+        related_name='diffs',
+        verbose_name='Ветка'
+    )
+
+    class Meta:
+        verbose_name = 'Изменение дорожки'
+        verbose_name_plural = 'Изменения дорожек'
+
+
+# Цепочечная последовательная схема без разветвлений, за зафиксированным снапшотом идет дифф,
+# потом создается Коллаборативный-снапшот, дифф - ребро графа, снапшот - конечная вершина
+class CollaborateTrackDiff(AbstractTrackDiff):
+    snapshot = models.ForeignKey(
+        TrackSnapshot,
+        on_delete=models.CASCADE,
+        related_name='collaborate_diffs',
+        verbose_name='Снимок'
+    )
+
+    class Meta:
+        verbose_name = 'Коллаборативное изменение дорожки'
+        verbose_name_plural = 'Коллаборативные изменения дорожек'
+
+
+class CollaborateTrackSnapshot(AbstractTrackSnapshot):
+    diff = models.OneToOneField(CollaborateTrackDiff)
+    track = models.ForeignKey(
+        Track,
+        on_delete=models.CASCADE,
+        related_name='collaborate_snapshots',
+        verbose_name='Коллаборативная дорожка'
+    )
+    branch = models.ForeignKey(
+        CompositionBranch,
+        on_delete=models.CASCADE,
+        related_name='collaborate_snapshots',
+        verbose_name='Ветка'
+    )
+
+    class Meta:
+        verbose_name = 'Коллаборативный снимок дорожки'
+        verbose_name_plural = 'Коллаборативные снимки дорожек'
