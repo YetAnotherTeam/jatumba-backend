@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from api.models import (
-    Composition, Track, CompositionBranch, TrackSnapshot, TrackDiff
+    Composition, Track, CompositionVersion
 )
 from api.serializers.dictionary import InstrumentSerializer
 from utils.django_rest_framework.fields import SerializableRelatedField
@@ -16,9 +16,9 @@ class CompositionSerializer(serializers.ModelSerializer):
         model = Composition
 
 
-class CompositionBranchSerializer(serializers.ModelSerializer):
+class CompositionVersionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CompositionBranch
+        model = CompositionVersion
 
 
 # noinspection PyAbstractClass
@@ -32,17 +32,3 @@ class TrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
         fields = ('id', 'composition', 'instrument')
-
-
-class TrackSnapshotSerializer(serializers.ModelSerializer):
-    entity = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
-
-    class Meta:
-        model = TrackSnapshot
-        fields = '__all__'
-
-
-class TrackDiffSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TrackDiff
-        fields = '__all__'
