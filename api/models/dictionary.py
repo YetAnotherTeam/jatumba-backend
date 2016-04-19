@@ -4,6 +4,8 @@ from audiofield.fields import AudioField
 from django.conf import settings
 from django.db import models
 
+from utils.django.storage import OverwriteStorage
+
 
 class Instrument(models.Model):
     name = models.CharField(max_length=25, verbose_name='Название', unique=True)
@@ -35,6 +37,7 @@ class Sound(models.Model):
     file = AudioField(
         upload_to=sounds_path,
         ext_whitelist=(".mp3", ".wav", ".ogg"),
+        storage=OverwriteStorage(),
         verbose_name='Audio-файл',
         help_text="Allowed type - .mp3, .wav, .ogg"
     )

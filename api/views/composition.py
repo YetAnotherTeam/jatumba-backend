@@ -21,7 +21,6 @@ class TrackViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = Track.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('composition',)
     serializer_class = TrackSerializer
 
     def create(self, request, *args, **kwargs):
