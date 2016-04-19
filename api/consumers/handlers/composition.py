@@ -3,7 +3,7 @@ from channels import Group
 from django.contrib.auth import get_user_model
 
 from api.models import Session, Composition
-from api.serializers import CompositionSerializer
+from api.serializers import CompositionSerializer, CompositionVersionSerializer
 
 User = get_user_model()
 COMPOSITION_GROUP_TEMPLATE = 'composition-%s'
@@ -28,17 +28,15 @@ def sign_in(message, composition_id, data):
         Group(COMPOSITION_GROUP_TEMPLATE % composition_id).add(message.reply_channel)
         composition = Composition.objects.get(id=composition_id)
         (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
-         .send({"text": ujson.dumps(CompositionSerializer(composition).data)}))
+         .send(
+            {
+                "text": ujson.dumps(
+                    CompositionVersionSerializer(composition.composition_verisions.last()).data
+                )
+            }
+        ))
     else:
         message.reply_channel.send({"text": ujson.dumps({'error': NOT_VALID_ACCESS_TOKEN_MESSAGE})})
-
-
-def diff(message, composition_id):
-    initial_data = message.content.get('composition')
-
-
-def commit(messge, composition_id):
-    pass
 
 
 def disconnect(message, composition_id):

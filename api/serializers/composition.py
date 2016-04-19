@@ -2,11 +2,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from api.models import (
-    Composition, Track, CompositionVersion
-)
-from api.serializers.dictionary import InstrumentSerializer
-from utils.django_rest_framework.fields import SerializableRelatedField
+from api.models import Composition, Track, CompositionVersion, Instrument
 
 User = get_user_model()
 
@@ -16,19 +12,25 @@ class CompositionSerializer(serializers.ModelSerializer):
         model = Composition
 
 
-class CompositionVersionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CompositionVersion
-
-
 # noinspection PyAbstractClass
 class TrackSerializer(serializers.ModelSerializer):
-    composition = SerializableRelatedField(serializer=CompositionSerializer)
-    instrument = SerializableRelatedField(
-        serializer=InstrumentSerializer,
-        serializer_params={'required_fields': ('name',)},
-    )
+    instrument = serializers.PrimaryKeyRelatedField(queryset=Instrument.objects.all())
+    entity = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
 
     class Meta:
         model = Track
         fields = ('id', 'composition', 'instrument')
+
+
+class CompositionVersionSerializer(serializers.ModelSerializer):
+    tracks = TrackSerializer(many=True)
+
+    class Meta:
+        model = CompositionVersion
+
+    def create(self, validated_data):
+        tracks = validated_data.pop('tracks')
+        composition_version = CompositionVersion.objects.create(validated_data)
+        for track in tracks:
+            track['composition_version'] = composition_version
+        self.fields['tracks'].create(tracks)

@@ -1,7 +1,7 @@
 import ujson
 from channels.sessions import channel_session
 
-from api.consumers.handlers.composition import sign_in, disconnect, diff, commit
+from api.consumers.handlers.composition import sign_in, disconnect
 
 
 @channel_session
@@ -12,10 +12,6 @@ def ws_receive(message, composition_id):
     data = request_json.get('data')
     if method == 'sign_in':
         sign_in(message, composition_id, data)
-    elif method == 'diff':
-        diff(message, composition_id)
-    elif method == 'commit':
-        commit(message, composition_id)
 
 
 @channel_session
