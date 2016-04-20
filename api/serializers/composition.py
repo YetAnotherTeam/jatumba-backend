@@ -19,7 +19,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Track
-        fields = ('id', 'composition', 'instrument')
+        fields = ('id', 'entity', 'instrument', 'composition_version')
 
 
 class CompositionVersionSerializer(serializers.ModelSerializer):
