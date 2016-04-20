@@ -7,11 +7,6 @@ from api.models import Composition, Track, CompositionVersion, Instrument
 User = get_user_model()
 
 
-class CompositionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Composition
-
-
 # noinspection PyAbstractClass
 class TrackSerializer(serializers.ModelSerializer):
     instrument = serializers.PrimaryKeyRelatedField(queryset=Instrument.objects.all())
@@ -19,7 +14,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Track
-        fields = ('id', 'entity', 'instrument', 'composition_version')
+        fields = ('id', 'entity', 'instrument')
 
 
 class CompositionVersionSerializer(serializers.ModelSerializer):
@@ -27,10 +22,23 @@ class CompositionVersionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CompositionVersion
+        fields = '__all__'
 
     def create(self, validated_data):
         tracks = validated_data.pop('tracks')
-        composition_version = CompositionVersion.objects.create(validated_data)
+        composition_version = CompositionVersion.objects.create(**validated_data)
         for track in tracks:
             track['composition_version'] = composition_version
         self.fields['tracks'].create(tracks)
+
+
+class CompositionSerializer(serializers.ModelSerializer):
+    versions = CompositionVersionSerializer(many=True)
+    latest_version = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Composition
+        fields = '__all__'
+
+    def get_latest_version(self, composition):
+        return CompositionVersionSerializer(composition.versions.last()).data

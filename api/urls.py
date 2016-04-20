@@ -8,6 +8,7 @@ router.register(r'user', UserViewSet)
 router.register(r'band', BandViewSet)
 router.register(r'member', MemberViewSet)
 router.register(r'composition', CompositionViewSet)
+router.register(r'composition_version', CompositionVersionViewSet)
 router.register(r'instrument', InstrumentViewSet)
 router.register(r'track', TrackViewSet)
 

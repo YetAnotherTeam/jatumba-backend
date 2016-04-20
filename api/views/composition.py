@@ -4,8 +4,8 @@ from rest_framework import mixins, viewsets, filters, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.models import Composition, Track, Sound
-from api.serializers import CompositionSerializer, TrackSerializer
+from api.models import Composition, Track, Sound, CompositionVersion
+from api.serializers import CompositionSerializer, TrackSerializer, CompositionVersionSerializer
 
 
 class CompositionViewSet(mixins.CreateModelMixin,
@@ -15,6 +15,13 @@ class CompositionViewSet(mixins.CreateModelMixin,
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band__members__user', 'band__members')
     serializer_class = CompositionSerializer
+
+
+class CompositionVersionViewSet(mixins.CreateModelMixin,
+                                mixins.ListModelMixin,
+                                viewsets.GenericViewSet):
+    queryset = CompositionVersion.objects.all()
+    serializer_class = CompositionVersionSerializer
 
 
 class TrackViewSet(viewsets.ModelViewSet):
