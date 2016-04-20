@@ -39,7 +39,7 @@ class Composition(models.Model):
 class CompositionVersion(models.Model):
     composition = models.ForeignKey(
         Composition,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='versions',
         verbose_name='Композиция'
     )

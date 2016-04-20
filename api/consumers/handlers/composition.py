@@ -1,9 +1,12 @@
 import ujson
 from channels import Group
 from django.contrib.auth import get_user_model
+from rest_framework import status
 
+from api.consumers.base import unauthorized
 from api.models import Session, Composition
 from api.serializers import CompositionSerializer, CompositionVersionSerializer
+from api.serializers.socket import SocketCompositionVersionSerializer
 
 User = get_user_model()
 COMPOSITION_GROUP_TEMPLATE = 'composition-%s'
@@ -28,15 +31,20 @@ def sign_in(message, composition_id, data):
         Group(COMPOSITION_GROUP_TEMPLATE % composition_id).add(message.reply_channel)
         composition = Composition.objects.get(id=composition_id)
         (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
-         .send(
+            .send(
             {
                 "text": ujson.dumps(
-                    CompositionVersionSerializer(composition.composition_verisions.last()).data
+                    SocketCompositionVersionSerializer(
+                        {
+                            'data': composition.versions.last(),
+                            'status': status.HTTP_200_OK,
+                        }
+                    ).data
                 )
             }
         ))
     else:
-        message.reply_channel.send({"text": ujson.dumps({'error': NOT_VALID_ACCESS_TOKEN_MESSAGE})})
+        unauthorized(message)
 
 
 def disconnect(message, composition_id):

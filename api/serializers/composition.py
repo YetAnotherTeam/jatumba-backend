@@ -34,7 +34,7 @@ class CompositionVersionSerializer(serializers.ModelSerializer):
 
 
 class CompositionSerializer(serializers.ModelSerializer):
-    versions = CompositionVersionSerializer(many=True)
+    versions = CompositionVersionSerializer(many=True, read_only=True)
     latest_version = serializers.SerializerMethodField()
 
     class Meta:

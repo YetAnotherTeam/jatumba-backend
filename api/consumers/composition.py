@@ -1,17 +1,30 @@
 import ujson
 from channels.sessions import channel_session
 
+from api.consumers.base import bad_request
 from api.consumers.handlers.composition import sign_in, disconnect
 
 
 @channel_session
 def ws_receive(message, composition_id):
     message_text = message.content['text']
-    request_json = ujson.loads(message_text)
-    method = request_json.get('method')
-    data = request_json.get('data')
-    if method == 'sign_in':
-        sign_in(message, composition_id, data)
+    try:
+        request_json = ujson.loads(message_text)
+        if isinstance(request_json, dict):
+            method = request_json.get('method')
+            data = request_json.get('data')
+            if method == 'sign_in':
+                sign_in(message, composition_id, data)
+            elif method == 'history_back':
+                pass
+            elif method == 'history_forward':
+                pass
+            elif method == 'commit':
+                pass
+            else:
+                bad_request(message)
+    except ValueError:
+        bad_request(message)
 
 
 @channel_session
