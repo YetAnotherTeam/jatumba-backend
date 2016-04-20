@@ -30,6 +30,7 @@ class CompositionVersionSerializer(serializers.ModelSerializer):
         for track in tracks:
             track['composition_version'] = composition_version
         self.fields['tracks'].create(tracks)
+        return composition_version
 
 
 class CompositionSerializer(serializers.ModelSerializer):
