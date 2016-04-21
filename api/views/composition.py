@@ -18,6 +18,8 @@ class CompositionViewSet(mixins.CreateModelMixin,
 
 
 class CompositionVersionViewSet(mixins.CreateModelMixin,
+                                mixins.RetrieveModelMixin,
+                                mixins.UpdateModelMixin,
                                 mixins.ListModelMixin,
                                 viewsets.GenericViewSet):
     queryset = CompositionVersion.objects.all()

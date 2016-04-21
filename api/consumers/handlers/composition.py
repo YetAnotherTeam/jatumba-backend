@@ -1,16 +1,15 @@
 import ujson
+
 from channels import Group
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
 from api.consumers.base import unauthorized
 from api.models import Session, Composition
-from api.serializers import CompositionSerializer, CompositionVersionSerializer
-from api.serializers.socket import SocketCompositionVersionSerializer
+from api.socket.serializers import SocketCompositionVersionSerializer
 
 User = get_user_model()
-COMPOSITION_GROUP_TEMPLATE = 'composition-%s'
-NOT_VALID_ACCESS_TOKEN_MESSAGE = 'Not valid access token.'
+COMPOSITION_GROUP_TEMPLATE = 'Composition-%s'
 
 
 def check_composition_perms(data, composition_id):
@@ -45,6 +44,30 @@ def sign_in(message, composition_id, data):
         ))
     else:
         unauthorized(message)
+
+
+def commit(message, composition_id, data):
+    serializer = SocketCompositionVersionSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        pass
+        # (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
+        #     .send(
+        #     {
+        #         "text": ujson.dumps(
+        #             SocketCompositionVersionSerializer(
+        #                 {
+        #                     'data': composition.versions.last(),
+        #                     'status': status.HTTP_200_OK,
+        #                 }
+        #             ).data
+        #         )
+        #     }
+        # ))
+    else:
+        message.reply_channel.send({"text": ujson.dumps(
+            {"status": 400, "data": serializer.errors}
+        )})
 
 
 def disconnect(message, composition_id):

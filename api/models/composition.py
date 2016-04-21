@@ -54,6 +54,7 @@ class CompositionVersion(models.Model):
 
 
 class Track(models.Model):
+    SECTOR_LENGTH = 32
     instrument = models.ForeignKey(
         Instrument,
         on_delete=models.CASCADE,

@@ -1,11 +1,10 @@
 import ujson
 
-NOT_FOUND_MESSAGE = 'Path not found.'
+from rest_framework import status
+
 BAD_REQUEST = 'Bad request'
 UNAUTHORIZED = 'Unauthorized'
-
-def not_found(message):
-    message.reply_channel.send({"text": ujson.dumps({'code': 404, 'data': NOT_FOUND_MESSAGE})})
+NOT_FOUND = 'Path not found.'
 
 
 def pass_message(*args, **kwargs):
@@ -13,8 +12,18 @@ def pass_message(*args, **kwargs):
 
 
 def bad_request(message):
-    message.reply_channel.send({"text": ujson.dumps({'code': 400, 'data': BAD_REQUEST})})
+    message.reply_channel.send(
+        {"text": ujson.dumps({'code': status.HTTP_400_BAD_REQUEST, 'data': BAD_REQUEST})}
+    )
 
 
 def unauthorized(message):
-    message.reply_channel.send({"text": ujson.dumps({'code': 401, 'data': UNAUTHORIZED})})
+    message.reply_channel.send(
+        {"text": ujson.dumps({'code': status.HTTP_401_UNAUTHORIZED, 'data': UNAUTHORIZED})}
+    )
+
+
+def not_found(message):
+    message.reply_channel.send(
+        {"text": ujson.dumps({'code': status.HTTP_404_NOT_FOUND, 'data': NOT_FOUND})}
+    )
