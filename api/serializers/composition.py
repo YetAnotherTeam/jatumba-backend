@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from api.models import Composition, Track, CompositionVersion, Instrument
-from utils.django_rest_framework.serializers import ObjectListSerializer
+from utils.django_rest_framework.serializers import ObjectListSerializer, DynamicFieldsMixin
 
 User = get_user_model()
 
@@ -32,24 +32,24 @@ class TrackSerializer(serializers.ModelSerializer):
         #         raise ValidationError('Сектор должен состоять из %d звуков.' % Track.SECTOR_LENGTH)
         return entity
 
-    def validate(self, track):
-        entity = track.get('entity') or self.instance.entity
-        instrument = track.get('instrument') or self.instance.instrument
-        sounds_ids = instrument.sounds.values_list('id', flat=True)
-        for sector in entity:
-            for sound_id in sector:
-                if sound_id not in sounds_ids:
-                    raise ValidationError(
-                        'У этого инструмента c id {instrument_id} нет звука с id {sound_id}'
-                            .format(
-                                instrument_id=instrument.id,
-                                sound_id=sound_id
-                            )
-                    )
-        return track
+    # def validate(self, track):
+    #     entity = track.get('entity') or self.instance.entity
+    #     instrument = track.get('instrument') or self.instance.instrument
+    #     sounds_ids = instrument.sounds.values_list('id', flat=True)
+    #     for sector in entity:
+    #         for sound_id in sector:
+    #             if sound_id not in sounds_ids:
+    #                 raise ValidationError(
+    #                     'У инструмента c id {instrument_id} нет звука с id {sound_id}.'
+    #                         .format(
+    #                             instrument_id=instrument.id,
+    #                             sound_id=sound_id
+    #                         )
+    #                 )
+    #     return track
 
 
-class CompositionVersionSerializer(serializers.ModelSerializer):
+class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     tracks = TrackSerializer(many=True)
 
     class Meta:

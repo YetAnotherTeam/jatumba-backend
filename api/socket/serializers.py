@@ -10,4 +10,4 @@ class SocketResponseSerializer(serializers.Serializer):
 
 # noinspection PyAbstractClass
 class SocketCompositionVersionSerializer(SocketResponseSerializer):
-    data = CompositionVersionSerializer()
+    data = CompositionVersionSerializer(required_fields=('tracks',))

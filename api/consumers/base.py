@@ -2,8 +2,10 @@ import ujson
 
 from rest_framework import status
 
+
 BAD_REQUEST = 'Bad request'
 UNAUTHORIZED = 'Unauthorized'
+FORBIDDEN = 'Forbidden'
 NOT_FOUND = 'Path not found.'
 
 
@@ -20,6 +22,12 @@ def bad_request(message):
 def unauthorized(message):
     message.reply_channel.send(
         {"text": ujson.dumps({'code': status.HTTP_401_UNAUTHORIZED, 'data': UNAUTHORIZED})}
+    )
+
+
+def forbidden(message):
+    message.reply_channel.send(
+        {"text": ujson.dumps({'code': status.HTTP_403_FORBIDDEN, 'data': FORBIDDEN})}
     )
 
 

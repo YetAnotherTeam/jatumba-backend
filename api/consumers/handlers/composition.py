@@ -4,8 +4,9 @@ from channels import Group
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
-from api.consumers.base import unauthorized
+from api.consumers.base import unauthorized, forbidden
 from api.models import Session, Composition
+from api.serializers import CompositionVersionSerializer
 from api.socket.serializers import SocketCompositionVersionSerializer
 
 User = get_user_model()
@@ -43,31 +44,34 @@ def sign_in(message, composition_id, data):
             }
         ))
     else:
-        unauthorized(message)
+        forbidden(message)
 
 
 def commit(message, composition_id, data):
-    serializer = SocketCompositionVersionSerializer(data=data)
-    if serializer.is_valid():
-        serializer.save()
-        pass
-        # (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
-        #     .send(
-        #     {
-        #         "text": ujson.dumps(
-        #             SocketCompositionVersionSerializer(
-        #                 {
-        #                     'data': composition.versions.last(),
-        #                     'status': status.HTTP_200_OK,
-        #                 }
-        #             ).data
-        #         )
-        #     }
-        # ))
+    if 'user' in message.channel_session:
+        data['composition'] = composition_id
+        serializer = CompositionVersionSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
+                .send(
+                {
+                    "text": ujson.dumps(
+                        SocketCompositionVersionSerializer(
+                            {
+                                'data': Composition.objects.get(pk=composition_id).versions.last(),
+                                'status': status.HTTP_200_OK,
+                            }
+                        ).data
+                    )
+                }
+            ))
+        else:
+            message.reply_channel.send({"text": ujson.dumps(
+                {"status": 400, "data": serializer.errors}
+            )})
     else:
-        message.reply_channel.send({"text": ujson.dumps(
-            {"status": 400, "data": serializer.errors}
-        )})
+        forbidden(message)
 
 
 def disconnect(message, composition_id):
