@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from api.models import *
 from api.serializers.auth import UserSerializer
@@ -27,3 +28,10 @@ class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
         fields = ('id', 'user', 'band', 'instrument')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Member.objects.all(),
+                fields=('user', 'band'),
+                message='Вы уже состоите в этой группе',
+            )
+        ]
