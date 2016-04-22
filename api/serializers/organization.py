@@ -22,7 +22,7 @@ class MemberSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=False,
         serializer=InstrumentSerializer,
-        serializer_params={'fields': ('name',)}
+        serializer_params={'required_fields': ('name',)}
     )
 
     class Meta:
