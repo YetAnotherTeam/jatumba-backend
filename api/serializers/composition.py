@@ -17,7 +17,9 @@ class TrackListSerializer(ObjectListSerializer):
 # noinspection PyAbstractClass
 class TrackSerializer(serializers.ModelSerializer):
     instrument = serializers.PrimaryKeyRelatedField(queryset=Instrument.objects.all())
-    entity = serializers.ListField(child=serializers.ListField(child=serializers.IntegerField()))
+    entity = serializers.ListField(
+        child=serializers.ListField(child=serializers.IntegerField(allow_null=True))
+    )
 
     class Meta:
         model = Track
@@ -38,7 +40,7 @@ class TrackSerializer(serializers.ModelSerializer):
         sounds_ids = instrument.sounds.values_list('id', flat=True)
         for sector in entity:
             for sound_id in sector:
-                if sound_id not in sounds_ids:
+                if sound_id is not None and sound_id not in sounds_ids:
                     raise ValidationError(
                         'У инструмента c id {instrument_id} нет звука с id {sound_id}.'
                             .format(
