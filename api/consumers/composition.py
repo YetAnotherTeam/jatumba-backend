@@ -8,8 +8,11 @@ from api.consumers.handlers.composition import sign_in, disconnect, commit
 @channel_session
 def ws_receive(message, composition_id):
     message_text = message.content['text']
-    # try:
-    request_json = ujson.loads(message_text)
+    request_json = None
+    try:
+        request_json = ujson.loads(message_text)
+    except ValueError as e:
+        print(e)
     if isinstance(request_json, dict):
         method = request_json.get('method')
         data = request_json.get('data')
@@ -23,13 +26,8 @@ def ws_receive(message, composition_id):
             pass
         elif method == 'commit':
             commit(message, composition_id, data)
-        else:
-            bad_request(message)
-    else:
-        bad_request(message)
-    # except ValueError as e:
-    #     print(e)
-    #     bad_request(message)
+    bad_request(message)
+
 
 
 
