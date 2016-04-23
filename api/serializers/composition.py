@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from api.models import Composition, Track, CompositionVersion, Instrument
+from utils.django_rest_framework.fields import NoneableIntegerField
 from utils.django_rest_framework.serializers import ObjectListSerializer, DynamicFieldsMixin
 
 User = get_user_model()
@@ -18,7 +19,7 @@ class TrackListSerializer(ObjectListSerializer):
 class TrackSerializer(serializers.ModelSerializer):
     instrument = serializers.PrimaryKeyRelatedField(queryset=Instrument.objects.all())
     entity = serializers.ListField(
-        child=serializers.ListField(child=serializers.IntegerField(allow_null=True))
+        child=serializers.ListField(child=NoneableIntegerField(allow_null=True))
     )
 
     class Meta:
