@@ -4,7 +4,7 @@ from channels import Group
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
-from api.consumers.base import unauthorized, forbidden
+from api.consumers.base import forbidden, bad_request
 from api.models import Session, Composition
 from api.serializers import CompositionVersionSerializer
 from api.socket.serializers import SocketCompositionVersionSerializer
@@ -30,46 +30,54 @@ def sign_in(message, composition_id, data):
         message.channel_session['user'] = user.id
         Group(COMPOSITION_GROUP_TEMPLATE % composition_id).add(message.reply_channel)
         composition = Composition.objects.get(id=composition_id)
-        (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
-            .send(
+        message.reply_channel.send(
             {
                 "text": ujson.dumps(
                     SocketCompositionVersionSerializer(
                         {
+                            'method': 'sign_in',
+                            'user': user.id,
                             'data': composition.versions.last(),
                             'status': status.HTTP_200_OK,
                         }
                     ).data
                 )
             }
-        ))
+        )
     else:
         forbidden(message)
 
 
 def commit(message, composition_id, data):
     if 'user' in message.channel_session:
-        data['composition'] = composition_id
-        serializer = CompositionVersionSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
-                .send(
-                {
-                    "text": ujson.dumps(
-                        SocketCompositionVersionSerializer(
-                            {
-                                'data': Composition.objects.get(pk=composition_id).versions.last(),
-                                'status': status.HTTP_200_OK,
-                            }
-                        ).data
-                    )
-                }
-            ))
+        if isinstance(data, dict):
+            data['composition'] = composition_id
+            serializer = CompositionVersionSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                composition = Composition.objects.get(id=composition_id)
+                (Group(COMPOSITION_GROUP_TEMPLATE % composition_id)
+                    .send(
+                    {
+                        "text": ujson.dumps(
+                            SocketCompositionVersionSerializer(
+                                {
+                                    # TODO временно пока не сделаем нормальный дифф
+                                    'method': 'diff',
+                                    'user': message.channel_session['user'],
+                                    'data': composition.versions.last(),
+                                    'status': status.HTTP_200_OK,
+                                }
+                            ).data
+                        )
+                    }
+                ))
+            else:
+                message.reply_channel.send({"text": ujson.dumps(
+                    {"status": 400, "data": serializer.errors}
+                )})
         else:
-            message.reply_channel.send({"text": ujson.dumps(
-                {"status": 400, "data": serializer.errors}
-            )})
+            bad_request(message)
     else:
         forbidden(message)
 

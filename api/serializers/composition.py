@@ -27,26 +27,26 @@ class TrackSerializer(serializers.ModelSerializer):
     def validate_entity(self, entity):
         if len(entity) == 0:
             raise ValidationError('В дорожке должен быть хотя бы один сектор')
-        # for sector in entity:
-        #     if len(sector) != Track.SECTOR_LENGTH:
-        #         raise ValidationError('Сектор должен состоять из %d звуков.' % Track.SECTOR_LENGTH)
+        for sector in entity:
+            if len(sector) != Track.SECTOR_LENGTH:
+                raise ValidationError('Сектор должен состоять из %d звуков.' % Track.SECTOR_LENGTH)
         return entity
 
-    # def validate(self, track):
-    #     entity = track.get('entity') or self.instance.entity
-    #     instrument = track.get('instrument') or self.instance.instrument
-    #     sounds_ids = instrument.sounds.values_list('id', flat=True)
-    #     for sector in entity:
-    #         for sound_id in sector:
-    #             if sound_id not in sounds_ids:
-    #                 raise ValidationError(
-    #                     'У инструмента c id {instrument_id} нет звука с id {sound_id}.'
-    #                         .format(
-    #                             instrument_id=instrument.id,
-    #                             sound_id=sound_id
-    #                         )
-    #                 )
-    #     return track
+    def validate(self, track):
+        entity = track.get('entity') or self.instance.entity
+        instrument = track.get('instrument') or self.instance.instrument
+        sounds_ids = instrument.sounds.values_list('id', flat=True)
+        for sector in entity:
+            for sound_id in sector:
+                if sound_id not in sounds_ids:
+                    raise ValidationError(
+                        'У инструмента c id {instrument_id} нет звука с id {sound_id}.'
+                            .format(
+                                instrument_id=instrument.id,
+                                sound_id=sound_id
+                            )
+                    )
+        return track
 
 
 class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
