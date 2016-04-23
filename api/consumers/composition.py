@@ -26,9 +26,10 @@ def ws_receive(message, composition_id):
             pass
         elif method == 'commit':
             commit(message, composition_id, data)
-    bad_request(message)
-
-
+        else:
+            bad_request(message)
+    else:
+        bad_request(message)
 
 
 @channel_session
