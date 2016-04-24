@@ -24,7 +24,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Track
-        fields = ('id', 'entity', 'instrument')
+        fields = ('id', 'entity', 'instrument', 'order')
         list_serializer_class = TrackListSerializer
 
     def validate_entity(self, entity):

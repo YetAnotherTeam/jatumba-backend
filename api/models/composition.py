@@ -61,15 +61,18 @@ class Track(models.Model):
         related_name='tracks',
         verbose_name='Инструмент'
     )
-    entity = JSONField(verbose_name='Сущность', null=True)
     composition_version = models.ForeignKey(
         CompositionVersion,
         on_delete=models.CASCADE,
         related_name='tracks',
         verbose_name='Композиция'
     )
+    entity = JSONField(verbose_name='Сущность', null=True)
+    order = models.PositiveSmallIntegerField(verbose_name='Порядок')
 
     class Meta:
+        unique_together = (('composition_version', 'order'),)
+        ordering = ('composition_version', 'order')
         verbose_name = 'Дорожка'
         verbose_name_plural = 'Дорожки'
 
