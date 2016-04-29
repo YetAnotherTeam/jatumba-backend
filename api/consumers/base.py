@@ -14,24 +14,28 @@ def pass_message(*args, **kwargs):
 
 
 def bad_request(message):
-    message.reply_channel.send(
-        {"text": ujson.dumps({'code': status.HTTP_400_BAD_REQUEST, 'data': BAD_REQUEST})}
-    )
+    message.reply_channel.send({
+        "text": ujson.dumps({'code': status.HTTP_400_BAD_REQUEST, 'data': BAD_REQUEST}),
+        "close": True,
+    })
 
 
 def unauthorized(message):
-    message.reply_channel.send(
-        {"text": ujson.dumps({'code': status.HTTP_401_UNAUTHORIZED, 'data': UNAUTHORIZED})}
-    )
+    message.reply_channel.send({
+        "text": ujson.dumps({'code': status.HTTP_401_UNAUTHORIZED, 'data': UNAUTHORIZED}),
+        "close": True,
+    })
 
 
 def forbidden(message):
-    message.reply_channel.send(
-        {"text": ujson.dumps({'code': status.HTTP_403_FORBIDDEN, 'data': FORBIDDEN})}
-    )
+    message.reply_channel.send({
+        "text": ujson.dumps({'code': status.HTTP_403_FORBIDDEN, 'data': FORBIDDEN}),
+        "close": True,
+    })
 
 
 def not_found(message):
-    message.reply_channel.send(
-        {"text": ujson.dumps({'code': status.HTTP_404_NOT_FOUND, 'data': NOT_FOUND})}
-    )
+    message.reply_channel.send({
+        "text": ujson.dumps({'code': status.HTTP_404_NOT_FOUND, 'data': NOT_FOUND}),
+        "close": True,
+    })
