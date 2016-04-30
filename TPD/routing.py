@@ -1,5 +1,7 @@
 from channels import route, include
 
+from api.socket.views import CompositionSocketView
+
 composition_routing = [
     route(
         'websocket.connect',
@@ -8,12 +10,12 @@ composition_routing = [
     ),
     route(
         'websocket.receive',
-        'api.consumers.composition.ws_receive',
+        CompositionSocketView.as_view(),
         path=r'/(?P<composition_id>\d+)/$'
     ),
     route(
         'websocket.disconnect',
-        'api.consumers.composition.ws_disconnect',
+        CompositionSocketView.as_view(),
         path=r'/(?P<composition_id>\d+)/$'
     ),
 ]
@@ -21,8 +23,8 @@ composition_routing = [
 
 chat_routing = [
     route('websocket.connect', 'api.consumers.base.pass_message'),
-    route('websocket.receive', 'api.consumers.composition.ws_receive'),
-    route('websocket.disconnect', 'api.consumers.composition.ws_disconnect'),
+    route('websocket.receive', CompositionSocketView.as_view()),
+    route('websocket.disconnect', CompositionSocketView.as_view()),
 ]
 
 not_found_routing = [
