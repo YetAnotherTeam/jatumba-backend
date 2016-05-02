@@ -125,10 +125,17 @@ class ChatSocketView(SocketRouteView):
                 band=Band.objects.get(pk=band_id)
             )
             group = Group(self.CHAT_GROUP_TEMPLATE % band_id)
-            messages = Message.objects.all()[:self.MESSAGES_COUNT][::-1]
             self.route_send(
                 group,
-                MessagesSerializer({"messages": messages}).data
+                serializer.data
             )
+        else:
+            raise PermissionDenied
+
+    @socket_route
+    def list(self, request, data, *args, **kwargs):
+        if 'user' in request.channel_session:
+            # TODO возможно стоит добавить просмотр сообщений до последних 20
+            pass
         else:
             raise PermissionDenied

@@ -12,5 +12,6 @@ class MessageSerializer(serializers.ModelSerializer):
         exclude = ('band',)
 
 
+# noinspection PyAbstractClass
 class MessagesSerializer(serializers.Serializer):
     messages = MessageSerializer(many=True)
