@@ -6,7 +6,7 @@ from rest_framework.exceptions import PermissionDenied
 from api.models import Session, Composition
 from api.serializers import CompositionVersionSerializer
 from api.socket.serializers import (
-    SignInSocketSerializer, CompositionVersionResponseSocketSerializer
+    SignInSocketSerializer
 )
 from rest_channels.socket_routing.decorators import socket_route
 from rest_channels.socket_routing.route_views import SocketRouteView
@@ -46,18 +46,10 @@ class CompositionSocketView(SocketRouteView):
             request.channel_session['user'] = user.id
             Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id).add(request.reply_channel)
             composition = Composition.objects.get(id=composition_id)
-            self.send(
+            self.route_send(
                 request.reply_channel,
-                CompositionVersionResponseSocketSerializer(
-                    {
-                        'method': 'sign_in',
-                        'user': user,
-                        'data': composition.versions.last(),
-                        'status': status.HTTP_200_OK,
-                    }
-                ).data
+                CompositionVersionSerializer(composition.versions.last()).data
             )
-
         else:
             raise PermissionDenied
 
@@ -69,18 +61,10 @@ class CompositionSocketView(SocketRouteView):
             serializer = CompositionVersionSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            composition = Composition.objects.get(id=composition_id)
-            self.send(
+            self.route_send(
                 Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
-                CompositionVersionResponseSocketSerializer(
-                    {
-                        # TODO временно пока не сделаем нормальный дифф
-                        'method': 'diff',
-                        'user': User.objects.get(pk=request.channel_session['user']),
-                        'data': composition.versions.last(),
-                        'status': status.HTTP_200_OK,
-                    }
-                ).data
+                serializer.data,
+                status.HTTP_201_CREATED
             )
         else:
             raise PermissionDenied
