@@ -21,29 +21,27 @@ class CompositionSocketView(SocketRouteView):
         composition_id = kwargs.get('composition_id')
         Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id).discard(request.reply_channel)
 
-    def check_composition_perms(self, access_token, composition_id):
-        if access_token:
-            session = (Session
-                       .objects
-                       .filter(access_token=access_token)
-                       .select_related('user')
-                       .first())
-            if session is not None:
-                user = session.user
-                if (Composition
-                        .objects
-                        .filter(id=composition_id, band__members__user=user.id)
-                        .exists()):
-                    return user
+    def check_composition_perms(self, serializer, composition_id):
+        session = (Session
+                   .objects
+                   .filter(access_token=serializer.data['access_token'])
+                   .select_related('user')
+                   .first())
+        if session is not None:
+            user = session.user
+            if (Composition
+                    .objects
+                    .filter(id=composition_id, band__members__user=user.id)
+                    .exists()):
+                return user
         return None
 
     @socket_route
     def sign_in(self, request, data, *args, **kwargs):
         serializer = SignInSocketSerializer(data=data)
         serializer.is_valid(raise_exception=True)
-        access_token = serializer.data.get('access_token')
         composition_id = kwargs.get('composition_id')
-        user = self.check_composition_perms(access_token, composition_id)
+        user = self.check_composition_perms(serializer, composition_id)
         if user is not None:
             request.channel_session['user'] = user.id
             Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id).add(request.reply_channel)
