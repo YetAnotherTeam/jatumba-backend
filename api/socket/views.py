@@ -3,8 +3,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 
-from api.models import Session, Composition
-from api.serializers import CompositionVersionSerializer
+from api.models import Session, Composition, Band, Message
+from api.serializers import CompositionVersionSerializer, MessageSerializer
+from api.serializers.chat import MessagesSerializer
 from api.socket.serializers import (
     SignInSocketSerializer
 )
@@ -55,8 +56,8 @@ class CompositionSocketView(SocketRouteView):
 
     @socket_route
     def commit(self, request, data, *args, **kwargs):
-        composition_id = kwargs.get('composition_id')
         if 'user' in request.channel_session:
+            composition_id = kwargs.get('composition_id')
             data['composition'] = composition_id
             serializer = CompositionVersionSerializer(data=data)
             serializer.is_valid(raise_exception=True)
@@ -65,6 +66,69 @@ class CompositionSocketView(SocketRouteView):
                 Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
                 serializer.data,
                 status.HTTP_201_CREATED
+            )
+        else:
+            raise PermissionDenied
+
+
+class ChatSocketView(SocketRouteView):
+    CHAT_GROUP_TEMPLATE = 'Chat-%s'
+    MESSAGES_COUNT = 2
+
+    def disconnect(self, request, *args, **kwargs):
+        chat_id = kwargs.get('chat_id')
+        group = Group(self.CHAT_GROUP_TEMPLATE % chat_id)
+        group.discard(request.reply_channel)
+        # self.send(group, {'leave': UserSerializer(user.id)})
+
+    def check_chat_perms(self, serializer, band_id):
+        session = (Session
+                   .objects
+                   .filter(access_token=serializer.data['access_token'])
+                   .select_related('user')
+                   .first())
+        if session is not None:
+            user = session.user
+            if (Band
+                    .objects
+                    .filter(id=band_id, members__user=user.id)
+                    .exists()):
+                return user
+        return None
+
+    @socket_route
+    def sign_in(self, request, data, *args, **kwargs):
+        serializer = SignInSocketSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        band_id = kwargs.get('band_id')
+        user = self.check_chat_perms(serializer, band_id)
+        if user is not None:
+            request.channel_session['user'] = user.id
+            group = Group(self.CHAT_GROUP_TEMPLATE % band_id)
+            group.add(request.reply_channel)
+            messages = Message.objects.all()[:self.MESSAGES_COUNT][::-1]
+            self.route_send(
+                request.reply_channel,
+                MessagesSerializer({"messages": messages}).data
+            )
+        else:
+            raise PermissionDenied
+
+    @socket_route
+    def publish(self, request, data, *args, **kwargs):
+        if 'user' in request.channel_session:
+            band_id = kwargs.get('band_id')
+            serializer = MessageSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(
+                author=User.objects.get(pk=request.channel_session['user']),
+                band=Band.objects.get(pk=band_id)
+            )
+            group = Group(self.CHAT_GROUP_TEMPLATE % band_id)
+            messages = Message.objects.all()[:self.MESSAGES_COUNT][::-1]
+            self.route_send(
+                group,
+                MessagesSerializer({"messages": messages}).data
             )
         else:
             raise PermissionDenied
