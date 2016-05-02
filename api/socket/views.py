@@ -1,43 +1,27 @@
 from channels import Group
-from channels.sessions import channel_session
+from django.contrib.auth import get_user_model
 from rest_framework import status
-from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import PermissionDenied
 
 from api.models import Session, Composition
 from api.serializers import CompositionVersionSerializer
-from api.socket.serializers import SocketCompositionVersionSerializer
-from rest_channels.decorators import rest_channels
-from rest_channels.views import SocketView
+from api.socket.serializers import (
+    SignInSocketSerializer, CompositionVersionResponseSocketSerializer
+)
+from rest_channels.socket_routing.decorators import socket_route
+from rest_channels.socket_routing.route_views import SocketRouteView
+
+User = get_user_model()
 
 
-class CompositionSocketView(SocketView):
+class CompositionSocketView(SocketRouteView):
     COMPOSITION_GROUP_TEMPLATE = 'Composition-%s'
-
-    @rest_channels(channel_session)
-    def receive(self, request, *args, **kwargs):
-        request_data = request.data
-        method = request_data.get('method')
-        composition_id = kwargs.get('composition_id')
-        data = request_data.get('data')
-        if method == 'sign_in':
-            self.sign_in(request, composition_id, data)
-        elif method == 'diff':
-            self.commit(request, composition_id, data)
-        elif method == 'history_back':
-            pass
-        elif method == 'history_forward':
-            pass
-        elif method == 'commit':
-            self.commit(request, composition_id, data)
-        else:
-            raise ValidationError('Method {method} not supplied'.format(method=method))
 
     def disconnect(self, request, *args, **kwargs):
         composition_id = kwargs.get('composition_id')
         Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id).discard(request.reply_channel)
 
-    def check_composition_perms(self, data, composition_id):
-        access_token = data.get('access_token')
+    def check_composition_perms(self, access_token, composition_id):
         if access_token:
             session = (Session
                        .objects
@@ -53,18 +37,23 @@ class CompositionSocketView(SocketView):
                     return user
         return None
 
-    def sign_in(self, request, composition_id, data):
-        user = self.check_composition_perms(data, composition_id)
+    @socket_route
+    def sign_in(self, request, data, *args, **kwargs):
+        serializer = SignInSocketSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        access_token = serializer.data.get('access_token')
+        composition_id = kwargs.get('composition_id')
+        user = self.check_composition_perms(access_token, composition_id)
         if user is not None:
             request.channel_session['user'] = user.id
             Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id).add(request.reply_channel)
             composition = Composition.objects.get(id=composition_id)
             self.send(
                 request.reply_channel,
-                SocketCompositionVersionSerializer(
+                CompositionVersionResponseSocketSerializer(
                     {
                         'method': 'sign_in',
-                        'user': user.id,
+                        'user': user,
                         'data': composition.versions.last(),
                         'status': status.HTTP_200_OK,
                     }
@@ -74,27 +63,26 @@ class CompositionSocketView(SocketView):
         else:
             raise PermissionDenied
 
-    def commit(self, message, composition_id, data):
-        if 'user' in message.channel_session:
-            if isinstance(data, dict):
-                data['composition'] = composition_id
-                serializer = CompositionVersionSerializer(data=data)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                composition = Composition.objects.get(id=composition_id)
-                self.send(
-                    Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
-                    SocketCompositionVersionSerializer(
-                        {
-                            # TODO временно пока не сделаем нормальный дифф
-                            'method': 'diff',
-                            'user': message.channel_session['user'],
-                            'data': composition.versions.last(),
-                            'status': status.HTTP_200_OK,
-                        }
-                    ).data
-                )
-            else:
-                raise ValidationError('data must be dict instance')
+    @socket_route
+    def commit(self, request, data, *args, **kwargs):
+        composition_id = kwargs.get('composition_id')
+        if 'user' in request.channel_session:
+            data['composition'] = composition_id
+            serializer = CompositionVersionSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            composition = Composition.objects.get(id=composition_id)
+            self.send(
+                Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
+                CompositionVersionResponseSocketSerializer(
+                    {
+                        # TODO временно пока не сделаем нормальный дифф
+                        'method': 'diff',
+                        'user': User.objects.get(pk=request.channel_session['user']),
+                        'data': composition.versions.last(),
+                        'status': status.HTTP_200_OK,
+                    }
+                ).data
+            )
         else:
             raise PermissionDenied
