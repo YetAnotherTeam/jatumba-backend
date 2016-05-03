@@ -15,7 +15,7 @@ from api.auth.session_generator import generate_session_params
 from api.models import Session
 from api.serializers import (
     AuthResponseSerializer, UserSerializer, SignUpSerializer, SignInSerializer,
-    IsAuthenticatedSerializer
+    IsAuthenticatedSerializer, UserRetrieveSerializer
 )
 
 User = get_user_model()
@@ -108,6 +108,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
     search_fields = ('id', 'username', 'first_name', 'last_name')
     serializers = {
         'DEFAULT': UserSerializer,
+        'retrieve': UserRetrieveSerializer,
         'sign_up': SignUpSerializer,
         'sign_in': SignInSerializer,
         'is_authenticated': IsAuthenticatedSerializer,

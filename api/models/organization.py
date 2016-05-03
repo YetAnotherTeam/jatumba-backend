@@ -4,8 +4,6 @@ from django.db import models
 from django.db.transaction import atomic
 from guardian.shortcuts import assign_perm, remove_perm
 
-from api.models.dictionary import Instrument
-
 
 class Band(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название')
@@ -53,14 +51,6 @@ class Member(models.Model):
         on_delete=models.CASCADE,
         related_name='members',
         verbose_name='Группа'
-    )
-    instrument = models.ForeignKey(
-        Instrument,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='members',
-        verbose_name='Инструмент'
     )
 
     class Meta:

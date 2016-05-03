@@ -8,6 +8,11 @@ from utils.django.storage import OverwriteStorage
 
 
 class Instrument(models.Model):
+    users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='instruments',
+        verbose_name='Пользователь'
+    )
     name = models.CharField(max_length=25, verbose_name='Название', unique=True)
 
     class Meta:
