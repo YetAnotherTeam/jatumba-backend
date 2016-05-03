@@ -45,6 +45,7 @@ class Member(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        related_name='members',
         verbose_name='Пользователь'
     )
     band = models.ForeignKey(

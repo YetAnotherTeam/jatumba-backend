@@ -103,7 +103,8 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     permission_classes = (DjangoObjectPermissions,)
     queryset = User.objects.all()
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
+    filter_fields = ('members__band',)
     search_fields = ('id', 'username', 'first_name', 'last_name')
     serializers = {
         'DEFAULT': UserSerializer,
