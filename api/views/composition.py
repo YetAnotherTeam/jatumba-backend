@@ -66,6 +66,16 @@ class CompositionVersionViewSet(mixins.CreateModelMixin,
         serializer = ForkSerializer(fork)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @detail_route(methods=('post',))
+    def rollback(self, request, pk=None):
+        composition_version = self.get_object()
+        (CompositionVersion
+         .objects
+         .filter(id__gt=composition_version.id, composition=composition_version.composition)
+         .delete())
+        serializer = self.get_serializer(composition_version)
+        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
 
 class TrackViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
