@@ -73,7 +73,7 @@ class CompositionSocketView(SocketRouteView):
 
 class ChatSocketView(SocketRouteView):
     CHAT_GROUP_TEMPLATE = 'Chat-%s'
-    MESSAGES_COUNT = 2
+    MESSAGES_COUNT = 20
 
     def disconnect(self, request, *args, **kwargs):
         chat_id = kwargs.get('chat_id')

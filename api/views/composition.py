@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from api.models import Composition, Track, Sound, CompositionVersion, atomic, Fork
 from api.serializers import (
     CompositionSerializer, TrackSerializer, CompositionVersionSerializer, ForkSerializer,
-    ForkCreateSerializer
+    ForkCreateSerializer, CompositionListItemSerializer
 )
 
 
@@ -18,7 +18,13 @@ class CompositionViewSet(mixins.CreateModelMixin,
     queryset = Composition.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band__members__user', 'band__members')
-    serializer_class = CompositionSerializer
+    serializers = {
+        'DEFAULT': CompositionSerializer,
+        'list': CompositionListItemSerializer
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers['DEFAULT'])
 
 
 class CompositionVersionViewSet(mixins.CreateModelMixin,

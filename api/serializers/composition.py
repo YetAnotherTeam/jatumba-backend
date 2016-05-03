@@ -77,7 +77,7 @@ class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializ
         return instance
 
 
-class CompositionSerializer(serializers.ModelSerializer):
+class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     versions = CompositionVersionSerializer(many=True, read_only=True)
     latest_version = serializers.SerializerMethodField()
 
@@ -87,6 +87,10 @@ class CompositionSerializer(serializers.ModelSerializer):
 
     def get_latest_version(self, composition):
         return CompositionVersionSerializer(composition.versions.last()).data
+
+
+class CompositionListItemSerializer(CompositionSerializer):
+    required_fields = ('id', 'name', 'band')
 
 
 # noinspection PyAbstractClass
