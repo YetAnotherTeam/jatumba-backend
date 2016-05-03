@@ -17,7 +17,7 @@ class CompositionViewSet(mixins.CreateModelMixin,
                          viewsets.GenericViewSet):
     queryset = Composition.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('band__members__user', 'band__members')
+    filter_fields = ('band__members__user', 'band__members', 'band')
     serializers = {
         'DEFAULT': CompositionSerializer,
         'list': CompositionListItemSerializer
