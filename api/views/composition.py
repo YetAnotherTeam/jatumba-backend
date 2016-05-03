@@ -1,11 +1,15 @@
 import ujson
 
 from rest_framework import mixins, viewsets, filters, status
+from rest_framework.decorators import detail_route
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.models import Composition, Track, Sound, CompositionVersion
-from api.serializers import CompositionSerializer, TrackSerializer, CompositionVersionSerializer
+from api.models import Composition, Track, Sound, CompositionVersion, atomic, Fork
+from api.serializers import (
+    CompositionSerializer, TrackSerializer, CompositionVersionSerializer, ForkSerializer,
+    ForkCreateSerializer
+)
 
 
 class CompositionViewSet(mixins.CreateModelMixin,
@@ -23,7 +27,38 @@ class CompositionVersionViewSet(mixins.CreateModelMixin,
                                 mixins.ListModelMixin,
                                 viewsets.GenericViewSet):
     queryset = CompositionVersion.objects.all()
-    serializer_class = CompositionVersionSerializer
+    serializers = {
+        'DEFAULT': CompositionVersionSerializer,
+        'fork': ForkCreateSerializer
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers['DEFAULT'])
+
+    @detail_route(methods=('post',))
+    @atomic
+    def fork(self, request, pk=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        composition_version = self.get_object()
+        composition = composition_version.composition
+        composition.band_id = serializer.data['band']
+        composition.id = None
+        composition.save()
+        new_composition_version = composition.versions.last()
+
+        for track in composition_version.tracks.all():
+            track.id = None
+            track.composition_version_id = new_composition_version.id
+            track.save()
+
+        fork = Fork.objects.create(
+            composition=composition,
+            composition_version=composition_version
+        )
+        serializer = ForkSerializer(fork)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class TrackViewSet(viewsets.ModelViewSet):

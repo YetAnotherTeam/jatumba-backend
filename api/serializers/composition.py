@@ -4,7 +4,7 @@ from django.db.transaction import atomic
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.models import Composition, Track, CompositionVersion, Instrument
+from api.models import Composition, Track, CompositionVersion, Instrument, Fork, Band
 from utils.django_rest_framework.fields import NoneableIntegerField
 from utils.django_rest_framework.serializers import ObjectListSerializer, DynamicFieldsMixin
 
@@ -87,3 +87,28 @@ class CompositionSerializer(serializers.ModelSerializer):
 
     def get_latest_version(self, composition):
         return CompositionVersionSerializer(composition.versions.last()).data
+
+
+# noinspection PyAbstractClass
+class ForkCreateSerializer(serializers.Serializer):
+    band = serializers.PrimaryKeyRelatedField(queryset=Band.objects.all())
+
+    def validate(self, attrs):
+        request = self.context['request']
+        user = request.user
+        band = attrs['band']
+        if not band.members.filter(user=user).exists():
+            raise ValidationError('Вы не состоите в этой группе')
+        return attrs
+
+
+# noinspection PyAbstractClass
+class ForkSerializer(serializers.ModelSerializer):
+    composition_version = serializers.PrimaryKeyRelatedField(
+        queryset=CompositionVersion.objects.all()
+    )
+    composition = CompositionSerializer()
+
+    class Meta:
+        model = Fork
+        fields = '__all__'

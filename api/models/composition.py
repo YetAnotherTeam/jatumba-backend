@@ -78,3 +78,23 @@ class Track(models.Model):
 
     def __str__(self):
         return str(self.composition)
+
+
+class Fork(models.Model):
+    composition_version = models.ForeignKey(
+        CompositionVersion,
+        on_delete=models.CASCADE,
+        related_name='forks',
+        verbose_name='Версия композиции'
+    )
+    composition = models.OneToOneField(
+        Composition,
+        on_delete=models.CASCADE,
+        related_name='fork',
+        verbose_name='Композиция'
+    )
+
+    class Meta:
+        verbose_name = 'Форк'
+        verbose_name_plural = 'Форки'
+
