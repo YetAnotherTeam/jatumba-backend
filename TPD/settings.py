@@ -54,7 +54,8 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'audiofield.middleware.threadlocals.ThreadLocals'
+    'audiofield.middleware.threadlocals.ThreadLocals',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
 
 ROOT_URLCONF = 'TPD.urls'
@@ -162,3 +163,11 @@ try:
     from .local import *
 except ImportError:
     pass
+
+
+ROLLBAR = {
+    'access_token': '327b174af7bc43f39d06ed51c8868f65',
+    'environment': 'production',
+    'branch': 'master',
+    'root': BASE_DIR,
+}
