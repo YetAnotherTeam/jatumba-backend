@@ -19,16 +19,10 @@ class BandSerializer(serializers.ModelSerializer):
 class MemberSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     user = SerializableRelatedField(serializer=UserSerializer)
     band = SerializableRelatedField(serializer=BandSerializer)
-    instrument = SerializableRelatedField(
-        allow_null=True,
-        required=False,
-        serializer=InstrumentSerializer,
-        serializer_params={'required_fields': ('name',)}
-    )
 
     class Meta:
         model = Member
-        fields = ('id', 'user', 'band', 'instrument')
+        fields = ('id', 'user', 'band')
         validators = [
             UniqueTogetherValidator(
                 queryset=Member.objects.all(),
