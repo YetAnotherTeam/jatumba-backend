@@ -53,8 +53,19 @@ class CompositionVersion(models.Model):
         return str(self.composition)
 
 
-class Track(models.Model):
+class AbstractTrack(models.Model):
     SECTOR_LENGTH = 32
+    entity = JSONField(verbose_name='Сущность', null=True)
+    order = models.PositiveSmallIntegerField(verbose_name='Порядок')
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return str(self.composition)
+
+
+class Track(AbstractTrack):
     instrument = models.ForeignKey(
         Instrument,
         on_delete=models.CASCADE,
@@ -65,10 +76,8 @@ class Track(models.Model):
         CompositionVersion,
         on_delete=models.CASCADE,
         related_name='tracks',
-        verbose_name='Композиция'
+        verbose_name='Версия композиции'
     )
-    entity = JSONField(verbose_name='Сущность', null=True)
-    order = models.PositiveSmallIntegerField(verbose_name='Порядок')
 
     class Meta:
         unique_together = (('composition_version', 'order'),)
@@ -76,8 +85,43 @@ class Track(models.Model):
         verbose_name = 'Дорожка'
         verbose_name_plural = 'Дорожки'
 
+
+class DiffCompositionVersion(models.Model):
+    composition = models.ForeignKey(
+        Composition,
+        on_delete=models.CASCADE,
+        related_name='diff_versions',
+        verbose_name='Композиция'
+    )
+
+    class Meta:
+        index_together = ('composition', 'id')
+        verbose_name = 'Дифф-версия композиции'
+        verbose_name_plural = 'Дифф-версии композиций'
+
     def __str__(self):
         return str(self.composition)
+
+
+class DiffTrack(AbstractTrack):
+    instrument = models.ForeignKey(
+        Instrument,
+        on_delete=models.CASCADE,
+        related_name='diff_tracks',
+        verbose_name='Инструмент'
+    )
+    diff_composition_version = models.ForeignKey(
+        DiffCompositionVersion,
+        on_delete=models.CASCADE,
+        related_name='diff_tracks',
+        verbose_name='Версия композиции'
+    )
+
+    class Meta:
+        unique_together = (('diff_composition_version', 'order'),)
+        ordering = ('diff_composition_version', 'order')
+        verbose_name = 'Дифф-дорожка'
+        verbose_name_plural = 'Дифф-дорожки'
 
 
 class Fork(models.Model):
@@ -97,4 +141,3 @@ class Fork(models.Model):
     class Meta:
         verbose_name = 'Форк'
         verbose_name_plural = 'Форки'
-

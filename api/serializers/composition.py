@@ -58,6 +58,7 @@ class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializ
     class Meta:
         model = CompositionVersion
         fields = '__all__'
+        extra_kwargs = {'composition': {'write_only': True}}
 
     @atomic
     def create(self, validated_data):

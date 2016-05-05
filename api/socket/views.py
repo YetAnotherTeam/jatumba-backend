@@ -54,6 +54,22 @@ class CompositionSocketView(SocketRouteView):
         else:
             raise PermissionDenied
 
+    # @socket_route
+    # def diff(self, request, data, *args, **kwargs):
+    #     if 'user' in request.channel_session:
+    #         composition_id = kwargs.get('composition_id')
+    #         data['composition'] = composition_id
+    #         serializer = CompositionVersionSerializer(data=data)
+    #         serializer.is_valid(raise_exception=True)
+    #         serializer.save()
+    #         self.route_send(
+    #             Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
+    #             serializer.data,
+    #             status.HTTP_201_CREATED
+    #         )
+    #     else:
+    #         raise PermissionDenied
+
     @socket_route
     def commit(self, request, data, *args, **kwargs):
         if 'user' in request.channel_session:

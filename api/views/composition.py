@@ -13,6 +13,7 @@ from api.serializers import (
 
 
 class CompositionViewSet(mixins.CreateModelMixin,
+                         mixins.RetrieveModelMixin,
                          mixins.ListModelMixin,
                          viewsets.GenericViewSet):
     queryset = Composition.objects.all()
