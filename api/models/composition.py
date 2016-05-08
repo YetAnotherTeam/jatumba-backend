@@ -43,7 +43,7 @@ class CompositionVersion(models.Model):
         related_name='versions',
         verbose_name='Композиция'
     )
-    datetime = models.DateTimeField(auto_now_add=True)
+    create_datetime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         index_together = ('composition', 'id')

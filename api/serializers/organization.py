@@ -1,3 +1,4 @@
+from django.db.models import Max
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -44,7 +45,13 @@ class UserRetrieveSerializer(UserSerializer):
         extra_kwargs = {'vk_profile': {'read_only': True}, 'fb_profile': {'read_only': True}}
 
     def get_compositions(self, user):
-        # TODO добавить порядок
+        # sorted_composition_versions = (
+        #     CompositionVersion.objects
+        #         .values_list('composition', 'id')
+        #         .annotate(Max('create_datetime'))
+        #         .filter(composition__band__members__user=user.id)
+        #         .order_by('create_datetime__max')
+        # )
         return CompositionSerializer(
             Composition.objects.filter(band__members__user=user.id).order_by(),
             required_fields=('id', 'latest_version', 'name', 'band', 'genres'),
