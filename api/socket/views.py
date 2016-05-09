@@ -5,7 +5,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from api.models import Session, Composition, Band, Message
 from api.serializers import (
-    CompositionVersionSerializer, MessageSerializer, MessagesSerializer, SignInSocketSerializer
+    CompositionVersionSerializer, MessageSerializer, MessagesSerializer, IsAuthenticatedSerializer
 )
 from rest_channels.socket_routing.decorators import socket_route
 from rest_channels.socket_routing.route_views import SocketRouteView
@@ -37,7 +37,7 @@ class CompositionSocketView(SocketRouteView):
 
     @socket_route
     def sign_in(self, request, data, *args, **kwargs):
-        serializer = SignInSocketSerializer(data=data)
+        serializer = IsAuthenticatedSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         composition_id = kwargs.get('composition_id')
         user = self.check_composition_perms(serializer, composition_id)
@@ -52,30 +52,31 @@ class CompositionSocketView(SocketRouteView):
         else:
             raise PermissionDenied
 
-    # @socket_route
-    # def diff(self, request, data, *args, **kwargs):
-    #     if 'user' in request.channel_session:
-    #         composition_id = kwargs.get('composition_id')
-    #         data['composition'] = composition_id
-    #         serializer = CompositionVersionSerializer(data=data)
-    #         serializer.is_valid(raise_exception=True)
-    #         serializer.save()
-    #         self.route_send(
-    #             Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
-    #             serializer.data,
-    #             status.HTTP_201_CREATED
-    #         )
-    #     else:
-    #         raise PermissionDenied
-
     @socket_route
-    def commit(self, request, data, *args, **kwargs):
+    def diff(self, request, data, *args, **kwargs):
         if 'user' in request.channel_session:
             composition_id = kwargs.get('composition_id')
             data['composition'] = composition_id
             serializer = CompositionVersionSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            self.route_send(
+                Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
+                serializer.data,
+                status.HTTP_201_CREATED
+            )
+        else:
+            raise PermissionDenied
+
+    @socket_route
+    def commit(self, request, data, *args, **kwargs):
+        user_id = request.channel_session.get('user')
+        if user_id is not None:
+            composition_id = kwargs.get('composition_id')
+            data['composition'] = composition_id
+            serializer = CompositionVersionSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user_id=user_id)
             self.route_send(
                 Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
                 serializer.data,
@@ -112,7 +113,7 @@ class ChatSocketView(SocketRouteView):
 
     @socket_route
     def sign_in(self, request, data, *args, **kwargs):
-        serializer = SignInSocketSerializer(data=data)
+        serializer = IsAuthenticatedSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         band_id = kwargs.get('band_id')
         user = self.check_chat_perms(serializer, band_id)

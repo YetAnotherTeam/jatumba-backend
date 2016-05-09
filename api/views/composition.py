@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from api.models import Composition, Track, Sound, CompositionVersion, atomic, Fork
 from api.serializers import (
     CompositionSerializer, TrackSerializer, CompositionVersionSerializer, ForkSerializer,
-    ForkCreateSerializer, CompositionListItemSerializer
+    ForkCreateSerializer, CompositionListItemSerializer, CompositionRetrieveSerializer
 )
 
 
@@ -21,6 +21,7 @@ class CompositionViewSet(mixins.CreateModelMixin,
     filter_fields = ('band__members__user', 'band__members', 'band')
     serializers = {
         'DEFAULT': CompositionSerializer,
+        'retrieve': CompositionRetrieveSerializer,
         'list': CompositionListItemSerializer
     }
 

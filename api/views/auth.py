@@ -1,21 +1,24 @@
 import binascii
 import os
+import time
 
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import status, viewsets, mixins, filters
 from rest_framework.decorators import list_route
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
+from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
 from api.models import Session
 from api.serializers import (
     AuthResponseSerializer, UserSerializer, SignUpSerializer, SignInSerializer,
-    IsAuthenticatedSerializer, UserRetrieveSerializer
+    IsAuthenticatedSerializer, UserRetrieveSerializer,
 )
 
 User = get_user_model()
@@ -25,8 +28,8 @@ def social_auth(user_data, request):
     username = request.data.get('username')
     if username is None or username == '':
         return Response(
-            {'error': 'user not found, register new by including username in request'},
-            status=404
+            {'error': 'User not found, register new by including username in request.'},
+            status=status.HTTP_400_BAD_REQUEST
         )
     user = User.objects.filter(username=username).first()
     if user:
@@ -60,7 +63,7 @@ class SocialAuthView(APIView):
         user_data = self.social_backend.get_user_data(token)
         user = User.objects.filter(**{self.user_profile_field: user_data['user_id']}).first()
         if user:
-            return Response(AuthResponseSerializer(instance=generate_auth_response(user)).data)
+            return Response(AuthResponseSerializer(generate_auth_response(user)).data)
         else:
             return social_auth(user_data, request)
 
@@ -148,4 +151,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         access_token = serializer.data['access_token']
         session = Session.objects.filter(access_token=access_token).first()
+        if (session is None or
+                (time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME)):
+            raise AuthenticationFailed('Access token not valid or expired.')
         return Response(AuthResponseSerializer({'user': session.user, 'session': session}).data)
