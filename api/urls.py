@@ -11,10 +11,11 @@ router.register(r'composition', CompositionViewSet)
 router.register(r'composition_version', CompositionVersionViewSet)
 router.register(r'instrument', InstrumentViewSet)
 router.register(r'track', TrackViewSet)
+router.register(r'fork', ForkViewSet)
 
 urlpatterns = [
-    url(r'sign_up/vk/', VKAuthView.as_view()),
-    url(r'sign_up/fb/', FBAuthView.as_view()),
-    url(r'token/refresh/', RefreshTokenView.as_view()),
+    url(r'sign_up/vk/', VKAuthView.as_view(), name='sign_up_vk'),
+    url(r'sign_up/fb/', FBAuthView.as_view(), name='sign_up_fb'),
+    url(r'token/refresh/', RefreshTokenView.as_view(), name='token_refresh'),
     url(r'', include(router.urls))
 ]

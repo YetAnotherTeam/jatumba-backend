@@ -1,19 +1,12 @@
-from django.db.models import Max
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from api.models import *
-from api.serializers import CompositionSerializer
-from api.serializers.auth import UserSerializer
+from api.serializers.complex.composition import CompositionSerializer
+from api.serializers.elementary.organization import BandSerializer
+from api.serializers.elementary.auth import UserSerializer
 from utils.django_rest_framework.fields import SerializableRelatedField
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
-
-
-# noinspection PyAbstractClass
-class BandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Band
-        fields = ('id', 'name', 'description')
 
 
 # noinspection PyAbstractClass

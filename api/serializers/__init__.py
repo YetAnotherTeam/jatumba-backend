@@ -1,5 +1,4 @@
-from api.serializers.auth import *
-from api.serializers.chat import *
-from api.serializers.composition import *
-from api.serializers.dictionary import *
-from api.serializers.organization import *
+from api.serializers.complex import *
+from api.serializers.elementary import *
+
+

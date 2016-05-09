@@ -1,10 +1,11 @@
 from rest_framework import serializers
 
 from api.models.chat import Message
-from api.serializers import UserSerializer
+from api.serializers.elementary.chat import MessageSerializer
+from api.serializers.elementary.auth import UserSerializer
 
 
-class MessageSerializer(serializers.ModelSerializer):
+class MessageCreateSerializer(MessageSerializer):
     author = UserSerializer(read_only=True)
 
     class Meta:

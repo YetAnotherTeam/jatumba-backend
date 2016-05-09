@@ -78,6 +78,12 @@ class CompositionVersionViewSet(mixins.CreateModelMixin,
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
+class ForkViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    queryset = Fork.objects.all()
+    serializer_class = ForkSerializer
+
+
 class TrackViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = Track.objects.all()

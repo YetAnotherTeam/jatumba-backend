@@ -1,10 +1,10 @@
 import binascii
 import os
 
-import time
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import status, viewsets, mixins, filters
 from rest_framework.decorators import list_route
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -114,15 +114,15 @@ class UserViewSet(mixins.RetrieveModelMixin,
         'is_authenticated': IsAuthenticatedSerializer,
     }
 
-    # для нормального отображения в BrowsableAPIRenderer
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers['DEFAULT'])
 
-    @list_route(methods=['post'], permission_classes=(AllowAny,))
+    @list_route(methods=['post'], permission_classes=(AllowAny,),
+                parser_classes=(MultiPartParser,))
     def sign_up(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = User.objects.create_user(**serializer.data)
+        user = serializer.save()
         return Response(
             AuthResponseSerializer(instance=generate_auth_response(user)).data,
             status=status.HTTP_201_CREATED

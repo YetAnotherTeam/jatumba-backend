@@ -4,10 +4,8 @@ from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 
 from api.models import Session, Composition, Band, Message
-from api.serializers import CompositionVersionSerializer, MessageSerializer
-from api.serializers.chat import MessagesSerializer
-from api.socket.serializers import (
-    SignInSocketSerializer
+from api.serializers import (
+    CompositionVersionSerializer, MessageSerializer, MessagesSerializer, SignInSocketSerializer
 )
 from rest_channels.socket_routing.decorators import socket_route
 from rest_channels.socket_routing.route_views import SocketRouteView

@@ -24,8 +24,10 @@ class VK(BaseProvider):
 
         if user_data is None:
             raise AuthenticationFailed('VK doesn\'t return user data')
-
-        user_data = user_data['response'][0]
+        try:
+            user_data = user_data['response'][0]
+        except IndexError:
+            raise AuthenticationFailed('VK doesn\'t find user')
         user_id = user_data.pop('id')
         user_data['user_id'] = str(user_id)
         user_data['network'] = 'vk'

@@ -11,9 +11,7 @@ class SoundSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'file')
 
 
-class InstrumentSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    sounds = SoundSerializer(many=True)
-
+class InstrumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Instrument
-        fields = ('id', 'name', 'sounds')
+        fields = '__all__'

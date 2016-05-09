@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.transaction import atomic
@@ -42,6 +43,12 @@ class CompositionVersion(models.Model):
         on_delete=models.CASCADE,
         related_name='versions',
         verbose_name='Композиция'
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='composition_versions',
+        verbose_name='Автор'
     )
     create_datetime = models.DateTimeField(auto_now_add=True)
 

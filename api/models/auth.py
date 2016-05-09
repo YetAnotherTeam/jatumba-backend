@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
@@ -5,8 +7,22 @@ from django.db.transaction import atomic
 from guardian.shortcuts import assign_perm
 
 
+def avatar_upload_to(instance, filename):
+    extension = os.path.splitext(filename)[-1]
+    return os.path.join(
+        'avatars',
+        '%s%s' % (instance.username, extension)
+    )
+
+
 class User(AbstractUser):
     phone = models.CharField(max_length=15, blank=True, verbose_name='Телефон')
+    avatar = models.ImageField(
+        upload_to=avatar_upload_to,
+        blank=True,
+        null=True,
+        verbose_name='Аватар'
+    )
     vk_profile = models.CharField(
         max_length=30,
         blank=True,
