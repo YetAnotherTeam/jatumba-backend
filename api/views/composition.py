@@ -1,7 +1,6 @@
 import ujson
 
 from django.contrib.auth import get_user_model
-from guardian.shortcuts import assign_perm
 from rest_framework import mixins, viewsets, filters, status
 from rest_framework.decorators import detail_route
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
@@ -9,7 +8,7 @@ from rest_framework.response import Response
 
 from api.models import Composition, Track, Sound, CompositionVersion, atomic, Fork
 from api.serializers import (
-    CompositionSerializer, TrackSerializer, CompositionVersionSerializer, ForkSerializer,
+    CompositionSerializer, TrackSerializer, CompositionVersionSerializer,
     ForkCreateSerializer, CompositionListItemSerializer, CompositionRetrieveSerializer
 )
 User = get_user_model()
@@ -33,8 +32,7 @@ class CompositionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         composition = serializer.save()
         CompositionVersion.objects.create(composition=composition, author=self.request.user)
-        for perm in ('api.change_composition', 'api.delete_composition'):
-            assign_perm(perm, composition.band.group, composition)
+        composition.assign_perms()
 
 
 class CompositionVersionViewSet(mixins.CreateModelMixin,
@@ -44,36 +42,11 @@ class CompositionVersionViewSet(mixins.CreateModelMixin,
                                 viewsets.GenericViewSet):
     queryset = CompositionVersion.objects.all()
     serializers = {
-        'DEFAULT': CompositionVersionSerializer,
-        'fork': ForkCreateSerializer
+        'DEFAULT': CompositionVersionSerializer
     }
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers['DEFAULT'])
-
-    @detail_route(methods=('post',))
-    @atomic
-    def fork(self, request, pk=None):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        composition_version = self.get_object()
-        composition = composition_version.composition
-        composition.band_id = serializer.data['band']
-        composition.id = None
-        composition.save()
-        new_composition_version = composition.versions.last()
-
-        for track in composition_version.tracks.all():
-            track.id = None
-            track.composition_version_id = new_composition_version.id
-            track.save()
-
-        fork = Fork.objects.create(
-            composition=composition,
-            composition_version=composition_version
-        )
-        serializer = ForkSerializer(fork, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @detail_route(methods=('post',))
     def rollback(self, request, pk=None):
@@ -86,10 +59,24 @@ class CompositionVersionViewSet(mixins.CreateModelMixin,
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
-class ForkViewSet(viewsets.ModelViewSet):
+class ForkViewSet(mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.ListModelMixin,
+                  viewsets.GenericViewSet):
     permission_classes = (AllowAny,)
     queryset = Fork.objects.all()
-    serializer_class = ForkSerializer
+
+    serializers = {
+        'DEFAULT': ForkCreateSerializer,
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers['DEFAULT'])
+
+    @atomic
+    def perform_create(self, serializer):
+        fork = serializer.save()
+        fork.composition.assign_perms()
 
 
 class TrackViewSet(viewsets.ModelViewSet):

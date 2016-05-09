@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 
 from api.models import Composition, Track, CompositionVersion, Instrument, Fork, Band
 from api.serializers.elementary.organization import BandSerializer
-from utils.django_rest_framework.fields import NoneableIntegerField
+from utils.django_rest_framework.fields import NoneableIntegerField, SerializableRelatedField
 from utils.django_rest_framework.serializers import ObjectListSerializer, DynamicFieldsMixin
 
 User = get_user_model()
@@ -144,9 +144,13 @@ class CompositionListItemSerializer(CompositionSerializer):
     required_fields = ('id', 'name', 'band')
 
 
-# noinspection PyAbstractClass
-class ForkCreateSerializer(serializers.Serializer):
-    band = serializers.PrimaryKeyRelatedField(queryset=Band.objects.all())
+class ForkCreateSerializer(serializers.ModelSerializer):
+    band = serializers.PrimaryKeyRelatedField(queryset=Band.objects.all(), write_only=True)
+    composition = SerializableRelatedField(serializer=CompositionSerializer)
+
+    class Meta:
+        model = Fork
+        fields = '__all__'
 
     def validate(self, attrs):
         request = self.context['request']
@@ -156,14 +160,31 @@ class ForkCreateSerializer(serializers.Serializer):
             raise ValidationError('Вы не состоите в этой группе')
         return attrs
 
+    @atomic
+    def create(self, validated_data):
+        composition_version = validated_data['composition_version']
 
-# noinspection PyAbstractClass
-class ForkSerializer(serializers.ModelSerializer):
-    composition_version = serializers.PrimaryKeyRelatedField(
-        queryset=CompositionVersion.objects.all()
-    )
-    composition = CompositionSerializer()
+        # Создаем новую композицию.
+        composition = composition_version.composition
+        composition.band_id = validated_data['band'].id
+        composition.id = None
+        composition.save()
 
-    class Meta:
-        model = Fork
-        fields = '__all__'
+        # Создаем новую версию новой композиции
+        new_composition_version = CompositionVersion.objects.create(
+            composition=composition,
+            author=composition_version.author
+        )
+
+        # Копируем дорожки
+        for track in composition_version.tracks.all():
+            track.id = None
+            track.composition_version_id = new_composition_version.id
+            track.save()
+
+        # Создаем форк
+        fork = Fork.objects.create(
+            composition=composition,
+            composition_version=composition_version
+        )
+        return fork

@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.transaction import atomic
+from guardian.shortcuts import assign_perm
 
 from api.models.dictionary import Genre, Instrument
 from api.models.organization import Band
@@ -27,6 +29,11 @@ class Composition(models.Model):
 
     def __str__(self):
         return self.name
+
+    @atomic
+    def assign_perms(self):
+        for perm in ('api.change_composition', 'api.delete_composition'):
+            assign_perm(perm, self.band.group, self)
 
 
 class CompositionVersion(models.Model):

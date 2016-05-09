@@ -36,6 +36,7 @@ class SerializableRelatedField(RelatedField):
 
     def to_representation(self, value):
         self.serializer_params['instance'] = value
+        self.serializer_params['context'] = self.context
         return self.serializer(**self.serializer_params).data
 
 
