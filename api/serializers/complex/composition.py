@@ -5,9 +5,12 @@ from guardian.shortcuts import get_perms
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.models import Composition, Track, CompositionVersion, Instrument, Fork, Band
+from api.models import (
+    Composition, Track, CompositionVersion, Instrument, Fork, Band, DiffTrack,
+    DiffCompositionVersion
+)
 from api.serializers.elementary.organization import BandSerializer
-from utils.django_rest_framework.fields import NoneableIntegerField, SerializableRelatedField
+from utils.django_rest_framework.fields import NoneableIntegerField
 from utils.django_rest_framework.serializers import ObjectListSerializer, DynamicFieldsMixin
 
 User = get_user_model()
@@ -17,14 +20,13 @@ class TrackListSerializer(ObjectListSerializer):
     pass
 
 
-class TrackSerializer(serializers.ModelSerializer):
+class BaseTrackSerializer(serializers.ModelSerializer):
     instrument = serializers.PrimaryKeyRelatedField(queryset=Instrument.objects.all())
     entity = serializers.ListField(
         child=serializers.ListField(child=NoneableIntegerField(allow_null=True))
     )
 
     class Meta:
-        model = Track
         fields = ('id', 'entity', 'instrument', 'order')
         extra_kwargs = {'order': {'write_only': True}}
         list_serializer_class = TrackListSerializer
@@ -54,6 +56,11 @@ class TrackSerializer(serializers.ModelSerializer):
         return track
 
 
+class TrackSerializer(BaseTrackSerializer):
+    class Meta(BaseTrackSerializer.Meta):
+        model = Track
+
+
 class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(read_only=True)
     tracks = TrackSerializer(many=True)
@@ -81,44 +88,35 @@ class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializ
         return instance
 
 
-class DiffTrackSerializer(serializers.ModelSerializer):
-    instrument = serializers.PrimaryKeyRelatedField(queryset=Instrument.objects.all())
-    entity = serializers.ListField(
-        child=serializers.ListField(child=NoneableIntegerField(allow_null=True))
-    )
+class DiffTrackSerializer(BaseTrackSerializer):
+    class Meta(BaseTrackSerializer.Meta):
+        model = DiffTrack
+
+
+class DiffCompositionVersionSerializer(serializers.ModelSerializer):
+    diff_tracks = DiffTrackSerializer(many=True)
 
     class Meta:
-        model = Track
-        fields = ('id', 'entity', 'instrument', 'order')
-        list_serializer_class = TrackListSerializer
+        model = DiffCompositionVersion
+        fields = '__all__'
+        extra_kwargs = {'composition': {'write_only': True}}
 
-    def validate_entity(self, entity):
-        if len(entity) == 0:
-            raise ValidationError('В дорожке должен быть хотя бы один сектор')
-        for sector in entity:
-            if len(sector) != Track.SECTOR_LENGTH:
-                raise ValidationError('Сектор должен состоять из %d звуков.' % Track.SECTOR_LENGTH)
-        return entity
+    @atomic
+    def create(self, validated_data):
+        diff_tracks = validated_data.pop('diff_tracks')
+        diff_composition_version = DiffCompositionVersion.objects.create(**validated_data)
+        for diff_track in diff_tracks:
+            diff_track['diff_composition_version'] = diff_composition_version
+        self.fields['diff_tracks'].create(diff_tracks)
+        return diff_composition_version
 
-    def validate(self, track):
-        entity = track.get('entity') or self.instance.entity
-        instrument = track.get('instrument') or self.instance.instrument
-        sounds_ids = instrument.sounds.values_list('id', flat=True)
-        for sector in entity:
-            for sound_id in sector:
-                if sound_id is not None and sound_id not in sounds_ids:
-                    raise ValidationError(
-                        'У инструмента c id {instrument_id} нет звука с id {sound_id}.'
-                            .format(
-                            instrument_id=instrument.id,
-                            sound_id=sound_id
-                        )
-                    )
-        return track
-
-
-# class DiffCompositionVersionSerializer(serializers.ModelSerializer):
-#     diff_tracks = DiffTrackSerializer()
+    @atomic
+    def update(self, instance, validated_data):
+        diff_tracks = validated_data.get('diff_tracks')
+        for diff_track in diff_tracks:
+            diff_track['diff_composition_version'] = instance
+        self.fields['diff_tracks'].update(instance.diff_tracks.all(), diff_tracks)
+        return instance
 
 
 class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):

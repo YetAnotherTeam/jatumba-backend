@@ -49,8 +49,10 @@ def social_auth(user_data, request):
     return Response(AuthResponseSerializer(generate_auth_response(user)).data)
 
 
-# noinspection PyUnresolvedReferences
 class SocialAuthView(APIView):
+    user_profile_field = None
+    social_backend = None
+
     def __init__(self, **kwargs):
         assert self.social_backend is not None, \
             "SocialAuthView must provide a `social_backend` field"

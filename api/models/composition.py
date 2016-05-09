@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -36,6 +38,39 @@ class Composition(models.Model):
             assign_perm(perm, self.band.group, self)
 
 
+class AbstractTrack(models.Model):
+    SECTOR_LENGTH = 32
+    entity = JSONField(verbose_name='Сущность', null=True)
+    order = models.PositiveSmallIntegerField(verbose_name='Порядок')
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return str(self.composition)
+
+
+class Track(AbstractTrack):
+    instrument = models.ForeignKey(
+        Instrument,
+        on_delete=models.CASCADE,
+        related_name='tracks',
+        verbose_name='Инструмент'
+    )
+    composition_version = models.ForeignKey(
+        'CompositionVersion',
+        on_delete=models.CASCADE,
+        related_name='tracks',
+        verbose_name='Версия композиции'
+    )
+
+    class Meta:
+        unique_together = (('composition_version', 'order'),)
+        ordering = ('composition_version', 'order')
+        verbose_name = 'Дорожка'
+        verbose_name_plural = 'Дорожки'
+
+
 class CompositionVersion(models.Model):
     composition = models.ForeignKey(
         Composition,
@@ -59,38 +94,43 @@ class CompositionVersion(models.Model):
     def __str__(self):
         return str(self.composition)
 
+    @classmethod
+    @atomic
+    def copy_from_diff_version(cls, last_diff_version, user_id):
+        version = cls.objects.create(
+            composition_id=last_diff_version.composition_id,
+            author_id=user_id,
+            create_datetime=datetime.datetime.now()
+        )
+        for track in last_diff_version.diff_tracks.all():
+            Track.objects.create(
+                composition_version=version,
+                instrument=track.instrument,
+                entity=track.entity,
+                order=track.order
+            )
+        return version
 
-class AbstractTrack(models.Model):
-    SECTOR_LENGTH = 32
-    entity = JSONField(verbose_name='Сущность', null=True)
-    order = models.PositiveSmallIntegerField(verbose_name='Порядок')
 
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        return str(self.composition)
-
-
-class Track(AbstractTrack):
+class DiffTrack(AbstractTrack):
     instrument = models.ForeignKey(
         Instrument,
         on_delete=models.CASCADE,
-        related_name='tracks',
+        related_name='diff_tracks',
         verbose_name='Инструмент'
     )
-    composition_version = models.ForeignKey(
-        CompositionVersion,
+    diff_composition_version = models.ForeignKey(
+        'DiffCompositionVersion',
         on_delete=models.CASCADE,
-        related_name='tracks',
+        related_name='diff_tracks',
         verbose_name='Версия композиции'
     )
 
     class Meta:
-        unique_together = (('composition_version', 'order'),)
-        ordering = ('composition_version', 'order')
-        verbose_name = 'Дорожка'
-        verbose_name_plural = 'Дорожки'
+        unique_together = (('diff_composition_version', 'order'),)
+        ordering = ('diff_composition_version', 'order')
+        verbose_name = 'Дифф-дорожка'
+        verbose_name_plural = 'Дифф-дорожки'
 
 
 class DiffCompositionVersion(models.Model):
@@ -109,26 +149,18 @@ class DiffCompositionVersion(models.Model):
     def __str__(self):
         return str(self.composition)
 
-
-class DiffTrack(AbstractTrack):
-    instrument = models.ForeignKey(
-        Instrument,
-        on_delete=models.CASCADE,
-        related_name='diff_tracks',
-        verbose_name='Инструмент'
-    )
-    diff_composition_version = models.ForeignKey(
-        DiffCompositionVersion,
-        on_delete=models.CASCADE,
-        related_name='diff_tracks',
-        verbose_name='Версия композиции'
-    )
-
-    class Meta:
-        unique_together = (('diff_composition_version', 'order'),)
-        ordering = ('diff_composition_version', 'order')
-        verbose_name = 'Дифф-дорожка'
-        verbose_name_plural = 'Дифф-дорожки'
+    @classmethod
+    @atomic
+    def copy_from_version(cls, last_composition_version):
+        diff_version = cls.objects.create(composition_id=last_composition_version.composition_id)
+        for track in last_composition_version.tracks.all():
+            DiffTrack.objects.create(
+                diff_composition_version=diff_version,
+                instrument=track.instrument,
+                entity=track.entity,
+                order=track.order
+            )
+        return diff_version
 
 
 class Fork(models.Model):

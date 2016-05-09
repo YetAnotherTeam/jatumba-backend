@@ -1,11 +1,15 @@
 from channels import Group
 from django.contrib.auth import get_user_model
+from django.db.transaction import atomic
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 
-from api.models import Session, Composition, Band, Message
+from api.models import (
+    Session, Composition, Band, Message, DiffCompositionVersion, CompositionVersion
+)
 from api.serializers import (
-    CompositionVersionSerializer, MessageSerializer, MessagesSerializer, IsAuthenticatedSerializer
+    CompositionVersionSerializer, MessageSerializer, MessagesSerializer, IsAuthenticatedSerializer,
+    DiffCompositionVersionSerializer
 )
 from rest_channels.socket_routing.decorators import socket_route
 from rest_channels.socket_routing.route_views import SocketRouteView
@@ -45,9 +49,13 @@ class CompositionSocketView(SocketRouteView):
             request.channel_session['user'] = user.id
             Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id).add(request.reply_channel)
             composition = Composition.objects.get(id=composition_id)
+            diff_version = composition.diff_versions.last()
+            if diff_version is None:
+                composition_version = composition.versions.last()
+                diff_version = DiffCompositionVersion.copy_from_version(composition_version)
             self.route_send(
                 request.reply_channel,
-                CompositionVersionSerializer(composition.versions.last()).data
+                DiffCompositionVersionSerializer(diff_version).data
             )
         else:
             raise PermissionDenied
@@ -57,7 +65,7 @@ class CompositionSocketView(SocketRouteView):
         if 'user' in request.channel_session:
             composition_id = kwargs.get('composition_id')
             data['composition'] = composition_id
-            serializer = CompositionVersionSerializer(data=data)
+            serializer = DiffCompositionVersionSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             self.route_send(
@@ -74,16 +82,30 @@ class CompositionSocketView(SocketRouteView):
         if user_id is not None:
             composition_id = kwargs.get('composition_id')
             data['composition'] = composition_id
-            serializer = CompositionVersionSerializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(author_id=user_id)
+            diff_version = (DiffCompositionVersion.objects
+                            .filter(composition_id=composition_id)
+                            .last())
+            composition_version = self.perform_commit(diff_version, user_id)
+            if composition_version is None:
+                composition_version = (CompositionVersion.objects
+                                       .filter(composition_id=composition_id)
+                                       .last())
             self.route_send(
                 Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
-                serializer.data,
+                CompositionVersionSerializer(composition_version).data,
                 status.HTTP_201_CREATED
             )
         else:
             raise PermissionDenied
+
+    @atomic
+    def perform_commit(self, diff_version, user_id):
+        if diff_version is not None:
+            version = CompositionVersion.copy_from_diff_version(diff_version, user_id)
+            (DiffCompositionVersion.objects
+             .filter(composition_id=diff_version.composition_id)
+             .delete())
+            return version
 
 
 class ChatSocketView(SocketRouteView):
