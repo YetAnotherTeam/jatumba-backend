@@ -1,7 +1,9 @@
 from django.conf import settings
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group
 from django.db import transaction
 from guardian.shortcuts import assign_perm
+
+from api.models import Composition, Member
 
 DEFAULT_USER_GROUP_MODEL_PERMISSION = {
     "api.add_user", "api.change_user", "api.delete_user",
@@ -32,7 +34,20 @@ def add_permissions_to_groups(group_permission_names_map):
             assign_perm(permission_name, group)
 
 
+def renovate_band_composition_permissions():
+    for composition in Composition.objects.select_related('band__group'):
+        for perm in ('api.change_composition', 'api.delete_composition'):
+            assign_perm(perm, composition.band.group, composition)
+
+
+def renovate_user_groups():
+    for member in Member.objects.select_related('band__group', 'user'):
+        member.band.group.user_set.add(member.user)
+
+
 @transaction.atomic
 def renovate_permissions():
     group_permission_names_map = create_groups()
     add_permissions_to_groups(group_permission_names_map)
+    renovate_band_composition_permissions()
+    renovate_user_groups()

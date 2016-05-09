@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.transaction import atomic
 
 from api.models.dictionary import Genre, Instrument
 from api.models.organization import Band
@@ -28,13 +27,6 @@ class Composition(models.Model):
 
     def __str__(self):
         return self.name
-
-    @atomic
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        is_new = not self.pk
-        super(Composition, self).save(force_insert, force_update, using, update_fields)
-        if is_new:
-            CompositionVersion.objects.create(composition=self)
 
 
 class CompositionVersion(models.Model):

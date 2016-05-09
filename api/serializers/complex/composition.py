@@ -1,6 +1,7 @@
 # noinspection PyAbstractClass
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
+from guardian.shortcuts import get_perms
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -123,15 +124,18 @@ class DiffCompositionVersionSerializer(serializers.ModelSerializer):
 
 
 class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    # versions = CompositionVersionSerializer(many=True, read_only=True)
     latest_version = serializers.SerializerMethodField()
+    permissions = serializers.SerializerMethodField()
 
     class Meta:
         model = Composition
-        # exclude = ('versions',)
+        fields = '__all__'
 
     def get_latest_version(self, composition):
         return CompositionVersionSerializer(composition.versions.last()).data
+
+    def get_permissions(self, composition):
+        return get_perms(self.context['request'].user, composition)
 
 
 class CompositionRetrieveSerializer(CompositionSerializer):

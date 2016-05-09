@@ -1,8 +1,10 @@
 import ujson
 
+from django.contrib.auth import get_user_model
+from guardian.shortcuts import assign_perm
 from rest_framework import mixins, viewsets, filters, status
 from rest_framework.decorators import detail_route
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 
 from api.models import Composition, Track, Sound, CompositionVersion, atomic, Fork
@@ -10,13 +12,12 @@ from api.serializers import (
     CompositionSerializer, TrackSerializer, CompositionVersionSerializer, ForkSerializer,
     ForkCreateSerializer, CompositionListItemSerializer, CompositionRetrieveSerializer
 )
+User = get_user_model()
 
 
-class CompositionViewSet(mixins.CreateModelMixin,
-                         mixins.RetrieveModelMixin,
-                         mixins.ListModelMixin,
-                         viewsets.GenericViewSet):
+class CompositionViewSet(viewsets.ModelViewSet):
     queryset = Composition.objects.all()
+    permission_classes = (DjangoObjectPermissions,)
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band__members__user', 'band__members', 'band')
     serializers = {
@@ -27,6 +28,13 @@ class CompositionViewSet(mixins.CreateModelMixin,
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers['DEFAULT'])
+
+    @atomic
+    def perform_create(self, serializer):
+        composition = serializer.save()
+        CompositionVersion.objects.create(composition=composition, author=self.request.user)
+        for perm in ('api.change_composition', 'api.delete_composition'):
+            assign_perm(perm, composition.band.group, composition)
 
 
 class CompositionVersionViewSet(mixins.CreateModelMixin,

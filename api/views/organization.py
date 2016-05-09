@@ -28,6 +28,14 @@ class MemberViewSet(viewsets.ModelViewSet):
     filter_fields = ('band',)
     serializer_class = MemberSerializer
 
-    def create(self, request, *args, **kwargs):
-        request.data['user'] = self.request.user.id
-        return super(MemberViewSet, self).create(request, *args, **kwargs)
+    @atomic
+    def perform_create(self, serializer):
+        user = self.request.data['user']
+        member = serializer.save(user=user)
+        member.band.group.user_set.add(user)
+
+    @atomic
+    def perform_destroy(self, instance):
+        user = self.request.data['user']
+        instance.band.group.user_set.add(user)
+        instance.delete()

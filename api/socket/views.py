@@ -76,7 +76,7 @@ class CompositionSocketView(SocketRouteView):
             data['composition'] = composition_id
             serializer = CompositionVersionSerializer(data=data)
             serializer.is_valid(raise_exception=True)
-            serializer.save(user_id=user_id)
+            serializer.save(author_id=user_id)
             self.route_send(
                 Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
                 serializer.data,
