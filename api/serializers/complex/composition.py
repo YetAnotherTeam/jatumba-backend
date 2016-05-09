@@ -54,6 +54,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
 
 class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
     tracks = TrackSerializer(many=True)
 
     class Meta:
