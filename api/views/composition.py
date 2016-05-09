@@ -11,6 +11,7 @@ from api.serializers import (
     CompositionSerializer, TrackSerializer, CompositionVersionSerializer,
     ForkCreateSerializer, CompositionListItemSerializer, CompositionRetrieveSerializer
 )
+
 User = get_user_model()
 
 
@@ -63,7 +64,6 @@ class ForkViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
-    permission_classes = (AllowAny,)
     queryset = Fork.objects.all()
 
     serializers = {

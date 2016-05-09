@@ -146,7 +146,7 @@ class CompositionListItemSerializer(CompositionSerializer):
 
 class ForkCreateSerializer(serializers.ModelSerializer):
     band = serializers.PrimaryKeyRelatedField(queryset=Band.objects.all(), write_only=True)
-    composition = SerializableRelatedField(serializer=CompositionSerializer)
+    composition = CompositionSerializer(read_only=True)
 
     class Meta:
         model = Fork
