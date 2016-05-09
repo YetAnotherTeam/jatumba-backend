@@ -56,7 +56,6 @@ class CompositionVersionViewSet(mixins.CreateModelMixin,
     def fork(self, request, pk=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         composition_version = self.get_object()
         composition = composition_version.composition
         composition.band_id = serializer.data['band']
@@ -73,7 +72,7 @@ class CompositionVersionViewSet(mixins.CreateModelMixin,
             composition=composition,
             composition_version=composition_version
         )
-        serializer = ForkSerializer(fork)
+        serializer = ForkSerializer(fork, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @detail_route(methods=('post',))

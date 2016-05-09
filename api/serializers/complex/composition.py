@@ -117,10 +117,8 @@ class DiffTrackSerializer(serializers.ModelSerializer):
         return track
 
 
-# TODO
-class DiffCompositionVersionSerializer(serializers.ModelSerializer):
-    # diff_tracks =
-    pass
+# class DiffCompositionVersionSerializer(serializers.ModelSerializer):
+#     diff_tracks = DiffTrackSerializer()
 
 
 class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
