@@ -147,8 +147,8 @@ class ChatSocketView(SocketRouteView):
     MESSAGES_COUNT = 20
 
     def disconnect(self, request, *args, **kwargs):
-        chat_id = kwargs.get('chat_id')
-        group = Group(self.CHAT_GROUP_TEMPLATE % chat_id)
+        band_id = kwargs.get('band_id')
+        group = Group(self.CHAT_GROUP_TEMPLATE % band_id)
         group.discard(request.reply_channel)
         # self.send(group, {'leave': UserSerializer(user.id)})
 
