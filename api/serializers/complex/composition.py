@@ -94,7 +94,7 @@ class DiffTrackSerializer(BaseTrackSerializer):
 
 
 class DiffCompositionVersionSerializer(serializers.ModelSerializer):
-    diff_tracks = DiffTrackSerializer(many=True)
+    tracks = DiffTrackSerializer(many=True)
 
     class Meta:
         model = DiffCompositionVersion
@@ -103,19 +103,19 @@ class DiffCompositionVersionSerializer(serializers.ModelSerializer):
 
     @atomic
     def create(self, validated_data):
-        diff_tracks = validated_data.pop('diff_tracks')
+        diff_tracks = validated_data.pop('tracks')
         diff_composition_version = DiffCompositionVersion.objects.create(**validated_data)
         for diff_track in diff_tracks:
             diff_track['diff_composition_version'] = diff_composition_version
-        self.fields['diff_tracks'].create(diff_tracks)
+        self.fields['tracks'].create(diff_tracks)
         return diff_composition_version
 
     @atomic
     def update(self, instance, validated_data):
-        diff_tracks = validated_data.get('diff_tracks')
+        diff_tracks = validated_data.get('tracks')
         for diff_track in diff_tracks:
             diff_track['diff_composition_version'] = instance
-        self.fields['diff_tracks'].update(instance.diff_tracks.all(), diff_tracks)
+        self.fields['tracks'].update(instance.tracks.all(), diff_tracks)
         return instance
 
 

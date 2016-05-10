@@ -2,7 +2,7 @@ from channels import Group
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from api.models import (
     Session, Composition, Band, Message, DiffCompositionVersion, CompositionVersion
@@ -82,14 +82,14 @@ class CompositionSocketView(SocketRouteView):
         if user_id is not None:
             composition_id = kwargs.get('composition_id')
             data['composition'] = composition_id
+            if (DiffCompositionVersion.objects
+                    .filter(composition_id=composition_id)
+                    .count() <= 1):
+                raise ValidationError('Nothing to commit.')
             diff_version = (DiffCompositionVersion.objects
                             .filter(composition_id=composition_id)
                             .last())
             composition_version = self.perform_commit(diff_version, user_id)
-            if composition_version is None:
-                composition_version = (CompositionVersion.objects
-                                       .filter(composition_id=composition_id)
-                                       .last())
             self.route_send(
                 Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
                 CompositionVersionSerializer(composition_version).data,
@@ -100,12 +100,11 @@ class CompositionSocketView(SocketRouteView):
 
     @atomic
     def perform_commit(self, diff_version, user_id):
-        if diff_version is not None:
-            version = CompositionVersion.copy_from_diff_version(diff_version, user_id)
-            (DiffCompositionVersion.objects
-             .filter(composition_id=diff_version.composition_id)
-             .delete())
-            return version
+        version = CompositionVersion.copy_from_diff_version(diff_version, user_id)
+        (DiffCompositionVersion.objects
+         .filter(composition_id=diff_version.composition_id)
+         .delete())
+        return version
 
 
 class ChatSocketView(SocketRouteView):

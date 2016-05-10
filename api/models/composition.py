@@ -102,12 +102,12 @@ class CompositionVersion(models.Model):
             author_id=user_id,
             create_datetime=datetime.datetime.now()
         )
-        for track in last_diff_version.diff_tracks.all():
+        for diff_track in last_diff_version.tracks.all():
             Track.objects.create(
                 composition_version=version,
-                instrument=track.instrument,
-                entity=track.entity,
-                order=track.order
+                instrument=diff_track.instrument,
+                entity=diff_track.entity,
+                order=diff_track.order
             )
         return version
 
@@ -122,7 +122,7 @@ class DiffTrack(AbstractTrack):
     diff_composition_version = models.ForeignKey(
         'DiffCompositionVersion',
         on_delete=models.CASCADE,
-        related_name='diff_tracks',
+        related_name='tracks',
         verbose_name='Версия композиции'
     )
 
