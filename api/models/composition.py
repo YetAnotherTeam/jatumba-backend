@@ -99,8 +99,7 @@ class CompositionVersion(models.Model):
     def copy_from_diff_version(cls, last_diff_version, user_id):
         version = cls.objects.create(
             composition_id=last_diff_version.composition_id,
-            author_id=user_id,
-            create_datetime=datetime.datetime.now()
+            author_id=user_id
         )
         for diff_track in last_diff_version.tracks.all():
             Track.objects.create(

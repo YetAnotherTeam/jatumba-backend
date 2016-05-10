@@ -2,15 +2,15 @@ from channels import Group
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
 
 from api.models import (
     Session, Composition, Band, Message, DiffCompositionVersion, CompositionVersion
 )
 from api.serializers import (
     CompositionVersionSerializer, MessageSerializer, MessagesSerializer, IsAuthenticatedSerializer,
-    DiffCompositionVersionSerializer
-)
+    DiffCompositionVersionSerializer,
+    DiffHistorySerializer)
 from rest_channels.socket_routing.decorators import socket_route
 from rest_channels.socket_routing.route_views import SocketRouteView
 
@@ -94,6 +94,54 @@ class CompositionSocketView(SocketRouteView):
                 Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id),
                 CompositionVersionSerializer(composition_version).data,
                 status.HTTP_201_CREATED
+            )
+        else:
+            raise PermissionDenied
+
+    @socket_route
+    def history_up(self, request, data, *args, **kwargs):
+        user_id = request.channel_session.get('user')
+        if user_id is not None:
+            composition_id = int(kwargs.get('composition_id'))
+            serializer = DiffHistorySerializer(
+                data=data,
+                context={'composition_id': composition_id}
+            )
+            serializer.is_valid(raise_exception=True)
+            diff_version_id = serializer.data['diff_composition_version']
+            diff_version = (DiffCompositionVersion.objects
+                                   .filter(composition_id=composition_id, id__lt=diff_version_id)
+                                   .last())
+            if diff_version is None:
+                raise NotFound('You have come to the beginning.')
+            self.route_send(
+                request.reply_channel,
+                DiffCompositionVersionSerializer(diff_version).data,
+                status.HTTP_200_OK
+            )
+        else:
+            raise PermissionDenied
+
+    @socket_route
+    def history_down(self, request, data, *args, **kwargs):
+        user_id = request.channel_session.get('user')
+        if user_id is not None:
+            composition_id = int(kwargs.get('composition_id'))
+            serializer = DiffHistorySerializer(
+                data=data,
+                context={'composition_id': composition_id}
+            )
+            serializer.is_valid(raise_exception=True)
+            diff_version_id = serializer.data['diff_composition_version']
+            diff_version = (DiffCompositionVersion.objects
+                                   .filter(composition_id=composition_id, id__gt=diff_version_id)
+                                   .first())
+            if diff_version is None:
+                raise NotFound('You have come to the end.')
+            self.route_send(
+                request.reply_channel,
+                DiffCompositionVersionSerializer(diff_version).data,
+                status.HTTP_200_OK
             )
         else:
             raise PermissionDenied
