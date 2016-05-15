@@ -2,7 +2,10 @@ import binascii
 import os
 import time
 
+import requests
 from django.contrib.auth import get_user_model, authenticate
+from django.core.files.base import ContentFile
+from django.db.transaction import atomic
 from rest_framework import status, viewsets, mixins, filters
 from rest_framework.decorators import list_route
 from rest_framework.exceptions import AuthenticationFailed
@@ -24,6 +27,7 @@ from api.serializers import (
 User = get_user_model()
 
 
+@atomic
 def social_auth(user_data, request):
     username = request.data.get('username')
     if username is None or username == '':
@@ -33,7 +37,7 @@ def social_auth(user_data, request):
         )
     user = User.objects.filter(username=username).first()
     if user:
-        return Response({'error': 'username already taken'}, status=400)
+        return Response({'error': 'username already taken'}, status=status.HTTP_400_BAD_REQUEST)
     user = User.objects.create_user(
         username,
         password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
@@ -45,6 +49,9 @@ def social_auth(user_data, request):
         user.fb_profile = user_data['user_id']
     elif user_data['network'] is 'vk':
         user.vk_profile = user_data['user_id']
+        url = user_data['photo_max_orig']
+        response = requests.get(url)
+        user.avatar.save(os.path.basename(url), ContentFile(response.content), save=False)
     user.save()
     return Response(AuthResponseSerializer(generate_auth_response(user)).data)
 

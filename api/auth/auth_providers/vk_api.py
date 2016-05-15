@@ -4,7 +4,7 @@ from api.auth.auth_providers.base import BaseProvider
 
 
 class VK(BaseProvider):
-    request_data = ('first_name', 'last_name', 'email', 'photo', 'id')
+    request_data = ('photo_max_orig',)
 
     def __init__(self, *args, **kwargs):
         super(VK, self).__init__(args, kwargs)
@@ -36,7 +36,7 @@ class VK(BaseProvider):
 
 
 class VK_API:
-    version = '5.45'
+    version = '5.52'
     url = 'https://api.vk.com/method/%s'
 
     def request(self, backend, method, data):
