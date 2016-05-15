@@ -15,4 +15,4 @@ class MessageCreateSerializer(MessageSerializer):
 
 # noinspection PyAbstractClass
 class MessagesSerializer(serializers.Serializer):
-    messages = MessageSerializer(many=True)
+    messages = MessageCreateSerializer(many=True)
