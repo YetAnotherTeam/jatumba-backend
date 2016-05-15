@@ -177,7 +177,7 @@ class ChatSocketView(SocketRouteView):
             request.channel_session['user'] = user.id
             group = Group(self.CHAT_GROUP_TEMPLATE % band_id)
             group.add(request.reply_channel)
-            messages = Message.objects.all()[:self.MESSAGES_COUNT][::-1]
+            messages = Message.objects.filter(band_id=band_id)[:self.MESSAGES_COUNT][::-1]
             self.route_send(
                 request.reply_channel,
                 MessagesSerializer({"messages": messages}).data
