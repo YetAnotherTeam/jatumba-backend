@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from api.models import Message
-from api.serializers.auth import UserSerializer
+
+from ..auth import UserSerializer
 
 
 class MessageSerializer(serializers.ModelSerializer):

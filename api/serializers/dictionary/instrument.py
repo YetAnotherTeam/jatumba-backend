@@ -1,13 +1,9 @@
 from rest_framework import serializers
 
-from api.models import Instrument, Sound
+from api.models import Instrument
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
 
-
-class SoundSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Sound
-        fields = ('id', 'name', 'file')
+from .sound import SoundSerializer
 
 
 class InstrumentSerializer(serializers.ModelSerializer):

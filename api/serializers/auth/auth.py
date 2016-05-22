@@ -2,10 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
-from api.models import Composition, Instrument, Session
-from api.serializers.composition import CompositionSerializer
-from api.serializers.organization import BandSerializer, MemberSerializer
-from utils.django_rest_framework.fields import SerializableRelatedField
+from api.models import Session
 
 from .user import UserSerializer
 
@@ -27,39 +24,6 @@ class SignInSerializer(serializers.Serializer):
 # noinspection PyAbstractClass
 class IsAuthenticatedSerializer(serializers.Serializer):
     access_token = serializers.CharField()
-
-
-class UserRetrieveSerializer(UserSerializer):
-    class NestedMemberSerializer(MemberSerializer):
-        required_fields = ('id', 'band')
-        band = SerializableRelatedField(
-            serializer=BandSerializer,
-            serializer_params={'required_fields': ('id', 'name', 'description')}
-        )
-
-    members = NestedMemberSerializer(many=True)
-    instruments = serializers.PrimaryKeyRelatedField(queryset=Instrument.objects.all(), many=True)
-    compositions = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'phone', 'vk_profile', 'fb_profile',
-                  'members', 'instruments', 'compositions')
-        extra_kwargs = {'vk_profile': {'read_only': True}, 'fb_profile': {'read_only': True}}
-
-    def get_compositions(self, user):
-        # sorted_composition_versions = (
-        #     CompositionVersion.objects
-        #         .values_list('composition', 'id')
-        #         .annotate(Max('create_datetime'))
-        #         .filter(composition__band__members__user=user.id)
-        #         .order_by('create_datetime__max')
-        # )
-        return CompositionSerializer(
-            Composition.objects.filter(band__members__user=user.id).order_by(),
-            required_fields=('id', 'latest_version', 'name', 'band', 'genres'),
-            many=True
-        ).data
 
 
 class SignUpSerializer(UserSerializer):

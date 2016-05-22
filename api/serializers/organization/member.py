@@ -1,21 +1,11 @@
 from rest_framework import serializers
 
-from api.models import Band, Member
+from api.models import Member
 from utils.django_rest_framework.fields import SerializableRelatedField
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
 
-from .auth.user import UserSerializer
-
-
-class BandSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    user_joined = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Band
-        fields = ('id', 'name', 'description', 'user_joined')
-
-    def get_user_joined(self, band):
-        return band.members.filter(user=self.context['request'].user).exists()
+from ..auth.user import UserSerializer
+from .band import BandSerializer
 
 
 class MemberSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
