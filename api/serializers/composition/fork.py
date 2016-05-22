@@ -19,7 +19,6 @@ class ForkSerializer(serializers.ModelSerializer):
 
 class ForkCreateSerializer(serializers.ModelSerializer):
     band = serializers.PrimaryKeyRelatedField(queryset=Band.objects.all(), write_only=True)
-    source_composition = CompositionSerializer(read_only=True)
     destination_composition = CompositionSerializer(read_only=True)
 
     class Meta:
