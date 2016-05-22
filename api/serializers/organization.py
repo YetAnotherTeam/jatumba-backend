@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import *
+from api.models import Band, Member
 from utils.django_rest_framework.fields import SerializableRelatedField
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
 

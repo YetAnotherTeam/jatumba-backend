@@ -1,7 +1,10 @@
 from django.conf.urls import include, url
 from rest_framework.routers import DefaultRouter
 
-from api.views import *
+from api.views import (
+    BandViewSet, CompositionVersionViewSet, CompositionViewSet, FBAuthView, ForkViewSet,
+    InstrumentViewSet, MemberViewSet, RefreshTokenView, UserViewSet, VKAuthView
+)
 
 router = DefaultRouter()
 router.register(r'user', UserViewSet)

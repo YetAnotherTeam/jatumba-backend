@@ -100,8 +100,8 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 REST_FRAMEWORK = {
@@ -153,7 +153,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
 # Группы пользователей
 DEFAULT_USER_GROUP = "Обычные пользователи"
 
@@ -163,10 +162,9 @@ FREQ_TYPE_VALUE = 0
 CONVERT_TYPE_VALUE = 0
 
 try:
-    from .local import *
+    from .local import *  # noqa
 except ImportError:
     pass
-
 
 ROLLBAR = {
     'access_token': '327b174af7bc43f39d06ed51c8868f65',

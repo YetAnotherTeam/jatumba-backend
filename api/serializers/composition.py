@@ -49,10 +49,7 @@ class BaseTrackSerializer(serializers.ModelSerializer):
                 if sound_id is not None and sound_id not in sounds_ids:
                     raise ValidationError(
                         'У инструмента c id {instrument_id} нет звука с id {sound_id}.'
-                            .format(
-                            instrument_id=instrument.id,
-                            sound_id=sound_id
-                        )
+                        .format(instrument_id=instrument.id, sound_id=sound_id)
                     )
         return track
 

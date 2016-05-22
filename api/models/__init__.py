@@ -1,5 +1,5 @@
-from api.models.auth import *
-from api.models.chat import *
-from api.models.composition import *
-from api.models.dictionary import *
-from api.models.organization import *
+from .auth import *  # noqa
+from .chat import *  # noqa
+from .composition import *  # noqa
+from .dictionary import *  # noqa
+from .organization import *  # noqa

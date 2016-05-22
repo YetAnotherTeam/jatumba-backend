@@ -1,7 +1,9 @@
+import os
+
 from audiofield.admin import AudioFileAdmin
 from django.contrib import admin
 
-from api.models import *
+from api.models import Band, Composition, Genre, Instrument, Member, Session, Sound, Track, User
 
 
 class UserAdmin(admin.ModelAdmin):

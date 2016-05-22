@@ -1,7 +1,7 @@
 import json
 import logging
 
-from TPD.settings import *
+from TPD.settings import *  # noqa
 
 DEBUG = True
 SQL_DEBUG = False
