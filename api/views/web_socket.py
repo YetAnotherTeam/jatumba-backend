@@ -9,7 +9,7 @@ from api.models import (
 )
 from api.serializers import (
     CompositionVersionSerializer, DiffCompositionVersionSerializer, DiffHistorySerializer,
-    IsAuthenticatedSerializer, MessageCreateSerializer, MessagesSerializer
+    IsAuthenticatedSerializer, MessageSerializer, MessagesSerializer
 )
 from rest_channels.socket_routing.decorators import socket_route
 from rest_channels.socket_routing.route_views import SocketRouteView
@@ -189,7 +189,7 @@ class ChatSocketView(SocketRouteView):
     def publish(self, request, data, *args, **kwargs):
         if 'user' in request.channel_session:
             band_id = kwargs.get('band_id')
-            serializer = MessageCreateSerializer(data=data)
+            serializer = MessageSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save(
                 author=User.objects.get(pk=request.channel_session['user']),

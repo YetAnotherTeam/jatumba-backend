@@ -5,14 +5,13 @@ from api.models import Message
 from ..auth import UserSerializer
 
 
+class NestedUserSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
+        fields = ('id', 'first_name', 'last_name', 'avatar')
+
+
 class MessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Message
-        exclude = ('band',)
-
-
-class MessageCreateSerializer(MessageSerializer):
-    author = UserSerializer(read_only=True)
+    author = NestedUserSerializer(read_only=True)
 
     class Meta:
         model = Message
@@ -21,4 +20,4 @@ class MessageCreateSerializer(MessageSerializer):
 
 # noinspection PyAbstractClass
 class MessagesSerializer(serializers.Serializer):
-    messages = MessageCreateSerializer(many=True)
+    messages = MessageSerializer(many=True)

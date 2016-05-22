@@ -1,1 +1,1 @@
-from .message import MessageCreateSerializer, MessageSerializer, MessagesSerializer  # noqa
+from .message import MessageSerializer, MessagesSerializer  # noqa
