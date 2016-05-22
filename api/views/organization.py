@@ -1,9 +1,9 @@
 from django.db.transaction import atomic
-from rest_framework import viewsets, filters, status
+from rest_framework import filters, status, viewsets
 from rest_framework.permissions import DjangoObjectPermissions
 from rest_framework.response import Response
 
-from api.models import Band, Member, Leader
+from api.models import Band, Leader, Member
 from api.serializers import BandSerializer, MemberSerializer
 
 

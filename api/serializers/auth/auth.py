@@ -2,11 +2,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
-from api.models import Instrument, Composition
-from api.models import Session
+from api.models import Composition, Instrument, Session
 from api.serializers.composition import CompositionSerializer
-from api.serializers.organization import MemberSerializer, BandSerializer
+from api.serializers.organization import BandSerializer, MemberSerializer
 from utils.django_rest_framework.fields import SerializableRelatedField
+
 from .user import UserSerializer
 
 User = get_user_model()

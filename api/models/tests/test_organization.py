@@ -7,7 +7,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from api.auth.session_generator import generate_session_params
-from api.models import Session, Band, Member, Composition
+from api.models import Band, Composition, Member, Session
 from api.permissions import renovate_permissions
 from api.serializers import MemberSerializer
 

@@ -1,6 +1,6 @@
-from channels import route, include
+from channels import include, route
 
-from api.socket.views import CompositionSocketView, ChatSocketView
+from api.socket.views import ChatSocketView, CompositionSocketView
 
 composition_routing = [
     route('websocket.connect', 'api.consumers.base.pass_message'),

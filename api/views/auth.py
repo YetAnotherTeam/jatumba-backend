@@ -3,10 +3,10 @@ import os
 import time
 
 import requests
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.core.files.base import ContentFile
 from django.db.transaction import atomic
-from rest_framework import status, viewsets, mixins, filters
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import list_route
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.parsers import MultiPartParser
@@ -20,8 +20,8 @@ from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
 from api.models import Session
 from api.serializers import (
-    AuthResponseSerializer, UserSerializer, SignUpSerializer, SignInSerializer,
-    IsAuthenticatedSerializer, UserRetrieveSerializer,
+    AuthResponseSerializer, IsAuthenticatedSerializer, SignInSerializer, SignUpSerializer,
+    UserRetrieveSerializer, UserSerializer
 )
 
 User = get_user_model()

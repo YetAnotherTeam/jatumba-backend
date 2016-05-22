@@ -2,14 +2,14 @@ from channels import Group
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 from api.models import (
-    Session, Composition, Band, Message, DiffCompositionVersion, CompositionVersion
+    Band, Composition, CompositionVersion, DiffCompositionVersion, Message, Session
 )
 from api.serializers import (
-    CompositionVersionSerializer, MessagesSerializer, IsAuthenticatedSerializer,
-    DiffCompositionVersionSerializer, DiffHistorySerializer, MessageCreateSerializer
+    CompositionVersionSerializer, DiffCompositionVersionSerializer, DiffHistorySerializer,
+    IsAuthenticatedSerializer, MessageCreateSerializer, MessagesSerializer
 )
 from rest_channels.socket_routing.decorators import socket_route
 from rest_channels.socket_routing.route_views import SocketRouteView

@@ -1,6 +1,7 @@
-from TPD.settings import *
-import logging
 import json
+import logging
+
+from TPD.settings import *
 
 DEBUG = True
 SQL_DEBUG = False

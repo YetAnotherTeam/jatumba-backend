@@ -1,13 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
-from rest_framework import mixins, viewsets, filters, status
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.permissions import DjangoObjectPermissions
 from rest_framework.response import Response
 
 from api.models import Composition, CompositionVersion, Fork
 from api.serializers import (
-    CompositionSerializer, CompositionListItemSerializer, CompositionRetrieveSerializer,
+    CompositionListItemSerializer, CompositionRetrieveSerializer, CompositionSerializer,
     CompositionVersionSerializer, ForkCreateSerializer
 )
 

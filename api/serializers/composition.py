@@ -6,11 +6,12 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from api.models import (
-    Composition, Track, CompositionVersion, Instrument, Fork, Band, DiffTrack,
-    DiffCompositionVersion
+    Band, Composition, CompositionVersion, DiffCompositionVersion, DiffTrack, Fork, Instrument,
+    Track
 )
 from utils.django_rest_framework.fields import NoneableIntegerField
-from utils.django_rest_framework.serializers import ObjectListSerializer, DynamicFieldsMixin
+from utils.django_rest_framework.serializers import DynamicFieldsMixin, ObjectListSerializer
+
 from .organization import BandSerializer
 
 User = get_user_model()
