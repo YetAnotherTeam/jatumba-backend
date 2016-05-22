@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from guardian.shortcuts import get_perms
 from rest_framework import serializers
 
-from api.models import Band, Composition, CompositionVersion, Fork
+from api.models import Band, Composition, Fork
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
 
 from .composition_version import CompositionVersionSerializer
@@ -16,26 +16,27 @@ class NestedCompositionSerializer(serializers.ModelSerializer):
         fields = ('name', 'id', 'band')
 
 
-class NestedCompositionVersionSerializer(serializers.ModelSerializer):
-    composition = NestedCompositionSerializer()
-
-    class Meta:
-        model = CompositionVersion
-        fields = ('composition',)
-
-
-class NestedForkSerializer(serializers.ModelSerializer):
-    composition_version = NestedCompositionVersionSerializer()
+class NestedAsDestinationForkSerializer(serializers.ModelSerializer):
+    source_composition = NestedCompositionSerializer()
 
     class Meta:
         model = Fork
-        fields = ('composition_version',)
+        fields = ('source_composition',)
+
+
+class NestedAsSourceForksSerializer(serializers.ModelSerializer):
+    destination_composition = NestedCompositionSerializer()
+
+    class Meta:
+        model = Fork
+        fields = ('destination_composition',)
 
 
 class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     latest_version = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
-    fork = NestedForkSerializer(read_only=True)
+    as_destination_fork = NestedAsDestinationForkSerializer(read_only=True)
+    as_source_forks = NestedAsSourceForksSerializer(read_only=True, many=True)
 
     class Meta:
         model = Composition

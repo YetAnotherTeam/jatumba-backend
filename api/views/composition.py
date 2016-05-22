@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from api.models import Composition, CompositionVersion, Fork
 from api.serializers import (
     CompositionListItemSerializer, CompositionRetrieveSerializer, CompositionSerializer,
-    CompositionVersionSerializer, ForkSerializer
+    CompositionVersionSerializer, ForkCreateSerializer, ForkSerializer
 )
 
 User = get_user_model()
@@ -66,6 +66,7 @@ class ForkViewSet(mixins.CreateModelMixin,
     queryset = Fork.objects.all()
     serializers = {
         'DEFAULT': ForkSerializer,
+        'create': ForkCreateSerializer,
     }
 
     def get_serializer_class(self):
@@ -74,4 +75,4 @@ class ForkViewSet(mixins.CreateModelMixin,
     @atomic
     def perform_create(self, serializer):
         fork = serializer.save()
-        fork.composition.assign_perms()
+        fork.destination_composition.assign_perms()

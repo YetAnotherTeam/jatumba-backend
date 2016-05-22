@@ -161,17 +161,23 @@ class DiffCompositionVersion(models.Model):
 
 
 class Fork(models.Model):
-    composition_version = models.ForeignKey(
+    source_composition = models.ForeignKey(
+        Composition,
+        on_delete=models.CASCADE,
+        related_name='as_source_forks',
+        verbose_name='Композиция, которую форкнули'
+    )
+    source_composition_version = models.ForeignKey(
         CompositionVersion,
         on_delete=models.CASCADE,
         related_name='forks',
         verbose_name='Версия композиции'
     )
-    composition = models.OneToOneField(
+    destination_composition = models.OneToOneField(
         Composition,
         on_delete=models.CASCADE,
-        related_name='fork',
-        verbose_name='Композиция'
+        related_name='as_destination_fork',
+        verbose_name='Новая композиция'
     )
 
     class Meta:

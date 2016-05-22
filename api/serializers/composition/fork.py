@@ -8,13 +8,28 @@ from .composition import CompositionSerializer
 
 
 class ForkSerializer(serializers.ModelSerializer):
-    band = serializers.PrimaryKeyRelatedField(queryset=Band.objects.all())
-    composition = CompositionSerializer(read_only=True)
+    source_composition = CompositionSerializer(read_only=True)
+    destination_composition = CompositionSerializer(read_only=True)
 
     class Meta:
         model = Fork
-        fields = ('id', 'band', 'composition', 'composition_version')
-        extra_kwargs = {'band': {'write_only': True}}
+        fields = ('id', 'source_composition', 'destination_composition',
+                  'source_composition_version')
+
+
+class ForkCreateSerializer(serializers.ModelSerializer):
+    band = serializers.PrimaryKeyRelatedField(queryset=Band.objects.all(), write_only=True)
+    source_composition = CompositionSerializer(read_only=True)
+    destination_composition = CompositionSerializer(read_only=True)
+
+    class Meta:
+        model = Fork
+        fields = ('id', 'band', 'source_composition', 'source_composition_version',
+                  'destination_composition')
+        extra_kwargs = {
+            'source_composition': {'read_only': True},
+            'destination_composition': {'read_only': True}
+        }
 
     def validate(self, attrs):
         request = self.context['request']
@@ -26,29 +41,31 @@ class ForkSerializer(serializers.ModelSerializer):
 
     @atomic
     def create(self, validated_data):
-        composition_version = validated_data['composition_version']
+        source_composition_version = validated_data['source_composition_version']
+        source_composition = source_composition_version.composition
+        source_composition_id = source_composition.id
 
         # Создаем новую композицию.
-        composition = composition_version.composition
-        composition.band_id = validated_data['band'].id
-        composition.id = None
-        composition.save()
-
+        destination_composition = source_composition
+        destination_composition.id = None
+        destination_composition.band_id = validated_data['band'].id
+        destination_composition.save()
         # Создаем новую версию новой композиции
-        new_composition_version = CompositionVersion.objects.create(
-            composition=composition,
-            author=composition_version.author
+        destination_composition_version = CompositionVersion.objects.create(
+            composition=destination_composition,
+            author=source_composition_version.author
         )
 
         # Копируем дорожки
-        for track in composition_version.tracks.all():
+        for track in source_composition_version.tracks.all():
             track.id = None
-            track.composition_version_id = new_composition_version.id
+            track.composition_version_id = destination_composition_version.id
             track.save()
 
         # Создаем форк
         fork = Fork.objects.create(
-            composition=composition,
-            composition_version=composition_version
+            source_composition_id=source_composition_id,
+            source_composition_version=source_composition_version,
+            destination_composition=destination_composition,
         )
         return fork
