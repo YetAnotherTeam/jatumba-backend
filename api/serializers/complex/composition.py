@@ -132,8 +132,27 @@ class DiffHistorySerializer(serializers.Serializer):
 
 
 class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    class NestedForkSerializer(serializers.ModelSerializer):
+        class NestedCompositionVersionSerializer(serializers.ModelSerializer):
+            class NestedCompositionSerializer(serializers.ModelSerializer):
+                class Meta:
+                    model = Composition
+                    fields = ('name', 'id', 'band')
+            composition = NestedCompositionSerializer()
+
+            class Meta:
+                model = CompositionVersion
+                fields = ('composition',)
+
+        composition_version = NestedCompositionVersionSerializer()
+
+        class Meta:
+            model = Fork
+            fields = ('composition_version',)
+
     latest_version = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
+    fork = NestedForkSerializer(read_only=True)
 
     class Meta:
         model = Composition
@@ -151,7 +170,7 @@ class CompositionRetrieveSerializer(CompositionSerializer):
 
 
 class CompositionListItemSerializer(CompositionSerializer):
-    required_fields = ('id', 'name', 'band')
+    required_fields = ('id', 'name', 'band', 'fork')
 
 
 class ForkCreateSerializer(serializers.ModelSerializer):

@@ -2,3 +2,4 @@ django-debug-toolbar
 pygments
 sqlparse
 django-dynamic-fixture
+tox
