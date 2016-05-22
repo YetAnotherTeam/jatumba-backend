@@ -34,8 +34,17 @@ class ForkCreateSerializer(serializers.ModelSerializer):
         request = self.context['request']
         user = request.user
         band = attrs['band']
+
         if not band.members.filter(user=user).exists():
-            raise ValidationError('Вы не состоите в этой группе')
+            raise ValidationError('Вы не состоите в этой группе.')
+
+        source_composition_version = attrs['source_composition_version']
+
+        if source_composition_version.composition.band_id == band.id:
+            raise ValidationError(
+                'Нельзя форкнуть композицию в группу, которой эта композиция и так принадлежит.'
+            )
+
         return attrs
 
     @atomic
