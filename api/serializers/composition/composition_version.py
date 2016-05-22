@@ -8,13 +8,15 @@ from .track import DiffTrackSerializer, TrackSerializer
 
 
 class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(read_only=True)
     tracks = TrackSerializer(many=True)
 
     class Meta:
         model = CompositionVersion
-        fields = '__all__'
-        extra_kwargs = {'composition': {'write_only': True}}
+        fields = ('id', 'author', 'tracks', 'create_datetime')
+        extra_kwargs = {
+            'composition': {'write_only': True},
+            'author': {'read_only': True}
+        }
 
     @atomic
     def create(self, validated_data):

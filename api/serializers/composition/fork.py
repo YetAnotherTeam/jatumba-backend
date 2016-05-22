@@ -7,13 +7,14 @@ from api.models import Band, CompositionVersion, Fork
 from .composition import CompositionSerializer
 
 
-class ForkCreateSerializer(serializers.ModelSerializer):
-    band = serializers.PrimaryKeyRelatedField(queryset=Band.objects.all(), write_only=True)
+class ForkSerializer(serializers.ModelSerializer):
+    band = serializers.PrimaryKeyRelatedField(queryset=Band.objects.all())
     composition = CompositionSerializer(read_only=True)
 
     class Meta:
         model = Fork
-        fields = '__all__'
+        fields = ('id', 'band', 'composition', 'composition_version')
+        extra_kwargs = {'band': {'write_only': True}}
 
     def validate(self, attrs):
         request = self.context['request']

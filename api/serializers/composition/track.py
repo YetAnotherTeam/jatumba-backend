@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.models import DiffTrack, Instrument, Track
+from api.models import DiffTrack, Track
 from utils.django_rest_framework.fields import NoneableIntegerField
 from utils.django_rest_framework.serializers import ObjectListSerializer
 
@@ -11,7 +11,6 @@ class TrackListSerializer(ObjectListSerializer):
 
 
 class BaseTrackSerializer(serializers.ModelSerializer):
-    instrument = serializers.PrimaryKeyRelatedField(queryset=Instrument.objects.all())
     entity = serializers.ListField(
         child=serializers.ListField(child=NoneableIntegerField(allow_null=True))
     )

@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from api.models import Band, Composition, Instrument, Member
+from api.models import Band, Composition, Member
 from utils.django_rest_framework.fields import SerializableRelatedField
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
 
@@ -17,11 +17,11 @@ class NestedBandSerializer(serializers.ModelSerializer):
 
 
 class NestedMemberSerializer(serializers.ModelSerializer):
-    required_fields = ('id', 'band')
     band = SerializableRelatedField(serializer=NestedBandSerializer)
 
     class Meta:
         model = Member
+        fields = ('id', 'band')
 
 
 class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -38,7 +38,6 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 class UserRetrieveSerializer(UserSerializer):
     members = NestedMemberSerializer(many=True)
-    instruments = serializers.PrimaryKeyRelatedField(queryset=Instrument.objects.all(), many=True)
     compositions = serializers.SerializerMethodField()
 
     class Meta:

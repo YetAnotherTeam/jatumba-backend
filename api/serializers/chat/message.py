@@ -1,12 +1,11 @@
 from rest_framework import serializers
 
-from api.models import Message
-
-from ..auth import UserSerializer
+from api.models import Message, User
 
 
-class NestedUserSerializer(UserSerializer):
-    class Meta(UserSerializer.Meta):
+class NestedUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
         fields = ('id', 'first_name', 'last_name', 'avatar')
 
 
@@ -15,7 +14,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        exclude = ('band',)
+        fields = ('id', 'author', 'datetime', 'text')
 
 
 # noinspection PyAbstractClass
