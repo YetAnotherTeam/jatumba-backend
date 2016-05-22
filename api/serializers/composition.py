@@ -9,9 +9,9 @@ from api.models import (
     Composition, Track, CompositionVersion, Instrument, Fork, Band, DiffTrack,
     DiffCompositionVersion
 )
-from api.serializers.elementary.organization import BandSerializer
 from utils.django_rest_framework.fields import NoneableIntegerField
 from utils.django_rest_framework.serializers import ObjectListSerializer, DynamicFieldsMixin
+from .organization import BandSerializer
 
 User = get_user_model()
 
@@ -138,6 +138,7 @@ class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 class Meta:
                     model = Composition
                     fields = ('name', 'id', 'band')
+
             composition = NestedCompositionSerializer()
 
             class Meta:

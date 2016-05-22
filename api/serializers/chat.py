@@ -1,8 +1,13 @@
 from rest_framework import serializers
 
-from api.models.chat import Message
-from api.serializers.elementary.chat import MessageSerializer
-from api.serializers.elementary.auth import UserSerializer
+from api.models import Message
+from api.serializers.auth import UserSerializer
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        exclude = ('band',)
 
 
 class MessageCreateSerializer(MessageSerializer):

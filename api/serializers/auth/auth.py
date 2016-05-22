@@ -3,12 +3,30 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from api.models import Instrument, Composition
-from api.serializers.complex.composition import CompositionSerializer
-from api.serializers.complex.organization import MemberSerializer, BandSerializer
-from api.serializers.elementary.auth import UserSerializer, SessionSerializer
+from api.models import Session
+from api.serializers.composition import CompositionSerializer
+from api.serializers.organization import MemberSerializer, BandSerializer
 from utils.django_rest_framework.fields import SerializableRelatedField
+from .user import UserSerializer
 
 User = get_user_model()
+
+
+class SessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Session
+        fields = ('access_token', 'refresh_token')
+
+
+# noinspection PyAbstractClass
+class SignInSerializer(serializers.Serializer):
+    username = serializers.CharField(label='Юзернейм')
+    password = serializers.CharField(style={'input_type': 'password'}, label='Пароль')
+
+
+# noinspection PyAbstractClass
+class IsAuthenticatedSerializer(serializers.Serializer):
+    access_token = serializers.CharField()
 
 
 class UserRetrieveSerializer(UserSerializer):
