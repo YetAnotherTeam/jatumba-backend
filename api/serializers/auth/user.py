@@ -43,7 +43,7 @@ class UserRetrieveSerializer(UserSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'phone', 'vk_profile', 'fb_profile',
-                  'members', 'instruments', 'compositions')
+                  'members', 'instruments', 'compositions', 'avatar')
         extra_kwargs = {'vk_profile': {'read_only': True}, 'fb_profile': {'read_only': True}}
 
     def get_compositions(self, user):
