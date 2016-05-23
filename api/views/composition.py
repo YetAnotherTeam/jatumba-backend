@@ -44,6 +44,8 @@ class CompositionVersionViewSet(mixins.CreateModelMixin,
     serializers = {
         'DEFAULT': CompositionVersionSerializer
     }
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('composition',)
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers['DEFAULT'])

@@ -85,6 +85,7 @@ class CompositionVersion(models.Model):
     create_datetime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        ordering = ('-create_datetime',)
         index_together = ('composition', 'id')
         verbose_name = 'Версия композиции'
         verbose_name_plural = 'Версии композиций'

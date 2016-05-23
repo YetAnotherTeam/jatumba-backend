@@ -65,4 +65,4 @@ class CompositionRetrieveSerializer(CompositionSerializer):
 
 
 class CompositionListItemSerializer(CompositionSerializer):
-    required_fields = ('id', 'name', 'band', 'fork')
+    required_fields = ('id', 'name', 'band', 'fork', 'as_destination_fork')
