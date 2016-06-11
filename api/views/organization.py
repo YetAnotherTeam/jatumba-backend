@@ -30,8 +30,9 @@ class MemberViewSet(viewsets.ModelViewSet):
     serializer_class = MemberSerializer
 
     def create(self, request, *args, **kwargs):
-        request.data['user'] = self.request.user.id
-        serializer = self.get_serializer(data=request.data)
+        data = dict(request.data)
+        data['user'] = self.request.user.id
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

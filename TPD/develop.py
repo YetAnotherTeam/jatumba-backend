@@ -4,7 +4,7 @@ import logging
 from TPD.settings import *  # noqa
 
 DEBUG = True
-SQL_DEBUG = False
+SQL_DEBUG = True
 
 
 class NonHtmlDebugToolbarMiddleware(object):
