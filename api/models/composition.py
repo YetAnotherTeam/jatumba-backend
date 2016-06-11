@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.transaction import atomic
 from guardian.shortcuts import assign_perm
@@ -38,11 +38,20 @@ class Composition(models.Model):
 
 class AbstractTrack(models.Model):
     SECTOR_LENGTH = 32
-    entity = JSONField(verbose_name='Сущность', null=True)
+    entity = ArrayField(
+        ArrayField(
+            models.IntegerField(verbose_name='Id звука', null=True, blank=True),
+            size=SECTOR_LENGTH,
+            verbose_name='Сектор'
+        ),
+        verbose_name='Сущность'
+    )
     order = models.PositiveSmallIntegerField(verbose_name='Порядок')
 
     class Meta:
         abstract = True
+        verbose_name = 'Абстрактная дорожка'
+        verbose_name_plural = 'Абстрактные дорожки'
 
     def __str__(self):
         return str(self.composition)
