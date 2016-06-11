@@ -15,7 +15,13 @@ User = get_user_model()
 
 
 class CompositionViewSet(viewsets.ModelViewSet):
-    queryset = Composition.objects.all()
+    querysets = {
+        'DEFAULT': (
+            Composition.objects
+            .select_related('band', 'as_destination_fork__source_composition')
+        ),
+        'list': Composition.objects.select_related('as_destination_fork__source_composition')
+    }
     permission_classes = (DjangoObjectPermissions,)
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band__members__user', 'band__members', 'band')
@@ -24,6 +30,9 @@ class CompositionViewSet(viewsets.ModelViewSet):
         'retrieve': CompositionRetrieveSerializer,
         'list': CompositionListItemSerializer
     }
+
+    def get_queryset(self):
+        return self.querysets.get(self.action, self.querysets['DEFAULT'])
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers['DEFAULT'])
@@ -64,7 +73,7 @@ class ForkViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
-    queryset = Fork.objects.all()
+    queryset = Fork.objects.select_related('source_composition', 'destination_composition')
     serializers = {
         'DEFAULT': ForkSerializer,
         'create': ForkCreateSerializer,

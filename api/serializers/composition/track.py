@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.models import DiffTrack, Track
+from api.models import AbstractTrack, DiffTrack, Track
 from utils.django_rest_framework.fields import NoneableIntegerField
 from utils.django_rest_framework.serializers import ObjectListSerializer
 
@@ -24,8 +24,11 @@ class BaseTrackSerializer(serializers.ModelSerializer):
         if len(entity) == 0:
             raise ValidationError('В дорожке должен быть хотя бы один сектор')
         for sector in entity:
-            if len(sector) != Track.SECTOR_LENGTH:
-                raise ValidationError('Сектор должен состоять из %d звуков.' % Track.SECTOR_LENGTH)
+            if len(sector) != AbstractTrack.SECTOR_LENGTH:
+                raise ValidationError(
+                    'Сектор должен состоять из {sounds_count} звуков.'
+                    .format(sounds_count=AbstractTrack.SECTOR_LENGTH)
+                )
         return entity
 
     def validate(self, track):

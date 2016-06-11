@@ -2,14 +2,19 @@ from django.db.transaction import atomic
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.models import Band, CompositionVersion, Fork
+from api.models import Band, Composition, CompositionVersion, Fork
+from api.serializers.composition.composition import CompositionSerializer
 
-from .composition import CompositionSerializer
+
+class NestedCompositionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Composition
+        fields = ('id', 'name')
 
 
 class ForkSerializer(serializers.ModelSerializer):
-    source_composition = CompositionSerializer(read_only=True)
-    destination_composition = CompositionSerializer(read_only=True)
+    source_composition = NestedCompositionSerializer(read_only=True)
+    destination_composition = NestedCompositionSerializer(read_only=True)
 
     class Meta:
         model = Fork

@@ -5,6 +5,6 @@ from api.serializers import InstrumentListItemSerializer
 
 
 class InstrumentViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Instrument.objects.all()
+    queryset = Instrument.objects.prefetch_related('sounds')
     serializer_class = InstrumentListItemSerializer
     pagination_class = None

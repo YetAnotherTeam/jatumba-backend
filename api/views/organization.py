@@ -9,6 +9,7 @@ from api.serializers import BandSerializer, MemberSerializer
 
 class BandViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
+    # TODO подумать как оптимизировать
     queryset = Band.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'description')
@@ -24,7 +25,7 @@ class BandViewSet(viewsets.ModelViewSet):
 
 class MemberViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
-    queryset = Member.objects.all()
+    queryset = Member.objects.select_related('user', 'band')
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('band',)
     serializer_class = MemberSerializer

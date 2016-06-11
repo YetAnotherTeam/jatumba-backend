@@ -116,6 +116,10 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
+    querysets = {
+        'DEFAULT': User.objects.all(),
+        'retrieve': User.objects.prefetch_related('members__band'),
+    }
     permission_classes = (DjangoObjectPermissions,)
     queryset = User.objects.all()
     filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
@@ -128,6 +132,9 @@ class UserViewSet(mixins.RetrieveModelMixin,
         'sign_in': SignInSerializer,
         'is_authenticated': IsAuthenticatedSerializer,
     }
+
+    def get_queryset(self):
+        return self.querysets.get(self.action, self.querysets['DEFAULT'])
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers['DEFAULT'])
