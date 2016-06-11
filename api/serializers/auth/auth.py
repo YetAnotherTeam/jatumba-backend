@@ -26,6 +26,11 @@ class IsAuthenticatedSerializer(serializers.Serializer):
     access_token = serializers.CharField()
 
 
+# noinspection PyAbstractClass
+class RefreshSessionSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField()
+
+
 class SignUpSerializer(UserSerializer):
     required_fields = ('username', 'password', 'first_name', 'last_name', 'avatar')
 

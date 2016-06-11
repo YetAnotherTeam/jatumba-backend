@@ -35,8 +35,7 @@ class CompositionViewSet(viewsets.ModelViewSet):
         composition.assign_perms()
 
 
-class CompositionVersionViewSet(mixins.CreateModelMixin,
-                                mixins.RetrieveModelMixin,
+class CompositionVersionViewSet(mixins.RetrieveModelMixin,
                                 mixins.UpdateModelMixin,
                                 mixins.ListModelMixin,
                                 viewsets.GenericViewSet):

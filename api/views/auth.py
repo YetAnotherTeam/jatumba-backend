@@ -6,13 +6,12 @@ import requests
 from django.contrib.auth import authenticate, get_user_model
 from django.core.files.base import ContentFile
 from django.db.transaction import atomic
-from rest_framework import filters, mixins, status, viewsets
+from rest_framework import filters, mixins, status, views, viewsets
 from rest_framework.decorators import list_route
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
@@ -20,8 +19,8 @@ from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
 from api.models import Session
 from api.serializers import (
-    AuthResponseSerializer, IsAuthenticatedSerializer, SignInSerializer, SignUpSerializer,
-    UserRetrieveSerializer, UserSerializer
+    AuthResponseSerializer, IsAuthenticatedSerializer, RefreshSessionSerializer, SignInSerializer,
+    SignUpSerializer, UserRetrieveSerializer, UserSerializer
 )
 
 User = get_user_model()
@@ -56,7 +55,7 @@ def social_auth(user_data, request):
     return Response(AuthResponseSerializer(generate_auth_response(user)).data)
 
 
-class SocialAuthView(APIView):
+class SocialAuthView(views.APIView):
     user_profile_field = None
     social_backend = None
 
@@ -96,14 +95,18 @@ def generate_auth_response(user):
     }
 
 
-class RefreshTokenView(APIView):
+class SessionViewSet(viewsets.GenericViewSet):
+    queryset = Session.objects.all()
     permission_classes = (AllowAny,)
+    serializer_class = RefreshSessionSerializer
 
-    def post(self, request):
-        refresh_token = request.data.get('refresh_token')
-        old_session = Session.objects.filter(refresh_token=refresh_token).first()
+    @list_route(methods=['post'])
+    def refresh(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        old_session = Session.objects.filter(refresh_token=serializer.data['refresh_token']).first()
         if old_session is None:
-            return Response({'error': 'invalid token'}, status=403)
+            raise ValidationError('Invalid token.')
         new_session = generate_auth_response(old_session.user)
         old_session.delete()
         return Response(AuthResponseSerializer(new_session).data)

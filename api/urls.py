@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from api.views import (
     BandViewSet, CompositionVersionViewSet, CompositionViewSet, FBAuthView, ForkViewSet,
-    InstrumentViewSet, MemberViewSet, RefreshTokenView, UserViewSet, VKAuthView
+    InstrumentViewSet, MemberViewSet, SessionViewSet, UserViewSet, VKAuthView
 )
 
 router = DefaultRouter()
@@ -14,10 +14,10 @@ router.register(r'composition', CompositionViewSet)
 router.register(r'composition_version', CompositionVersionViewSet)
 router.register(r'instrument', InstrumentViewSet)
 router.register(r'fork', ForkViewSet)
+router.register(r'session', SessionViewSet)
 
 urlpatterns = [
     url(r'sign_up/vk/', VKAuthView.as_view(), name='sign_up_vk'),
     url(r'sign_up/fb/', FBAuthView.as_view(), name='sign_up_fb'),
-    url(r'token/refresh/', RefreshTokenView.as_view(), name='token_refresh'),
     url(r'', include(router.urls))
 ]
