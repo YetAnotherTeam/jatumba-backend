@@ -160,7 +160,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
             return Response(AuthResponseSerializer(instance=generate_auth_response(user)).data)
         else:
             return Response(
-                {'error': 'wrong username or password'},
+                {'error': 'Wrong username or password'},
                 status=status.HTTP_403_FORBIDDEN
             )
 

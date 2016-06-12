@@ -12,4 +12,4 @@ class BandSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'user_joined')
 
     def get_user_joined(self, band):
-        return band.members.filter(user=self.context['request'].user).exists()
+        return bool(band.user_joined)

@@ -1,3 +1,4 @@
+from django.db.models.expressions import RawSQL
 from django.db.transaction import atomic
 from rest_framework import filters, status, viewsets
 from rest_framework.permissions import DjangoObjectPermissions
@@ -9,11 +10,19 @@ from api.serializers import BandSerializer, MemberSerializer
 
 class BandViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
-    # TODO подумать как оптимизировать
-    queryset = Band.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'description')
     serializer_class = BandSerializer
+
+    def get_queryset(self):
+        return Band.objects.annotate(
+            user_joined=RawSQL(
+                'SELECT 1 FROM api_member '
+                'WHERE api_member.band_id = api_band.id AND api_member.user_id = %s '
+                'LIMIT 1',
+                (self.request.user.id,)
+            )
+        )
 
     @atomic
     def perform_create(self, serializer):

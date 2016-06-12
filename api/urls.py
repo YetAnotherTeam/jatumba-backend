@@ -8,7 +8,7 @@ from api.views import (
 
 router = DefaultRouter()
 router.register(r'user', UserViewSet, base_name='user')
-router.register(r'band', BandViewSet)
+router.register(r'band', BandViewSet, base_name='band')
 router.register(r'member', MemberViewSet)
 router.register(r'composition', CompositionViewSet, base_name='composition')
 router.register(r'composition_version', CompositionVersionViewSet)
