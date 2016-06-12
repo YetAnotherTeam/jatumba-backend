@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.transaction import atomic
 from guardian.shortcuts import assign_perm
@@ -38,23 +38,13 @@ class Composition(models.Model):
 
 class AbstractTrack(models.Model):
     SECTOR_LENGTH = 32
-    entity = ArrayField(
-        ArrayField(
-            models.IntegerField(verbose_name='Id звука', null=True, blank=True),
-            size=SECTOR_LENGTH,
-            verbose_name='Сектор'
-        ),
-        verbose_name='Сущность'
-    )
+    entity = JSONField(verbose_name='Сущность')
     order = models.PositiveSmallIntegerField(verbose_name='Порядок')
 
     class Meta:
         abstract = True
         verbose_name = 'Абстрактная дорожка'
         verbose_name_plural = 'Абстрактные дорожки'
-
-    def __str__(self):
-        return str(self.composition)
 
 
 class Track(AbstractTrack):
@@ -76,6 +66,12 @@ class Track(AbstractTrack):
         ordering = ('composition_version', 'order')
         verbose_name = 'Дорожка'
         verbose_name_plural = 'Дорожки'
+
+    def __str__(self):
+        return (
+            '№{order} | {composition_version}'
+            .format(order=self.order, composition_version=self.composition_version)
+        )
 
 
 class CompositionVersion(models.Model):
@@ -138,6 +134,12 @@ class DiffTrack(AbstractTrack):
         ordering = ('diff_composition_version', 'order')
         verbose_name = 'Дифф-дорожка'
         verbose_name_plural = 'Дифф-дорожки'
+
+    def __str__(self):
+        return (
+            '№{order} | {diff_composition_version}'
+            .format(order=self.order, diff_composition_version=self.diff_composition_version)
+        )
 
 
 class DiffCompositionVersion(models.Model):
