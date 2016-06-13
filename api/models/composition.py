@@ -114,6 +114,43 @@ class CompositionVersion(models.Model):
             )
         return version
 
+    @atomic
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super(CompositionVersion, self).save(force_insert, force_update, using, update_fields)
+        LastCompositionVersionLink.objects.update_or_create(
+            defaults={'composition_version_id': self.id},
+            composition=self.composition
+        )
+
+    @atomic
+    def delete(self, using=None, keep_parents=False):
+        super(CompositionVersion, self).delete(using, keep_parents)
+        composition_version = CompositionVersion.objects.filter(composition=self.composition).last()
+        if composition_version:
+            LastCompositionVersionLink.objects.update_or_create(
+                defaults={'composition_version_id': composition_version.id},
+                composition=self.composition
+            )
+
+
+class LastCompositionVersionLink(models.Model):
+    composition = models.OneToOneField(
+        Composition,
+        on_delete=models.CASCADE,
+        related_name='last_composition_version_link',
+        verbose_name='Композиция'
+    )
+    composition_version = models.OneToOneField(
+        CompositionVersion,
+        on_delete=models.CASCADE,
+        related_name='last_composition_version_link',
+        verbose_name='Версия композиции'
+    )
+
+    class Meta:
+        verbose_name = 'Связь между последней версией композиции и композицией'
+        verbose_name_plural = 'Связи между последними версиями композиций и композициями'
+
 
 class DiffTrack(AbstractTrack):
     instrument = models.ForeignKey(

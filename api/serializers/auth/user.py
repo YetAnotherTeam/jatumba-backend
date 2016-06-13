@@ -47,15 +47,15 @@ class UserRetrieveSerializer(UserSerializer):
         extra_kwargs = {'vk_profile': {'read_only': True}, 'fb_profile': {'read_only': True}}
 
     def get_compositions(self, user):
-        # sorted_composition_versions = (
-        #     CompositionVersion.objects
-        #         .values_list('composition', 'id')
-        #         .annotate(Max('create_datetime'))
-        #         .filter(composition__band__members__user=user.id)
-        #         .order_by('create_datetime__max')
-        # )
         return CompositionSerializer(
-            Composition.objects.filter(band__members__user=user.id),
+            Composition.objects
+            .filter(band__members__user=user.id)
+            .select_related('last_composition_version_link__composition_version')
+            .order_by('last_composition_version_link__composition_version__create_datetime')
+            .prefetch_related(
+                'genres',
+                'last_composition_version_link__composition_version__tracks'
+            ),
             required_fields=('id', 'latest_version', 'name', 'band', 'genres'),
             many=True
         ).data

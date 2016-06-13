@@ -18,7 +18,11 @@ class CompositionViewSet(viewsets.ModelViewSet):
     querysets = {
         'DEFAULT': (
             Composition.objects
-            .select_related('band', 'as_destination_fork__source_composition')
+            .select_related(
+                'band',
+                'as_destination_fork__source_composition',
+                'last_composition_version_link__composition_version'
+            )
         ),
         'list': Composition.objects.select_related('as_destination_fork__source_composition')
     }
@@ -48,7 +52,7 @@ class CompositionVersionViewSet(mixins.RetrieveModelMixin,
                                 mixins.UpdateModelMixin,
                                 mixins.ListModelMixin,
                                 viewsets.GenericViewSet):
-    queryset = CompositionVersion.objects.all()
+    queryset = CompositionVersion.objects.prefetch_related('tracks')
     serializers = {
         'DEFAULT': CompositionVersionSerializer
     }
