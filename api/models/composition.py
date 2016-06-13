@@ -117,19 +117,32 @@ class CompositionVersion(models.Model):
     @atomic
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super(CompositionVersion, self).save(force_insert, force_update, using, update_fields)
-        LastCompositionVersionLink.objects.update_or_create(
-            defaults={'composition_version_id': self.id},
-            composition=self.composition
+        (
+            LastCompositionVersionLink.objects
+            .using(using)
+            .update_or_create(
+                defaults={'composition_version_id': self.id},
+                composition=self.composition
+            )
         )
 
     @atomic
     def delete(self, using=None, keep_parents=False):
         super(CompositionVersion, self).delete(using, keep_parents)
-        composition_version = CompositionVersion.objects.filter(composition=self.composition).last()
+        composition_version = (
+            CompositionVersion.objects
+            .filter(composition=self.composition)
+            .using(using)
+            .last()
+        )
         if composition_version:
-            LastCompositionVersionLink.objects.update_or_create(
-                defaults={'composition_version_id': composition_version.id},
-                composition=self.composition
+            (
+                LastCompositionVersionLink.objects
+                .using(using)
+                .update_or_create(
+                    defaults={'composition_version_id': composition_version.id},
+                    composition=self.composition
+                )
             )
 
 
