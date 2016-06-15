@@ -16,9 +16,9 @@ def forwards(apps, schema_editor):
                 composition=composition,
                 author=composition.band.leader.member.user
             )
-        LastCompositionVersionLink.objects.create(
+        LastCompositionVersionLink.objects.update_or_create(
             composition=composition,
-            composition_version=composition_version
+            update_fields={'composition_version': composition_version}
         )
 
 
