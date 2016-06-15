@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from guardian.shortcuts import get_perms
 from rest_framework import serializers
 
-from api.models import Band, Composition, Fork
+from api.models import Band, Composition, Fork, LastCompositionVersionLink
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
 
 from .composition_version import CompositionVersionSerializer
@@ -43,9 +43,13 @@ class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         fields = '__all__'
 
     def get_latest_version(self, composition):
-        return CompositionVersionSerializer(
-            composition.last_composition_version_link.composition_version
-        ).data
+        try:
+            last_composition_version_link = composition.last_composition_version_link
+            return CompositionVersionSerializer(
+                last_composition_version_link.composition_version
+            ).data
+        except LastCompositionVersionLink.DoesNotExist:
+            return None
 
     def get_permissions(self, composition):
         return get_perms(self.context['request'].user, composition)
