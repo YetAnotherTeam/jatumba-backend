@@ -18,7 +18,7 @@ def forwards(apps, schema_editor):
             )
         LastCompositionVersionLink.objects.update_or_create(
             composition=composition,
-            update_fields={'composition_version': composition_version}
+            defaults={'composition_version': composition_version}
         )
 
 
