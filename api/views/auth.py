@@ -36,7 +36,7 @@ def social_auth(user_data, request):
         )
     user = User.objects.filter(username=username).first()
     if user:
-        return Response({'error': 'username already taken'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Username already taken.'}, status=status.HTTP_400_BAD_REQUEST)
     user = User.objects.create_user(
         username,
         password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
