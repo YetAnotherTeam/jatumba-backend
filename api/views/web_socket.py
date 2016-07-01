@@ -184,7 +184,7 @@ class ChatSocketView(SocketRouteView):
                         [::-1])
             self.route_send(
                 request.reply_channel,
-                MessagesSerializer({"messages": messages}).data
+                MessagesSerializer({'messages': messages}).data
             )
         else:
             raise PermissionDenied

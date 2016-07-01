@@ -43,7 +43,7 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return "%s (%d)" % (self.get_full_name(), self.id)
+        return '%s (%d)' % (self.get_full_name(), self.id)
 
     @atomic
     def save(self, *args, **kwargs):

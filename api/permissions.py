@@ -6,12 +6,12 @@ from guardian.shortcuts import assign_perm
 from api.models import Composition, Member
 
 DEFAULT_USER_GROUP_MODEL_PERMISSION = {
-    "api.add_user", "api.change_user", "api.delete_user",
-    "api.add_band", "api.change_band", "api.delete_band",
-    "api.add_instrument", "api.change_instrument", "api.delete_instrument",
-    "api.add_member", "api.change_member", "api.delete_member",
-    "api.add_composition", "api.change_composition", "api.delete_composition",
-    "api.add_track", "api.change_track", "api.delete_track",
+    'api.add_user', 'api.change_user', 'api.delete_user',
+    'api.add_band', 'api.change_band', 'api.delete_band',
+    'api.add_instrument', 'api.change_instrument', 'api.delete_instrument',
+    'api.add_member', 'api.change_member', 'api.delete_member',
+    'api.add_composition', 'api.change_composition', 'api.delete_composition',
+    'api.add_track', 'api.change_track', 'api.delete_track',
 }
 
 GROUP_NAME_PERMISSION_NAMES_MAP = {

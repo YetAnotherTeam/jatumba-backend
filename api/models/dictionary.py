@@ -27,7 +27,7 @@ def sounds_path(instance, filename):
     return os.path.join(
         'instrument',
         instance.instrument.name,
-        "%s.%s" % (instance.name, filename.split('.')[-1])
+        '%s.%s' % (instance.name, filename.split('.')[-1])
     )
 
 
@@ -41,10 +41,10 @@ class Sound(models.Model):
     )
     file = AudioField(
         upload_to=sounds_path,
-        ext_whitelist=(".mp3", ".wav", ".ogg"),
+        ext_whitelist=('.mp3', '.wav', '.ogg'),
         storage=OverwriteStorage(),
         verbose_name='Audio-файл',
-        help_text="Allowed type - .mp3, .wav, .ogg"
+        help_text='Allowed type - .mp3, .wav, .ogg'
     )
 
     def audio_file_player(self):
@@ -68,7 +68,7 @@ class Sound(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=50, verbose_name="Название")
+    name = models.CharField(max_length=50, verbose_name='Название')
 
     class Meta:
         verbose_name = 'Музыкальный жанр'

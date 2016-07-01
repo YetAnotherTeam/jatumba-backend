@@ -61,9 +61,9 @@ class SocialAuthView(views.APIView):
 
     def __init__(self, **kwargs):
         assert self.social_backend is not None, \
-            "SocialAuthView must provide a `social_backend` field"
+            'SocialAuthView must provide a `social_backend` field'
         assert self.user_profile_field is not None, \
-            "SocialAuthView must provide a `user_profile_field` field"
+            'SocialAuthView must provide a `user_profile_field` field'
         super(SocialAuthView, self).__init__(**kwargs)
 
     def post(self, request):

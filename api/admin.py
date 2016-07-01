@@ -26,9 +26,9 @@ class SoundAdmin(AudioFileAdmin):
                 if os.path.exists(sound.file.path):
                     os.remove(sound.file.path)
             sound.delete()
-        self.message_user(request, "Successfully deleted %d audio files." % count)
+        self.message_user(request, 'Successfully deleted %d audio files.' % count)
 
-    custom_delete_selected.short_description = "Delete selected items"
+    custom_delete_selected.short_description = 'Delete selected items'
 
     def get_actions(self, request):
         actions = super(AudioFileAdmin, self).get_actions(request)

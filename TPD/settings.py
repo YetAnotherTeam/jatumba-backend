@@ -138,12 +138,12 @@ USE_L10N = True
 USE_TZ = True
 
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+    'default': {
+        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
         },
-        "ROUTING": "TPD.routing.main_routing",
+        'ROUTING': 'TPD.routing.main_routing',
     },
 }
 
@@ -157,7 +157,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Группы пользователей
-DEFAULT_USER_GROUP = "Обычные пользователи"
+DEFAULT_USER_GROUP = 'Обычные пользователи'
 
 # Аудио-поле
 CHANNEL_TYPE_VALUE = 0
