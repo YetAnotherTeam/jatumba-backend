@@ -16,4 +16,4 @@ class BandSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return bool(getattr(band, 'user_joined', True))
 
     def get_is_leader(self, band):
-        return band.lead_members.filter(user=self.context['request'].user).exists()
+        return band.leader.member.user_id == self.context['request'].user.id

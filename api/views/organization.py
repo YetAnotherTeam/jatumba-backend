@@ -22,7 +22,7 @@ class BandViewSet(viewsets.ModelViewSet):
                 'LIMIT 1',
                 (self.request.user.id,)
             )
-        )
+        ).select_related('leader__member__user')
 
     @atomic
     def perform_create(self, serializer):
