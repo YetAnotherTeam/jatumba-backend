@@ -6,15 +6,15 @@ from api.models import Band, Composition, CompositionVersion, Fork
 from api.serializers.composition.composition import CompositionSerializer
 
 
-class NestedCompositionSerializer(serializers.ModelSerializer):
+class _CompositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Composition
         fields = ('id', 'name')
 
 
 class ForkSerializer(serializers.ModelSerializer):
-    source_composition = NestedCompositionSerializer(read_only=True)
-    destination_composition = NestedCompositionSerializer(read_only=True)
+    source_composition = _CompositionSerializer(read_only=True)
+    destination_composition = _CompositionSerializer(read_only=True)
 
     class Meta:
         model = Fork

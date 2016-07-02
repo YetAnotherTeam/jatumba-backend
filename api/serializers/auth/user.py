@@ -10,14 +10,14 @@ from ..composition import CompositionSerializer
 User = get_user_model()
 
 
-class NestedBandSerializer(serializers.ModelSerializer):
+class _BandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Band
         fields = ('id', 'name', 'description')
 
 
-class NestedMemberSerializer(serializers.ModelSerializer):
-    band = SerializableRelatedField(serializer=NestedBandSerializer)
+class _MemberSerializer(serializers.ModelSerializer):
+    band = SerializableRelatedField(serializer=_BandSerializer)
 
     class Meta:
         model = Member
@@ -37,7 +37,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 
 class UserRetrieveSerializer(UserSerializer):
-    members = NestedMemberSerializer(many=True)
+    members = _MemberSerializer(many=True)
     compositions = serializers.SerializerMethodField()
 
     class Meta:

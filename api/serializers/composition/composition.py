@@ -10,22 +10,22 @@ from .composition_version import CompositionVersionSerializer
 User = get_user_model()
 
 
-class NestedCompositionSerializer(serializers.ModelSerializer):
+class _CompositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Composition
         fields = ('name', 'id', 'band')
 
 
-class NestedAsDestinationForkSerializer(serializers.ModelSerializer):
-    source_composition = NestedCompositionSerializer()
+class _AsDestinationForkSerializer(serializers.ModelSerializer):
+    source_composition = _CompositionSerializer()
 
     class Meta:
         model = Fork
         fields = ('source_composition',)
 
 
-class NestedAsSourceForksSerializer(serializers.ModelSerializer):
-    destination_composition = NestedCompositionSerializer()
+class _AsSourceForksSerializer(serializers.ModelSerializer):
+    destination_composition = _CompositionSerializer()
 
     class Meta:
         model = Fork
@@ -35,8 +35,8 @@ class NestedAsSourceForksSerializer(serializers.ModelSerializer):
 class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     latest_version = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
-    as_destination_fork = NestedAsDestinationForkSerializer(read_only=True)
-    as_source_forks = NestedAsSourceForksSerializer(read_only=True, many=True)
+    as_destination_fork = _AsDestinationForkSerializer(read_only=True)
+    as_source_forks = _AsSourceForksSerializer(read_only=True, many=True)
 
     class Meta:
         model = Composition
@@ -55,7 +55,7 @@ class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return get_perms(self.context['request'].user, composition)
 
 
-class NestedBandSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+class _BandSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     user_joined = serializers.SerializerMethodField()
 
     class Meta:
@@ -67,7 +67,7 @@ class NestedBandSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 
 class CompositionRetrieveSerializer(CompositionSerializer):
-    band = NestedBandSerializer()
+    band = _BandSerializer()
 
 
 class CompositionListItemSerializer(CompositionSerializer):

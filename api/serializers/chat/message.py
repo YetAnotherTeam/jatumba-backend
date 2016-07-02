@@ -3,14 +3,14 @@ from rest_framework import serializers
 from api.models import Message, User
 
 
-class NestedUserSerializer(serializers.ModelSerializer):
+class _UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name', 'avatar')
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    author = NestedUserSerializer(read_only=True)
+    author = _UserSerializer(read_only=True)
 
     class Meta:
         model = Message
