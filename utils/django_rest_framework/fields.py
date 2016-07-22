@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import serializers
 from rest_framework.relations import RelatedField
 
 
@@ -38,11 +37,3 @@ class SerializableRelatedField(RelatedField):
         self.serializer_params['instance'] = value
         self.serializer_params['context'] = self.context
         return self.serializer(**self.serializer_params).data
-
-
-class NoneableIntegerField(serializers.IntegerField):
-    def to_representation(self, value):
-        if value is not None:
-            return int(value)
-        else:
-            return None
