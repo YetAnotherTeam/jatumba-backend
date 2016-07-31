@@ -52,7 +52,12 @@ def social_auth(user_data, request):
         response = requests.get(url)
         user.avatar.save(os.path.basename(url), ContentFile(response.content), save=False)
     user.save()
-    return Response(AuthResponseSerializer(generate_auth_response(user)).data)
+    return Response(
+        AuthResponseSerializer(
+            generate_auth_response(user),
+            context={'request': request}
+        ).data
+    )
 
 
 class SocialAuthView(views.APIView):
@@ -71,7 +76,12 @@ class SocialAuthView(views.APIView):
         user_data = self.social_backend.get_user_data(token)
         user = User.objects.filter(**{self.user_profile_field: user_data['user_id']}).first()
         if user:
-            return Response(AuthResponseSerializer(generate_auth_response(user)).data)
+            return Response(
+                AuthResponseSerializer(
+                    generate_auth_response(user),
+                    context={'request': request}
+                ).data
+            )
         else:
             return social_auth(user_data, request)
 
@@ -107,9 +117,14 @@ class SessionViewSet(viewsets.GenericViewSet):
         old_session = Session.objects.filter(refresh_token=serializer.data['refresh_token']).first()
         if old_session is None:
             raise ValidationError('Invalid token.')
-        new_session = generate_auth_response(old_session.user)
+        auth_response = generate_auth_response(old_session.user)
         old_session.delete()
-        return Response(AuthResponseSerializer(new_session).data)
+        return Response(
+            AuthResponseSerializer(
+                auth_response,
+                context=self.get_serializer_context()
+            ).data
+        )
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -146,7 +161,10 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response(
-            AuthResponseSerializer(instance=generate_auth_response(user)).data,
+            AuthResponseSerializer(
+                instance=generate_auth_response(user),
+                context=self.get_serializer_context()
+            ).data,
             status=status.HTTP_201_CREATED
         )
 
@@ -157,7 +175,12 @@ class UserViewSet(mixins.RetrieveModelMixin,
         user = authenticate(**serializer.data)
         if user:
             user.sessions.all().delete()
-            return Response(AuthResponseSerializer(instance=generate_auth_response(user)).data)
+            return Response(
+                AuthResponseSerializer(
+                    instance=generate_auth_response(user),
+                    context=self.get_serializer_context()
+                ).data
+            )
         else:
             return Response(
                 {'error': 'Wrong username or password'},
@@ -173,4 +196,9 @@ class UserViewSet(mixins.RetrieveModelMixin,
         if (session is None or
                 (time.time() - session.time > TokenAuthentication.SESSION_EXPIRE_TIME)):
             raise AuthenticationFailed('Access token not valid or expired.')
-        return Response(AuthResponseSerializer({'user': session.user, 'session': session}).data)
+        return Response(
+            AuthResponseSerializer(
+                {'user': session.user, 'session': session},
+                context=self.get_serializer_context()
+            ).data
+        )
