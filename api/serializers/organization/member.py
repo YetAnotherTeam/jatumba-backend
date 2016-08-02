@@ -12,7 +12,7 @@ class MemberSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     user = SerializableRelatedField(serializer=UserSerializer)
     band = SerializableRelatedField(
         serializer=BandSerializer,
-        serializer_params={'required_fields': ('id', 'name', 'description')}
+        serializer_params={'required_fields': ('id', 'name', 'description', 'create_datetime')}
     )
 
     class Meta:

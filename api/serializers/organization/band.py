@@ -10,7 +10,7 @@ class BandSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Band
-        fields = ('id', 'name', 'description', 'user_joined', 'is_leader')
+        fields = ('id', 'name', 'description', 'user_joined', 'is_leader', 'create_datetime')
 
     def get_user_joined(self, band):
         return bool(getattr(band, 'user_joined', True))

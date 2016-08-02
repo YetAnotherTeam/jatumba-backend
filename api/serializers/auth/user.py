@@ -13,7 +13,7 @@ User = get_user_model()
 class _BandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Band
-        fields = ('id', 'name', 'description')
+        fields = ('id', 'name', 'description', 'create_datetime')
 
 
 class _MemberSerializer(serializers.ModelSerializer):

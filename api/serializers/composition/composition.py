@@ -60,7 +60,7 @@ class _BandSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Band
-        fields = ('id', 'name', 'description', 'user_joined')
+        fields = ('id', 'name', 'description', 'user_joined', 'create_datetime')
 
     def get_user_joined(self, band):
         return band.members.filter(user=self.context['request'].user).exists()

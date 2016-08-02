@@ -20,6 +20,7 @@ class Band(models.Model):
         verbose_name='Лидер'
     )
     description = models.TextField(max_length=200, blank=True, default='', verbose_name='Описание')
+    create_datetime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Музыкальная группа'
