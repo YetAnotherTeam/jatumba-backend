@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.db.models.expressions import RawSQL
 from django.db.transaction import atomic
 from rest_framework import filters, status, viewsets
@@ -15,14 +16,20 @@ class BandViewSet(viewsets.ModelViewSet):
     serializer_class = BandSerializer
 
     def get_queryset(self):
-        return Band.objects.annotate(
-            user_joined=RawSQL(
-                'SELECT 1 FROM api_member '
-                'WHERE api_member.band_id = api_band.id AND api_member.user_id = %s '
-                'LIMIT 1',
-                (self.request.user.id,)
+        return (
+            Band.objects
+            .annotate(
+                user_joined=RawSQL(
+                    'SELECT 1 FROM api_member '
+                    'WHERE api_member.band_id = api_band.id AND api_member.user_id = %s '
+                    'LIMIT 1',
+                    (self.request.user.id,)
+                )
             )
-        ).select_related('leader__member__user')
+            .annotate(compositions_count=Count('compositions'))
+            .annotate(members_count=Count('members'))
+            .select_related('leader__member__user')
+        )
 
     @atomic
     def perform_create(self, serializer):
