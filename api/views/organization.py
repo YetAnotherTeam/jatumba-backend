@@ -26,8 +26,8 @@ class BandViewSet(viewsets.ModelViewSet):
                     (self.request.user.id,)
                 )
             )
-            .annotate(compositions_count=Count('compositions'))
-            .annotate(members_count=Count('members'))
+            .annotate(compositions_count=Count('compositions', distinct=True))
+            .annotate(members_count=Count('members', distinct=True))
             .select_related('leader__member__user')
         )
 
