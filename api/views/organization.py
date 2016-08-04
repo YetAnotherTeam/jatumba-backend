@@ -12,7 +12,7 @@ from api.serializers import BandSerializer, MemberSerializer
 class BandViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', 'description')
+    search_fields = ('@name', '@description')
     serializer_class = BandSerializer
 
     def get_queryset(self):

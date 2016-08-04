@@ -139,7 +139,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
     queryset = User.objects.all()
     filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
     filter_fields = ('members__band',)
-    search_fields = ('id', 'username', 'first_name', 'last_name')
+    search_fields = ('id', '@username', '@first_name', '@last_name')
     serializers = {
         'DEFAULT': UserSerializer,
         'retrieve': UserRetrieveSerializer,
