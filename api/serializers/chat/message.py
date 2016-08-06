@@ -6,7 +6,7 @@ from api.models import Message, User
 class _UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'avatar')
+        fields = ('id', 'first_name', 'last_name', 'avatar', 'username')
 
 
 class MessageSerializer(serializers.ModelSerializer):
