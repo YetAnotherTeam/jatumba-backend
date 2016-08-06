@@ -12,7 +12,7 @@ User = get_user_model()
 class _UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'avatar', 'first_name', 'last_name')
+        fields = ('id', 'avatar', 'username')
 
 
 class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
