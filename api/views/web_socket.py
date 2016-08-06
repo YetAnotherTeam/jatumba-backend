@@ -51,7 +51,7 @@ class CompositionSocketView(SocketRouteView):
             composition = Composition.objects.get(id=composition_id)
             diff_version = composition.diff_versions.last()
             if diff_version is None:
-                composition_version = composition.versions.last()
+                composition_version = composition.versions.order_by('create_datetime').last()
                 diff_version = DiffCompositionVersion.copy_from_version(composition_version)
             self.route_send(
                 request.reply_channel,
