@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.9/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
-
+import json
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -164,6 +164,12 @@ DEFAULT_USER_GROUP = 'Обычные пользователи'
 CHANNEL_TYPE_VALUE = 0
 FREQ_TYPE_VALUE = 0
 CONVERT_TYPE_VALUE = 0
+
+DDF_FIELD_FIXTURES = {
+    'django.contrib.postgres.fields.jsonb.JSONField': {
+        'ddf_fixture': lambda: json.dumps([1, 2, 3])
+    },
+}
 
 try:
     from .local import *  # noqa
