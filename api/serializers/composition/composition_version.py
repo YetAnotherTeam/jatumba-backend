@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from api.models import CompositionVersion, DiffCompositionVersion
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
+
 from .track import DiffTrackSerializer, TrackSerializer
 
 User = get_user_model()

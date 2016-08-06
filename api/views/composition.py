@@ -5,8 +5,9 @@ from rest_framework.decorators import detail_route
 from rest_framework.permissions import DjangoObjectPermissions
 from rest_framework.response import Response
 
-from api.models import Composition, CompositionVersion, Fork
-from api.serializers import (
+from ..models import Composition, CompositionVersion, Fork
+from ..pagination import CompositionVersionPagination
+from ..serializers import (
     CompositionListItemSerializer, CompositionRetrieveSerializer, CompositionSerializer,
     CompositionVersionSerializer, ForkCreateSerializer, ForkSerializer
 )
@@ -53,6 +54,7 @@ class CompositionVersionViewSet(mixins.RetrieveModelMixin,
                                 mixins.ListModelMixin,
                                 viewsets.GenericViewSet):
     queryset = CompositionVersion.objects.prefetch_related('tracks')
+    pagination_class = CompositionVersionPagination
     serializers = {
         'DEFAULT': CompositionVersionSerializer
     }
