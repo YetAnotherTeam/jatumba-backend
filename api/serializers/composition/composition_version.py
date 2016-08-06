@@ -1,21 +1,29 @@
+from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
 from rest_framework import serializers
 
 from api.models import CompositionVersion, DiffCompositionVersion
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
-
 from .track import DiffTrackSerializer, TrackSerializer
+
+User = get_user_model()
+
+
+class _UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'avatar', 'first_name', 'last_name')
 
 
 class CompositionVersionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     tracks = TrackSerializer(many=True)
+    author = _UserSerializer(read_only=True)
 
     class Meta:
         model = CompositionVersion
         fields = ('id', 'author', 'tracks', 'create_datetime')
         extra_kwargs = {
-            'composition': {'write_only': True},
-            'author': {'read_only': True}
+            'composition': {'write_only': True}
         }
 
     @atomic
