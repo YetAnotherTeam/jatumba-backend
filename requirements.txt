@@ -5,11 +5,11 @@ django-audiofield==0.8.3
 django-extensions==1.6.7
 django-filter==0.13.0
 django-guardian==1.4.4
-django-rest-swagger==0.3.8
-djangorestframework==3.4.0
+django-rest-swagger==0.3.10
+djangorestframework==3.4.3
 drf-ujson==1.2
 gunicorn==19.6.0
 Pillow==3.3.0
-psycopg2==2.6.1
+psycopg2==2.6.2
 requests==2.10.0
 git+https://github.com/khasanovbi/rest_channels.git
