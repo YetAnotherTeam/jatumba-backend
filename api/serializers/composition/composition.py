@@ -46,7 +46,8 @@ class CompositionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         try:
             last_composition_version_link = composition.last_composition_version_link
             return CompositionVersionSerializer(
-                last_composition_version_link.composition_version
+                last_composition_version_link.composition_version,
+                context=self.context
             ).data
         except LastCompositionVersionLink.DoesNotExist:
             return None

@@ -57,5 +57,6 @@ class UserRetrieveSerializer(UserSerializer):
                 'last_composition_version_link__composition_version__tracks'
             ),
             required_fields=('id', 'latest_version', 'name', 'band', 'genres'),
-            many=True
+            many=True,
+            context=self.context
         ).data
