@@ -51,7 +51,7 @@ class UserRetrieveSerializer(UserSerializer):
             Composition.objects
             .filter(band__members__user=user.id)
             .select_related('last_composition_version_link__composition_version')
-            .order_by('last_composition_version_link__composition_version__create_datetime')
+            .order_by('-last_composition_version_link__composition_version__create_datetime')
             .prefetch_related(
                 'genres',
                 'last_composition_version_link__composition_version__tracks'
