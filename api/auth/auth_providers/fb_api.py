@@ -4,7 +4,7 @@ from api.auth.auth_providers.base import BaseProvider
 
 
 class FB(BaseProvider):
-    request_data = ('first_name', 'last_name', 'email', 'id')
+    request_data = ('first_name', 'last_name', 'email', 'id', 'picture.width(640)')
 
     def __init__(self, *args, **kwargs):
         super(FB, self).__init__(args, kwargs)
@@ -37,7 +37,7 @@ class FB(BaseProvider):
 
 
 class FB_API:
-    URL = 'https://graph.facebook.com/v2.5/%s'
+    URL = 'https://graph.facebook.com/v2.7/%s'
 
     def request(self, backend, method, data):
         try:

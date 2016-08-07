@@ -26,40 +26,6 @@ from api.serializers import (
 User = get_user_model()
 
 
-@atomic
-def social_auth(user_data, request):
-    username = request.data.get('username')
-    if username is None or username == '':
-        return Response(
-            {'error': 'User not found, register new by including username in request.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    user = User.objects.filter(username=username).first()
-    if user:
-        return Response({'error': 'Username already taken.'}, status=status.HTTP_400_BAD_REQUEST)
-    user = User.objects.create_user(
-        username,
-        password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
-        first_name=user_data['first_name'],
-        last_name=user_data['last_name']
-    )
-
-    if user_data['network'] is 'fb':
-        user.fb_profile = user_data['user_id']
-    elif user_data['network'] is 'vk':
-        user.vk_profile = user_data['user_id']
-        url = user_data['photo_max_orig']
-        response = requests.get(url)
-        user.avatar.save(os.path.basename(url), ContentFile(response.content), save=False)
-    user.save()
-    return Response(
-        AuthResponseSerializer(
-            generate_auth_response(user),
-            context={'request': request}
-        ).data
-    )
-
-
 class SocialAuthView(views.APIView):
     user_profile_field = None
     social_backend = None
@@ -83,7 +49,38 @@ class SocialAuthView(views.APIView):
                 ).data
             )
         else:
-            return social_auth(user_data, request)
+            return self.social_auth(user_data, request)
+
+    @atomic
+    def social_auth(self, user_data, request):
+        username = request.data.get('username')
+        if username is None or username == '':
+            return Response(
+                {'error': 'User not found, register new by including username in request.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        user = User.objects.filter(username=username).first()
+        if user:
+            return Response(
+                {'error': 'Username already taken.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        user = User.objects.create_user(
+            username,
+            password=binascii.hexlify(os.urandom(10)).decode('utf-8'),
+            first_name=user_data['first_name'],
+            last_name=user_data['last_name']
+        )
+        self.add_avatar_to_user(user_data, user)
+        return Response(
+            AuthResponseSerializer(
+                generate_auth_response(user),
+                context={'request': request}
+            ).data
+        )
+
+    def add_avatar_to_user(self, user, user_data):
+        raise NotImplementedError
 
 
 class VKAuthView(SocialAuthView):
@@ -91,11 +88,21 @@ class VKAuthView(SocialAuthView):
     user_profile_field = 'vk_profile'
     social_backend = VK()
 
+    def add_avatar_to_user(self, user, user_data):
+        url = user_data['photo_max_orig']
+        response = requests.get(url)
+        user.avatar.save(os.path.basename(url), ContentFile(response.content))
+
 
 class FBAuthView(SocialAuthView):
     permission_classes = ()
     user_profile_field = 'fb_profile'
     social_backend = FB()
+
+    def add_avatar_to_user(self, user, user_data):
+        url = user_data['picture']['data']['url']
+        response = requests.get(url)
+        user.avatar.save(os.path.basename(url), ContentFile(response.content))
 
 
 def generate_auth_response(user):
