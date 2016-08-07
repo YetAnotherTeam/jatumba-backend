@@ -12,6 +12,7 @@ from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
+from six.moves.urllib.parse import urlparse
 
 from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
@@ -79,8 +80,14 @@ class SocialAuthView(views.APIView):
             ).data
         )
 
-    def add_avatar_to_user(self, user, user_data):
+    def get_avatar_url(self, user_data):
         raise NotImplementedError
+
+    def add_avatar_to_user(self, user, user_data):
+        url = self.get_avatar_url(user_data)
+        response = requests.get(url)
+        filename = urlparse(url)[2].rsplit('/', 1)[1]
+        user.avatar.save(filename, ContentFile(response.content))
 
 
 class VKAuthView(SocialAuthView):
@@ -88,10 +95,8 @@ class VKAuthView(SocialAuthView):
     user_profile_field = 'vk_profile'
     social_backend = VK()
 
-    def add_avatar_to_user(self, user, user_data):
-        url = user_data['photo_max_orig']
-        response = requests.get(url)
-        user.avatar.save(os.path.basename(url), ContentFile(response.content))
+    def get_avatar_url(self, user_data):
+        return user_data['photo_max_orig']
 
 
 class FBAuthView(SocialAuthView):
@@ -99,10 +104,8 @@ class FBAuthView(SocialAuthView):
     user_profile_field = 'fb_profile'
     social_backend = FB()
 
-    def add_avatar_to_user(self, user, user_data):
-        url = user_data['picture']['data']['url']
-        response = requests.get(url)
-        user.avatar.save(os.path.basename(url), ContentFile(response.content))
+    def get_avatar_url(self, user_data):
+        return user_data['picture']['data']['url']
 
 
 def generate_auth_response(user):
