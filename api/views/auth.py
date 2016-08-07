@@ -71,7 +71,7 @@ class SocialAuthView(views.APIView):
             first_name=user_data['first_name'],
             last_name=user_data['last_name']
         )
-        self.add_avatar_to_user(user_data, user)
+        self.add_avatar_to_user(user, user_data)
         return Response(
             AuthResponseSerializer(
                 generate_auth_response(user),
