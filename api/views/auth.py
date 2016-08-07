@@ -72,7 +72,7 @@ class SocialAuthView(views.APIView):
             first_name=user_data['first_name'],
             last_name=user_data['last_name']
         )
-        self.add_avatar_to_user(user, user_data)
+        self.save_social_data(user, user_data)
         return Response(
             AuthResponseSerializer(
                 generate_auth_response(user),
@@ -83,11 +83,17 @@ class SocialAuthView(views.APIView):
     def get_avatar_url(self, user_data):
         raise NotImplementedError
 
+    def save_social_data(self, user, user_data):
+        setattr(user, self.user_profile_field, user_data['user_id'])
+        self.add_avatar_to_user(user, user_data)
+        user.save()
+
     def add_avatar_to_user(self, user, user_data):
+        # without db save
         url = self.get_avatar_url(user_data)
         response = requests.get(url)
         filename = urlparse(url)[2].rsplit('/', 1)[1]
-        user.avatar.save(filename, ContentFile(response.content))
+        user.avatar.save(filename, ContentFile(response.content), save=False)
 
 
 class VKAuthView(SocialAuthView):
