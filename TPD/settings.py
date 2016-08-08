@@ -171,6 +171,8 @@ DDF_FIELD_FIXTURES = {
     },
 }
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 try:
     from .local import *  # noqa
 except ImportError:
