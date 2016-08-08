@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.transaction import atomic
+from django.utils import timezone
 from guardian.shortcuts import assign_perm
 
 from api.models.dictionary import Genre, Instrument
@@ -87,7 +88,7 @@ class CompositionVersion(models.Model):
         related_name='composition_versions',
         verbose_name='Автор'
     )
-    create_datetime = models.DateTimeField(auto_now_add=True)
+    create_datetime = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ('-create_datetime',)

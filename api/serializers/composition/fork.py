@@ -66,7 +66,8 @@ class ForkCreateSerializer(serializers.ModelSerializer):
         # Создаем новую версию новой композиции
         destination_composition_version = CompositionVersion.objects.create(
             composition=destination_composition,
-            author=source_composition_version.author
+            author=source_composition_version.author,
+            create_datetime=source_composition_version.create_datetime
         )
 
         # Копируем дорожки
