@@ -138,7 +138,7 @@ class CompositionSocketView(SocketRouteView):
         version = CompositionVersion.copy_from_diff_version(diff_version, user_id)
         (DiffCompositionVersion.objects
          .filter(composition_id=diff_version.composition_id)
-         .exclude(diff_version.id)
+         .exclude(pk=diff_version.id)
          .delete())
         return version
 
