@@ -18,7 +18,7 @@ from api.auth.auth_providers.fb_api import FB
 from api.auth.auth_providers.vk_api import VK
 from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
-from api.models import Session
+from api.models import Session, get_anonymous_user_instance
 from api.serializers import (
     AuthResponseSerializer, IsAuthenticatedSerializer, RefreshSessionSerializer, SignInSerializer,
     SignUpSerializer, UserRetrieveSerializer, UserSerializer
@@ -152,7 +152,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
         'retrieve': User.objects.prefetch_related('members__band'),
     }
     permission_classes = (DjangoObjectPermissions,)
-    queryset = User.objects.all()
+    queryset = User.objects.exclude(pk=get_anonymous_user_instance(User).pk)
     filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
     filter_fields = ('members__band',)
     search_fields = ('id', '@username', '@first_name', '@last_name')
