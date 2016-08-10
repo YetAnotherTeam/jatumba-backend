@@ -149,11 +149,12 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.ListModelMixin,
                   viewsets.GenericViewSet):
     querysets = {
-        'DEFAULT': User.objects.all(),
-        'retrieve': User.objects.prefetch_related('members__band'),
+        'DEFAULT': User.objects.exclude(pk=get_anonymous_user_instance(User).pk),
+        'retrieve': User.objects
+            .exclude(pk=get_anonymous_user_instance(User).pk)
+            .prefetch_related('members__band'),
     }
     permission_classes = (DjangoObjectPermissions,)
-    queryset = User.objects.exclude(pk=get_anonymous_user_instance(User).pk)
     filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
     filter_fields = ('members__band',)
     search_fields = ('id', '@username', '@first_name', '@last_name')
