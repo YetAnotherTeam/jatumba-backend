@@ -19,6 +19,7 @@ from api.auth.auth_providers.vk_api import VK
 from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
 from api.models import Session, get_anonymous_user_instance
+from api.pagination import UserPagination
 from api.serializers import (
     AuthResponseSerializer, IsAuthenticatedSerializer, RefreshSessionSerializer, SignInSerializer,
     SignUpSerializer, UserRetrieveSerializer, UserSerializer
@@ -156,6 +157,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
     filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
     filter_fields = ('members__band',)
     search_fields = ('id', '@username', '@first_name', '@last_name')
+    pagination_class = UserPagination
     serializers = {
         'DEFAULT': UserSerializer,
         'retrieve': UserRetrieveSerializer,
