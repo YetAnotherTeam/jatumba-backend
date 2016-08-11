@@ -1,23 +1,22 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from api.models import Band, Composition, Member
+from api.models import Band, Composition, LastCompositionVersionLink, Member, Fork
 from utils.django_rest_framework.fields import SerializableRelatedField
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
-
-from ..composition import CompositionSerializer
+from ..composition.composition_version import CompositionVersionSerializer
 
 User = get_user_model()
 
 
-class _BandSerializer(serializers.ModelSerializer):
+class _MemberBandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Band
         fields = ('id', 'name', 'description', 'create_datetime')
 
 
 class _MemberSerializer(serializers.ModelSerializer):
-    band = SerializableRelatedField(serializer=_BandSerializer)
+    band = SerializableRelatedField(serializer=_MemberBandSerializer)
 
     class Meta:
         model = Member
@@ -36,6 +35,47 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         }
 
 
+class _BandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Band
+        fields = ('id', 'name')
+
+
+class _ForkCompositionSerializer(serializers.ModelSerializer):
+    band = _BandSerializer()
+
+    class Meta:
+        model = Composition
+        fields = ('band',)
+
+
+class _AsDestinationForkSerializer(serializers.ModelSerializer):
+    source_composition = _ForkCompositionSerializer()
+
+    class Meta:
+        model = Fork
+        fields = ('source_composition',)
+
+
+class _CompositionSerializer(serializers.ModelSerializer):
+    latest_version = serializers.SerializerMethodField()
+    as_destination_fork = _AsDestinationForkSerializer(read_only=True)
+
+    class Meta:
+        model = Composition
+        fields = ('id', 'latest_version', 'as_destination_fork', 'name', 'band', 'genres')
+
+    def get_latest_version(self, composition):
+        try:
+            last_composition_version_link = composition.last_composition_version_link
+            return CompositionVersionSerializer(
+                last_composition_version_link.composition_version,
+                context=self.context
+            ).data
+        except LastCompositionVersionLink.DoesNotExist:
+            return None
+
+
 class UserRetrieveSerializer(UserSerializer):
     members = _MemberSerializer(many=True)
     compositions = serializers.SerializerMethodField()
@@ -47,7 +87,7 @@ class UserRetrieveSerializer(UserSerializer):
         extra_kwargs = {'vk_profile': {'read_only': True}, 'fb_profile': {'read_only': True}}
 
     def get_compositions(self, user):
-        return CompositionSerializer(
+        return _CompositionSerializer(
             Composition.objects
             .filter(band__members__user=user.id)
             .select_related('last_composition_version_link__composition_version')
@@ -55,9 +95,6 @@ class UserRetrieveSerializer(UserSerializer):
             .prefetch_related(
                 'genres',
                 'last_composition_version_link__composition_version__tracks'
-            ),
-            required_fields=(
-                'id', 'latest_version', 'name', 'band', 'genres', 'as_destination_fork'
             ),
             many=True,
             context=self.context
