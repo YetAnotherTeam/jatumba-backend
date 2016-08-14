@@ -150,6 +150,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     querysets = {
         'DEFAULT': User.objects.exclude(pk=get_anonymous_user_instance(User).pk),
+        'list': User.objects.exclude(pk=get_anonymous_user_instance(User).pk).order_by('id'),
         'retrieve': User.objects
             .exclude(pk=get_anonymous_user_instance(User).pk)
             .prefetch_related('members__band'),
