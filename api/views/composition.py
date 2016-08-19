@@ -37,7 +37,7 @@ class CompositionViewSet(viewsets.ModelViewSet):
     }
 
     def get_queryset(self):
-        return self.querysets.get(self.action, self.querysets['DEFAULT'])
+        return self.querysets.get(self.action, self.querysets['DEFAULT']).all()
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers['DEFAULT'])
