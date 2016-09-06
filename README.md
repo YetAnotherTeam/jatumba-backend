@@ -16,12 +16,12 @@ $ sudo npm install -g redis-commander
 ```
 Install `JATumba` application.
 ```bash
-$ mkvirtualenv jatumba
+$ mkvirtualenv jatumba --python=python3.5
 $ pip install -r requirements.txt
 ```
 Install `circus`.
 ```bash
-$ mkvirtualenv circus
+$ mkvirtualenv circus --python=python2.7
 $ pip install -r circus/requirements.txt
 ```
 
