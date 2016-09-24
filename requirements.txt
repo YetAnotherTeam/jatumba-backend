@@ -4,10 +4,10 @@ daphne==0.15.0
 Django==1.10.1
 django-audiofield==0.8.3
 django-extensions==1.7.4
-django-filter==0.14.0
-django-guardian==1.4.5
+django-filter==0.15.0
+django-guardian==1.4.6
 django-rest-swagger==0.3.10
-djangorestframework==3.4.6
+djangorestframework==3.4.7
 drf-ujson==1.2
 gunicorn==19.6.0
 Pillow==3.3.1

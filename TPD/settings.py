@@ -28,7 +28,7 @@ SECRET_KEY = 'kap=0c&fg0q2x2@d=@&to2(b*!2z_my-6&5)br(&35u+4%5*+a'
 DEBUG = False
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'jatumba.ml']
+ALLOWED_HOSTS = ['127.0.0.1', 'jatumba.ru']
 
 # Application definition
 
