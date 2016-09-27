@@ -19,10 +19,12 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 
+from api.views.schema import schema_view
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('api.urls')),
-    url(r'^docs/', include('rest_framework_swagger.urls')),
+    url('^docs/', schema_view),
 ]
 
 if settings.DEBUG:
