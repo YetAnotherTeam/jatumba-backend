@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
-from rest_framework import filters, mixins, status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.permissions import DjangoObjectPermissions
 from rest_framework.response import Response
@@ -28,7 +29,7 @@ class CompositionViewSet(viewsets.ModelViewSet):
         'list': Composition.objects.select_related('as_destination_fork__source_composition')
     }
     permission_classes = (DjangoObjectPermissions,)
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend,)
     filter_fields = ('band__members__user', 'band__members', 'band')
     serializers = {
         'DEFAULT': CompositionSerializer,
@@ -58,7 +59,7 @@ class CompositionVersionViewSet(mixins.RetrieveModelMixin,
     serializers = {
         'DEFAULT': CompositionVersionSerializer
     }
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend,)
     filter_fields = ('composition',)
 
     def get_serializer_class(self):

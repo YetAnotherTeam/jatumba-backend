@@ -1,6 +1,7 @@
 from django.db.models import Count
 from django.db.models.expressions import RawSQL
 from django.db.transaction import atomic
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.permissions import DjangoObjectPermissions
 from rest_framework.response import Response
@@ -42,7 +43,7 @@ class BandViewSet(viewsets.ModelViewSet):
 class MemberViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
     queryset = Member.objects.select_related('user', 'band')
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend,)
     filter_fields = ('band',)
     serializer_class = MemberSerializer
 

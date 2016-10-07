@@ -6,6 +6,7 @@ import requests
 from django.contrib.auth import authenticate, get_user_model
 from django.core.files.base import ContentFile
 from django.db.transaction import atomic
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, views, viewsets
 from rest_framework.decorators import list_route
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
@@ -152,11 +153,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
         'DEFAULT': User.objects.exclude(pk=get_anonymous_user_instance(User).pk),
         'list': User.objects.exclude(pk=get_anonymous_user_instance(User).pk).order_by('id'),
         'retrieve': User.objects
-            .exclude(pk=get_anonymous_user_instance(User).pk)
-            .prefetch_related('members__band'),
+                    .exclude(pk=get_anonymous_user_instance(User).pk)
+                    .prefetch_related('members__band'),
     }
     permission_classes = (DjangoObjectPermissions,)
-    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     filter_fields = ('members__band',)
     search_fields = ('id', '@username', '@first_name', '@last_name')
     pagination_class = UserPagination

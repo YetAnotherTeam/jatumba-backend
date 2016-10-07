@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from api.models import Band, Composition, LastCompositionVersionLink, Member, Fork
+from api.models import Band, Composition, Fork, LastCompositionVersionLink, Member
 from utils.django_rest_framework.fields import SerializableRelatedField
 from utils.django_rest_framework.serializers import DynamicFieldsMixin
+
 from ..composition.composition_version import CompositionVersionSerializer
 
 User = get_user_model()
