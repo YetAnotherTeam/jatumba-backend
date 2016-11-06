@@ -15,20 +15,22 @@ User = get_user_model()
 
 
 class CreatePermissionsMixin(object):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         renovate_permissions()
 
 
 class BaseTestCase(CreatePermissionsMixin, APITestCase):
-    def setUp(self):
-        super(BaseTestCase, self).setUp()
+    @classmethod
+    def setUpTestData(cls):
+        super(BaseTestCase, cls).setUpTestData()
         users = G(User, is_active=True, is_superuser=True, avatar=None, n=2)
-        self.user = users[0]
-        self.only_user = users[1]
-        self.session = G(Session, **generate_session_params(self.user))
-        self.band = G(Band)
-        self.member = G(Member, user=self.user)
-        self.composition = G(Composition)
+        cls.user = users[0]
+        cls.only_user = users[1]
+        cls.session = G(Session, **generate_session_params(cls.user))
+        cls.band = G(Band)
+        cls.member = G(Member, user=cls.user)
+        cls.composition = G(Composition)
 
 
 @skip('Not implemented')
@@ -46,7 +48,7 @@ class MemberTestCase(BaseTestCase):
                 'band': self.band.id
             }
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
         self.assertEqual(
             response.data,
             MemberSerializer(Member.objects.get(id=response.data['id'])).data

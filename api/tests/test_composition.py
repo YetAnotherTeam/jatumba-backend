@@ -5,11 +5,11 @@ from api.models import CompositionVersion, DiffCompositionVersion, Track
 
 
 class BaseTestCase(APITestCase):
-    def setUp(self):
-        super(BaseTestCase, self).setUp()
-        self.composition_version = G(CompositionVersion)
-        self.tracks_count = 5
-        G(Track, composition_version=self.composition_version, n=self.tracks_count)
+    @classmethod
+    def setUpTestData(cls):
+        cls.composition_version = G(CompositionVersion)
+        cls.tracks_count = 5
+        G(Track, composition_version=cls.composition_version, n=cls.tracks_count)
 
     def test_copy_diff_composition_version_from_composition_version(self):
         diff_composition_version = DiffCompositionVersion.copy_from_version(
