@@ -1,10 +1,10 @@
 asgi-redis==0.10.0
 channels==0.17.3
 daphne==0.15.0
-Django==1.10.3
+Django==1.10.4
 django-audiofield==0.8.3
 django-extensions==1.7.5
-django-filter==1.0.0
+django-filter==1.0.1
 django-guardian==1.4.6
 django-rest-swagger==2.1.0
 djangorestframework==3.5.3
@@ -12,6 +12,6 @@ drf-ujson==1.2
 gunicorn==19.6.0
 Pillow==3.4.2
 psycopg2==2.6.2
-requests==2.12.1
+requests==2.12.3
 rest_channels==0.1.0
 six==1.10.0
