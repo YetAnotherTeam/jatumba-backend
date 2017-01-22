@@ -1,4 +1,4 @@
 # Пришлось установить версию с гита, потому что в Pypi стоит устаревшая версия с багой
 git+https://github.com/circus-tent/circus-web
-circus==0.13.0
-PyYAML==3.11
+circus==0.14.0
+PyYAML==3.12

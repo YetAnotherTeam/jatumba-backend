@@ -3,14 +3,14 @@ from channels import include, route
 from api.views.web_socket import ChatSocketView, CompositionSocketView
 
 composition_routing = [
-    route('websocket.connect', 'api.consumers.base.pass_message'),
+    route('websocket.connect', CompositionSocketView.as_view()),
     route('websocket.receive', CompositionSocketView.as_view()),
     route('websocket.disconnect', CompositionSocketView.as_view()),
 ]
 
 
 chat_routing = [
-    route('websocket.connect', 'api.consumers.base.pass_message'),
+    route('websocket.connect', ChatSocketView.as_view()),
     route('websocket.receive', ChatSocketView.as_view()),
     route('websocket.disconnect', ChatSocketView.as_view()),
 ]

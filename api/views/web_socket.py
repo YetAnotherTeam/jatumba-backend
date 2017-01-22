@@ -20,6 +20,9 @@ User = get_user_model()
 class CompositionSocketView(SocketRouteView):
     COMPOSITION_GROUP_TEMPLATE = 'Composition-%s'
 
+    def connect(self, request, *args, **kwargs):
+        request.reply_channel.send({"accept": True})
+
     def disconnect(self, request, *args, **kwargs):
         composition_id = kwargs.get('composition_id')
         Group(self.COMPOSITION_GROUP_TEMPLATE % composition_id).discard(request.reply_channel)
@@ -146,6 +149,9 @@ class CompositionSocketView(SocketRouteView):
 class ChatSocketView(SocketRouteView):
     CHAT_GROUP_TEMPLATE = 'Chat-%s'
     MESSAGES_COUNT = 20
+
+    def connect(self, request, *args, **kwargs):
+        request.reply_channel.send({"accept": True})
 
     def disconnect(self, request, *args, **kwargs):
         band_id = kwargs.get('band_id')
