@@ -45,6 +45,7 @@ class SocialAuthView(views.APIView):
         user_data = self.social_backend.get_user_data(token)
         user = User.objects.filter(**{self.user_profile_field: user_data['user_id']}).first()
         if user:
+            self.save_social_data(user, user_data)
             return Response(
                 AuthResponseSerializer(
                     generate_auth_response(user),
