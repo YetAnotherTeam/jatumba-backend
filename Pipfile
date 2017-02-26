@@ -1,0 +1,30 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+
+[dev-packages]
+daphne = ">=1.0.3"
+django-debug-toolbar = "*"
+django-dynamic-fixture = ">=1.9.1"
+gunicorn = ">=19.6.0"
+ipython = "*"
+Pygments = "*"
+sqlparse = "*"
+tox = "*"
+
+[packages]
+asgi_redis = ">=1.0.0"
+channels = ">=1.0.3"
+Django = ">=1.10.5"
+django-audiofield = ">=0.8.3"
+django-extensions = "*"
+django-filter = ">=1.0.1"
+django-guardian = ">=1.4.6"
+django-rest-swagger = ">=2.1.1"
+djangorestframework = ">=3.5.4"
+drf_ujson = ">=1.2"
+Pillow = ">=4.0.0"
+psycopg2 = ">=2.6.2"
+requests = ">=2.13.0"
+rest_channels = ">=0.1.1"
+six = ">=1.10.0"

@@ -1,4 +1,4 @@
 #!/bin/bash
 git pull
-pip install -r requirements.txt
+pipenv install --dev
 /home/jatumba/.virtualenvs/circus/bin/circusctl restart

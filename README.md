@@ -16,8 +16,8 @@ $ sudo npm install -g redis-commander
 ```
 Install `JATumba` application.
 ```bash
-$ mkvirtualenv jatumba --python=python3.5
-$ pip install -r requirements.txt
+$ pipenv --three
+$ pipenv install --dev
 ```
 Install `circus`.
 ```bash
@@ -28,5 +28,6 @@ $ pip install -r circus/requirements.txt
 ## Usage
 This script run `daphne`, `gunicorn`, `workers` and `circus`, `redis` web interaces.
 ```bash
-$ ./start.sh
+$ workon circus
+$ circusd circus/circus.ini --daemon
 ```
