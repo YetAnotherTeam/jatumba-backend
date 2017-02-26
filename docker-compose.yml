@@ -1,0 +1,49 @@
+version: "2"
+
+services:
+  web:
+    container_name: jatumba_web
+    restart: always
+    build: .
+    env_file: .env
+    ports:
+      - "8000:8000"
+    links:
+      - postgres:postgres
+      - redis:redis
+    volumes:
+      - /jatumba-backend
+      - /var/log/jatumba/gunicorn:/var/log/gunicorn
+    environment:
+      DEBUG: 'true'
+
+  nginx:
+    container_name: jatumba_nginx
+    restart: always
+    build: ./server_configurations/nginx/
+    ports:
+      - "8080:80"
+    volumes:
+      - /www/static
+    volumes_from:
+      - web
+    links:
+      - web:web
+
+  postgres:
+    container_name: jatumba_postgres
+    restart: always
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - /var/lib/postgresql/data/
+
+  redis:
+    container_name: jatumba_redis
+    restart: always
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - /data

@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'kap=0c&fg0q2x2@d=@&to2(b*!2z_my-6&5)br(&35u+4%5*+a'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -87,11 +87,11 @@ WSGI_APPLICATION = 'TPD.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'jatumba',
-        'USER': 'jatumba',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASS'],
+        'HOST': os.environ['DB_HOST'],
+        'PORT': os.environ['DB_PORT']
     }
 }
 
@@ -139,7 +139,12 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'asgi_redis.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+            'hosts': [
+                'redis://{host}:{port}'.format(
+                    host=os.environ['REDIS_HOST'],
+                    port=os.environ['REDIS_PORT']
+                )
+            ],
         },
         'ROUTING': 'TPD.routing.main_routing',
     },
