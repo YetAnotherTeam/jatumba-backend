@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
 from django.db.transaction import atomic
+
 from guardian.shortcuts import assign_perm, remove_perm
 
 

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
+
 from rest_framework import serializers
 
 from api.models import CompositionVersion, DiffCompositionVersion

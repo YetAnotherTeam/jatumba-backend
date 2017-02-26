@@ -2,7 +2,7 @@ FROM python:3.5
 
 ENV PYTHONUNBUFFERED 1
 RUN mkdir /jatumba-backend
-ADD . /jatumba-backend
+COPY . /jatumba-backend
 WORKDIR /jatumba-backend
 
 RUN pip install pipenv && \

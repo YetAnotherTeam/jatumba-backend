@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import transaction
+
 from guardian.shortcuts import assign_perm
 
 from api.models import Composition, Member

@@ -1,7 +1,8 @@
 import functools
 
-from channels.handler import AsgiRequest
 from django.contrib.auth.models import AnonymousUser
+
+from channels.handler import AsgiRequest
 
 from api.models import Session
 

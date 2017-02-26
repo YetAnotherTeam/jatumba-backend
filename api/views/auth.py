@@ -2,10 +2,11 @@ import binascii
 import os
 import time
 
-import requests
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate, get_user_model, user_logged_in
 from django.core.files.base import ContentFile
 from django.db.transaction import atomic
+
+import requests
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, views, viewsets
 from rest_framework.decorators import list_route
@@ -15,8 +16,7 @@ from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 from six.moves.urllib.parse import urlparse
 
-from api.auth.auth_providers.fb_api import FB
-from api.auth.auth_providers.vk_api import VK
+from api.auth.auth_providers import FB, VK
 from api.auth.authentication import TokenAuthentication
 from api.auth.session_generator import generate_session_params
 from api.models import Session, get_anonymous_user_instance
@@ -46,6 +46,7 @@ class SocialAuthView(views.APIView):
         user = User.objects.filter(**{self.user_profile_field: user_data['user_id']}).first()
         if user:
             self.save_social_data(user, user_data)
+            user_logged_in.send(sender=user.__class__, request=request, user=user)
             return Response(
                 AuthResponseSerializer(
                     generate_auth_response(user),
@@ -76,6 +77,7 @@ class SocialAuthView(views.APIView):
             last_name=user_data['last_name']
         )
         self.save_social_data(user, user_data)
+        user_logged_in.send(sender=user.__class__, request=request, user=user)
         return Response(
             AuthResponseSerializer(
                 generate_auth_response(user),
@@ -196,6 +198,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         user = authenticate(**serializer.data)
         if user:
+            user_logged_in.send(sender=user.__class__, request=request, user=user)
             user.sessions.all().delete()
             return Response(
                 AuthResponseSerializer(

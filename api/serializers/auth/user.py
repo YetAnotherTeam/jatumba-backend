@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
 
 from api.models import Band, Composition, Fork, LastCompositionVersionLink, Member

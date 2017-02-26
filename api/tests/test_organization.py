@@ -1,6 +1,7 @@
 from unittest import skip
 
 from django.contrib.auth import get_user_model
+
 from django_dynamic_fixture import G
 from rest_framework import status
 from rest_framework.reverse import reverse

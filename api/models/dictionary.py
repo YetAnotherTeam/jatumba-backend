@@ -1,8 +1,9 @@
 import os
 
-from audiofield.fields import AudioField
 from django.conf import settings
 from django.db import models
+
+from audiofield.fields import AudioField
 
 from utils.django.storage import OverwriteStorage
 

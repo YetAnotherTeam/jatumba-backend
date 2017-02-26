@@ -1,6 +1,9 @@
-from channels import Group
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
+
+from channels import Group
+from rest_channels.socket_routing.decorators import socket_route
+from rest_channels.socket_routing.route_views import SocketRouteView
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
@@ -11,8 +14,6 @@ from api.serializers import (
     CompositionVersionSerializer, DiffCompositionVersionSerializer, DiffHistorySerializer,
     IsAuthenticatedSerializer, MessageSerializer, MessagesSerializer
 )
-from rest_channels.socket_routing.decorators import socket_route
-from rest_channels.socket_routing.route_views import SocketRouteView
 
 User = get_user_model()
 

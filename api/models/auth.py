@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
 from django.db.transaction import atomic
+
 from guardian.shortcuts import assign_perm
 
 
