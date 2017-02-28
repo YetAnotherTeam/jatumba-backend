@@ -1,14 +1,15 @@
 FROM python:3.5
 
 ENV PYTHONUNBUFFERED 1
-RUN mkdir /jatumba-backend
-COPY . /jatumba-backend
-WORKDIR /jatumba-backend
 
+WORKDIR /jatumba-backend
+COPY Pipfile* ./
 RUN pip install pipenv && \
     pipenv install && \
-    pipenv install gunicorn && \
-    mkdir -p /var/log/gunicorn
+    pipenv install gunicorn
+
+COPY . /jatumba-backend
+RUN mkdir -p /var/log/daphne
 
 CMD /root/.local/share/virtualenvs/jatumba-backend/bin/gunicorn \
     TPD.wsgi:application \
@@ -16,5 +17,3 @@ CMD /root/.local/share/virtualenvs/jatumba-backend/bin/gunicorn \
     --access-logfile /var/log/gunicorn/access.log \
     --error-logfile /var/log/gunicorn/error.log \
     --log-level debug
-
-EXPOSE 8000

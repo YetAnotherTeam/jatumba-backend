@@ -1,0 +1,17 @@
+FROM python:3.5
+
+ENV PYTHONUNBUFFERED 1
+
+WORKDIR /jatumba-backend
+COPY Pipfile* ./
+RUN pip install pipenv && \
+    pipenv install && \
+    pipenv install daphne
+
+COPY . /jatumba-backend
+RUN mkdir -p /var/log/daphne
+
+CMD /root/.local/share/virtualenvs/jatumba-backend/bin/daphne TPD.asgi:channel_layer \
+    --port 9000 \
+    --access-log /var/log/daphne/access.log \
+    --verbosity 2
