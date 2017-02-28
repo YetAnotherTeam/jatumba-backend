@@ -12,6 +12,7 @@ COPY . /jatumba-backend
 RUN mkdir -p /var/log/daphne
 
 CMD /root/.local/share/virtualenvs/jatumba-backend/bin/daphne TPD.asgi:channel_layer \
+    --bind 0.0.0.0 \
     --port 9000 \
     --access-log /var/log/daphne/access.log \
     --verbosity 2
