@@ -1,0 +1,11 @@
+FROM python:3.5
+MAINTAINER Bulat Khasanov <afti@yandex.ru>
+
+ENV PYTHONUNBUFFERED 1
+
+WORKDIR /jatumba-backend
+COPY Pipfile* ./
+RUN pip install pipenv && \
+    pipenv install
+
+COPY . .

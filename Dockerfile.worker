@@ -1,13 +1,3 @@
-FROM python:3.5
-
-ENV PYTHONUNBUFFERED 1
-
-WORKDIR /jatumba-backend
-COPY Pipfile* ./
-RUN pip install pipenv && \
-    pipenv install && \
-    pipenv install gunicorn
-
-COPY . /jatumba-backend
+FROM bkhasanov/jatumba-backend-base
 
 CMD /root/.local/share/virtualenvs/jatumba-backend/bin/python manage.py runworker -v 2

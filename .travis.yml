@@ -1,0 +1,11 @@
+sudo: require
+
+services:
+  - docker
+
+script:
+  - export REPO=$DOCKER_USERNAME/$DOCKER_IMAGE_NAME
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker build -f Dockerfile.base -t $REPO:$TRAVIS_COMMIT .
+  - docker tag $REPO:$TRAVIS_COMMIT $REPO:latest
+  - docker push $REPO:latest

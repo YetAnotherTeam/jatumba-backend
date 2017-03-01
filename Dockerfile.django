@@ -1,15 +1,7 @@
-FROM python:3.5
+FROM bkhasanov/jatumba-backend-base
 
-ENV PYTHONUNBUFFERED 1
-
-WORKDIR /jatumba-backend
-COPY Pipfile* ./
-RUN pip install pipenv && \
-    pipenv install && \
-    pipenv install gunicorn
-
-COPY . /jatumba-backend
-RUN mkdir -p /var/log/daphne
+RUN pipenv install gunicorn && \
+    mkdir -p /var/log/gunicorn
 
 CMD /root/.local/share/virtualenvs/jatumba-backend/bin/gunicorn \
     TPD.wsgi:application \
