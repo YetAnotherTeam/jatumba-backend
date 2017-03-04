@@ -28,7 +28,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = False
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'jatumba.ru']
+ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'].split(',')
 
 # Application definition
 
