@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /jatumba-backend
 COPY Pipfile* ./
-RUN pip install pipenv && \
+RUN pip install pipenv==3.4.2 && \
     pipenv install
 
 COPY . .
