@@ -1,7 +1,10 @@
 FROM bkhasanov/jatumba-backend-base
+MAINTAINER Bulat Khasanov <afti@yandex.ru>
 
 RUN pipenv install gunicorn && \
     mkdir -p /var/log/gunicorn
+
+ENTRYPOINT ${PYTHON_BIN_PATH}/python manage.py collectstatic --noinput
 
 CMD /root/.local/share/virtualenvs/jatumba-backend/bin/gunicorn \
     TPD.wsgi:application \

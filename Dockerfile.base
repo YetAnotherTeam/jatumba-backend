@@ -1,7 +1,9 @@
 FROM python:3.5
 MAINTAINER Bulat Khasanov <afti@yandex.ru>
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1 \
+    PYTHON_BIN_PATH=/root/.local/share/virtualenvs/jatumba-backend/bin \
+    STATIC_ROOT=/static
 
 WORKDIR /jatumba-backend
 COPY Pipfile* ./
