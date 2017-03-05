@@ -4,9 +4,12 @@ MAINTAINER Bulat Khasanov <afti@yandex.ru>
 RUN pipenv install gunicorn && \
     mkdir -p /var/log/gunicorn
 
-ENTRYPOINT ${PYTHON_BIN_PATH}/python manage.py collectstatic --noinput
-
-CMD /root/.local/share/virtualenvs/jatumba-backend/bin/gunicorn \
+CMD $PYTHON_BIN_PATH/python \
+    manage.py \
+    collectstatic \
+    --noinput \
+    && \
+    ${PYTHON_BIN_PATH}/gunicorn \
     TPD.wsgi:application \
     --bind=:8000 \
     --access-logfile /var/log/gunicorn/access.log \
