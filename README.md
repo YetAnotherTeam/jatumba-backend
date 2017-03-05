@@ -1,5 +1,8 @@
+[![Build Status](https://travis-ci.org/YetAnotherTeam/jatumba-backend.svg?branch=master)](https://travis-ci.org/YetAnotherTeam/jatumba-backend)
+
 JATumba backend
 ===============
+
 Server-side for `JATumba` application
 ## Required
 * Python Version >=3.5 for `JATumba` application
