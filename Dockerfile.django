@@ -1,15 +1,15 @@
 FROM bkhasanov/jatumba-backend-base
 MAINTAINER Bulat Khasanov <afti@yandex.ru>
 
-RUN pipenv install gunicorn && \
+RUN pip install gunicorn && \
     mkdir -p /var/log/gunicorn
 
-CMD ${PYTHON_BIN_PATH}/python \
+CMD python \
     manage.py \
     collectstatic \
     --noinput \
     && \
-    ${PYTHON_BIN_PATH}/gunicorn \
+    gunicorn \
     TPD.wsgi:application \
     --bind=:8000 \
     --access-logfile /var/log/gunicorn/access.log \

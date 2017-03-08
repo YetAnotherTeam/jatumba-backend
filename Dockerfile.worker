@@ -1,4 +1,4 @@
 FROM bkhasanov/jatumba-backend-base
 MAINTAINER Bulat Khasanov <afti@yandex.ru>
 
-CMD ${PYTHON_BIN_PATH}/python manage.py runworker -v 2
+CMD python manage.py runworker -v 2

@@ -2,7 +2,6 @@ FROM python:3.5
 MAINTAINER Bulat Khasanov <afti@yandex.ru>
 
 ENV PYTHONUNBUFFERED=1 \
-    PYTHON_BIN_PATH=/usr/local/bin/python \
     STATIC_ROOT=/static \
     MEDIA_ROOT=/media
 

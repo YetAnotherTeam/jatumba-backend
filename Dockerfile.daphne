@@ -1,10 +1,10 @@
 FROM bkhasanov/jatumba-backend-base
 MAINTAINER Bulat Khasanov <afti@yandex.ru>
 
-RUN pipenv install daphne && \
+RUN pip install daphne && \
     mkdir -p /var/log/daphne
 
-CMD ${PYTHON_BIN_PATH}/daphne TPD.asgi:channel_layer \
+CMD daphne TPD.asgi:channel_layer \
     --bind 0.0.0.0 \
     --port 9000 \
     --access-log /var/log/daphne/access.log \
