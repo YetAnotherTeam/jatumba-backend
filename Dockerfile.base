@@ -2,13 +2,14 @@ FROM python:3.5
 MAINTAINER Bulat Khasanov <afti@yandex.ru>
 
 ENV PYTHONUNBUFFERED=1 \
-    PYTHON_BIN_PATH=/root/.local/share/virtualenvs/jatumba-backend/bin \
+    PYTHON_BIN_PATH=/usr/local/bin/python \
     STATIC_ROOT=/static \
     MEDIA_ROOT=/media
 
 WORKDIR /jatumba-backend
 COPY Pipfile* ./
-RUN pip install pipenv==3.4.2 && \
-    pipenv install
+RUN pip install pipenv && \
+    pipenv lock -r > requirements.txt && \
+    pip install -r requirements.txt
 
 COPY . .

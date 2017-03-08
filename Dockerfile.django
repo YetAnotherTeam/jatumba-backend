@@ -4,7 +4,7 @@ MAINTAINER Bulat Khasanov <afti@yandex.ru>
 RUN pipenv install gunicorn && \
     mkdir -p /var/log/gunicorn
 
-CMD $PYTHON_BIN_PATH/python \
+CMD ${PYTHON_BIN_PATH}/python \
     manage.py \
     collectstatic \
     --noinput \
