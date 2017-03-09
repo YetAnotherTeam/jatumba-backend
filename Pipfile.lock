@@ -77,8 +77,8 @@
             "version": "==15.1.0"
         },
         "coreapi": {
-            "hash": "sha256:627d246616c491a1d1f9a7a5ecb59594b9396a2764e8f124cbb5a24a378c9910",
-            "version": "==2.2.4"
+            "hash": "sha256:95a24903c8f3b03e2a330a5228c4cc5705223855257a614f6f355327b8800d51",
+            "version": "==2.3.0"
         },
         "coreschema": {
             "hash": "sha256:9503506007d482ab0867ba14724b93c18a33b22b6d19fb419ef2d239dd4a1607",
@@ -113,8 +113,8 @@
             "version": "==2.1.1"
         },
         "djangorestframework": {
-            "hash": "sha256:110afa12784ceadfb50808882689302d266785b51e3d13286744333ff6d78e60",
-            "version": "==3.5.4"
+            "hash": "sha256:6ea1e778d35e71fb53d42e8b7d367eeb4948507c05f7030681db26c5a134b4ea",
+            "version": "==3.6.1"
         },
         "drf_ujson": {
             "hash": "sha256:a4cd6a96eabe8357db9efe5aacf78b3856d2cb13b387aadb4f125fb03adf1324",
@@ -255,8 +255,8 @@
             "version": "==1.7"
         },
         "django-dynamic-fixture": {
-            "hash": "sha256:489d09d3d6c89ab17cacf0a8c0207b5b59fdbd4993c8cc6c702f7561d02ac3aa",
-            "version": "==1.9.1"
+            "hash": "sha256:edfcc5e0d2c2ba31e22a8e34b9de5acd137659d31ff01a0ac3d1b9a21e720932",
+            "version": "==1.9.3"
         },
         "gunicorn": {
             "hash": "sha256:7b48e797990b7972862bf93c7eec637efb391217485920e6fa5f509376d94727",
