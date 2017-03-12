@@ -109,12 +109,12 @@
             "version": "==1.4.6"
         },
         "django-rest-swagger": {
-            "hash": "sha256:6ef17b12456dac9434e44357480e323812bee3087579d14e046f6091de6a15d0",
-            "version": "==2.1.1"
+            "hash": "sha256:3471e6c21a3e97751fa6f7b81b66e916e40fa645cac36be1594c0efed810d247",
+            "version": "==2.1.2"
         },
         "djangorestframework": {
-            "hash": "sha256:6ea1e778d35e71fb53d42e8b7d367eeb4948507c05f7030681db26c5a134b4ea",
-            "version": "==3.6.1"
+            "hash": "sha256:3dc4bb6377dd1d58d8e2adc908d4f2e3bca5d8d0fb8323c49f57c8c8d407f6ec",
+            "version": "==3.6.2"
         },
         "drf_ujson": {
             "hash": "sha256:a4cd6a96eabe8357db9efe5aacf78b3856d2cb13b387aadb4f125fb03adf1324",
@@ -173,8 +173,8 @@
             "version": "==0.1.1"
         },
         "setuptools": {
-            "hash": "sha256:9349b47bcdef2e695065791260f9416b7aae8739fd30c6849f807bce5281d046",
-            "version": "==34.3.1"
+            "hash": "sha256:6483f8412313ec787fa71379147a4605d3b1cc303c3648d02542a9160d3db72b",
+            "version": "==34.3.2"
         },
         "simplejson": {
             "hash": "sha256:953be622e88323c6f43fad61ffd05bebe73b9fd9863a46d68b052d2aa7d71ce2",
@@ -307,8 +307,8 @@
             "version": "==2.2.0"
         },
         "setuptools": {
-            "hash": "sha256:9349b47bcdef2e695065791260f9416b7aae8739fd30c6849f807bce5281d046",
-            "version": "==34.3.1"
+            "hash": "sha256:6483f8412313ec787fa71379147a4605d3b1cc303c3648d02542a9160d3db72b",
+            "version": "==34.3.2"
         },
         "simplegeneric": {
             "hash": "sha256:dc972e06094b9af5b855b3df4a646395e43d1c9d0d39ed345b7393560d0b9173",
