@@ -149,8 +149,8 @@
             "version": "==16.8"
         },
         "psycopg2": {
-            "hash": "sha256:e452672f74f8d4540da0b9df4d50cd26109f05e2ed35015bb0ffe6a0f08e730e",
-            "version": "==2.7"
+            "hash": "sha256:9c9fe11f87c44e83620b2273f40338e3c25fdbfd34986dddc77e840e0acd25bc",
+            "version": "==2.7.1"
         },
         "pyparsing": {
             "hash": "sha256:fee43f17a9c4087e7ed1605bd6df994c6173c1e977d7ade7b651292fab2bd010",
@@ -271,8 +271,8 @@
             "version": "==5.3.0"
         },
         "ipython_genutils": {
-            "hash": "sha256:6218e9abd612fb5acfb175ea7c7b026006de4df9691d9a73c9b390cfa1a41c2b",
-            "version": "==0.1.0"
+            "hash": "sha256:72dd37233799e619666c9f639a9da83c34013a73e8bbc79a7a6348d93c61fab8",
+            "version": "==0.2.0"
         },
         "packaging": {
             "hash": "sha256:99276dc6e3a7851f32027a68f1095cd3f77c148091b092ea867a351811cfe388",
