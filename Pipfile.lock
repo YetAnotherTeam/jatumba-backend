@@ -45,8 +45,8 @@
             "version": "==1.4.3"
         },
         "asgi_redis": {
-            "hash": "sha256:03103fb7eeb31476dfcaae63d589cbdfb128001e49b836b79a842f787a2c1699",
-            "version": "==1.0.0"
+            "hash": "sha256:0c308ef0c35307bfe66cb17388a2a748468e37a2e0f34a9a2ea9f2d867531517",
+            "version": "==1.1.0"
         },
         "asgiref": {
             "hash": "sha256:b7d118253c23545707a540a9e9f54f99dc75df4df8ddd62eac6415da0a306581",
@@ -69,8 +69,8 @@
             "version": "==4.0.2"
         },
         "channels": {
-            "hash": "sha256:52ea5277123516c702f29d2f3e620057c4f60577161a9fb38194cb02c3e5f95d",
-            "version": "==1.0.3"
+            "hash": "sha256:300f7da2329550802ae27949889c62fee2e84430c0f96bd5cc5a7a41e122c102",
+            "version": "==1.1.0"
         },
         "constantly": {
             "hash": "sha256:dd2fa9d6b1a51a83f0d7dd76293d734046aa176e384bf6e33b7e44880eb37c5d",
@@ -85,8 +85,8 @@
             "version": "==0.0.4"
         },
         "daphne": {
-            "hash": "sha256:83bbb1b0264152df46973fd0fddc5740e1efa2c4a9f4ed0cf52cbdf452a35479",
-            "version": "==1.0.3"
+            "hash": "sha256:0ed2c517086f6b2dc54a8c40ebb282696e0085d6d642873117853ab7874c721c",
+            "version": "==1.1.0"
         },
         "django-audiofield": {
             "hash": "sha256:a05e6ff07028e79efc2d8fae0e1d7285b6770623dc10704fe319fe6990b234ed",
@@ -243,8 +243,8 @@
             "version": "==15.1.0"
         },
         "daphne": {
-            "hash": "sha256:83bbb1b0264152df46973fd0fddc5740e1efa2c4a9f4ed0cf52cbdf452a35479",
-            "version": "==1.0.3"
+            "hash": "sha256:0ed2c517086f6b2dc54a8c40ebb282696e0085d6d642873117853ab7874c721c",
+            "version": "==1.1.0"
         },
         "decorator": {
             "hash": "sha256:73cbaadb8bc4e3c65fe1100773d56331a2d756cc0f5c7b9d8d5d5223fe04f600",
@@ -299,8 +299,8 @@
             "version": "==0.5.1"
         },
         "py": {
-            "hash": "sha256:2d4bba2e25fff58140e6bdce1e485e89bb59776adbe01d490baa6b1f37a3dd6b",
-            "version": "==1.4.32"
+            "hash": "sha256:81b5e37db3cc1052de438375605fb5d3b3e97f950f415f9143f04697c684d7eb",
+            "version": "==1.4.33"
         },
         "pyparsing": {
             "hash": "sha256:fee43f17a9c4087e7ed1605bd6df994c6173c1e977d7ade7b651292fab2bd010",
