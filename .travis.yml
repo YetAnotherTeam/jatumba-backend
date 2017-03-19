@@ -4,8 +4,27 @@ services:
   - docker
 
 script:
-  - export REPO=$DOCKER_USERNAME/$DOCKER_IMAGE_NAME
-  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker build -f Dockerfile.base -t $REPO:$TRAVIS_COMMIT .
-  - docker tag $REPO:$TRAVIS_COMMIT $REPO:latest
-  - docker push $REPO:latest
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+
+    export BASE_REPO=$DOCKER_USERNAME/jatumba-backend-base;
+    docker build -f Dockerfile.base -t $BASE_REPO:$TRAVIS_COMMIT .;
+    docker tag $BASE_REPO:$TRAVIS_COMMIT $BASE_REPO:latest;
+
+    export DAPHNE_REPO=$DOCKER_USERNAME/jatumba-backend-daphne;
+    docker build -f Dockerfile.daphne -t $DAPHNE_REPO:$TRAVIS_COMMIT .;
+    docker tag $DAPHNE_REPO:$TRAVIS_COMMIT $DAPHNE_REPO:latest;
+
+    export DJANGO_REPO=$DOCKER_USERNAME/jatumba-backend-django;
+    docker build -f Dockerfile.django -t $DJANGO_REPO:$TRAVIS_COMMIT .;
+    docker tag $DJANGO_REPO:$TRAVIS_COMMIT $DJANGO_REPO:latest;
+
+    export WORKER_REPO=$DOCKER_USERNAME/jatumba-backend-worker;
+    docker build -f Dockerfile.worker -t $WORKER_REPO:$TRAVIS_COMMIT .;
+    docker tag $WORKER_REPO:$TRAVIS_COMMIT $WORKER_REPO:latest;
+
+    docker push $BASE_REPO:latest;
+    docker push $DAPHNE_REPO:latest;
+    docker push $DJANGO_REPO:latest;
+    docker push $WORKER_REPO:latest;
+    fi
