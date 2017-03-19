@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c9dcff8e698b5b089d2288d828ccf277524b16603fe24ca50f7c456d8ceb4ed5"
+            "sha256": "43608aaab656e77604731b95a21396dd26b39ed157a6d9b763f42ae5e0871e74"
         },
         "requires": {},
         "sources": [
@@ -169,8 +169,8 @@
             "version": "==2.13.0"
         },
         "rest_channels": {
-            "hash": "sha256:2040087b1559c58b41340519b97040da4e0a67316e28b65530ab36af45dcce61",
-            "version": "==0.1.1"
+            "hash": "sha256:af5366fbbbabdfe4f1a7ac8ce19bd15ecb4cd0827333340fc9b3bd6b40543264",
+            "version": "==0.1.2"
         },
         "setuptools": {
             "hash": "sha256:6483f8412313ec787fa71379147a4605d3b1cc303c3648d02542a9160d3db72b",
