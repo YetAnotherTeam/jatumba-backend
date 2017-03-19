@@ -49,8 +49,8 @@
             "version": "==1.1.0"
         },
         "asgiref": {
-            "hash": "sha256:b7d118253c23545707a540a9e9f54f99dc75df4df8ddd62eac6415da0a306581",
-            "version": "==1.0.0"
+            "hash": "sha256:dac4b6782ae55a5e7bb03cfc51e76e71e6cc7a4deb3bd1303c6b6cdc510387e8",
+            "version": "==1.0.1"
         },
         "attrs": {
             "hash": "sha256:c59426b15b45e39a7bc408eb6ba7e7188d9532764f873cc691199ddd975c97ef",
@@ -69,8 +69,8 @@
             "version": "==4.0.2"
         },
         "channels": {
-            "hash": "sha256:300f7da2329550802ae27949889c62fee2e84430c0f96bd5cc5a7a41e122c102",
-            "version": "==1.1.0"
+            "hash": "sha256:25daa75b8d2a9c6a62ffd84a806ca82e1e3ef3db500fb0b33d955c469cd99b25",
+            "version": "==1.1.1"
         },
         "constantly": {
             "hash": "sha256:dd2fa9d6b1a51a83f0d7dd76293d734046aa176e384bf6e33b7e44880eb37c5d",
@@ -227,8 +227,8 @@
             "version": "==1.4.3"
         },
         "asgiref": {
-            "hash": "sha256:b7d118253c23545707a540a9e9f54f99dc75df4df8ddd62eac6415da0a306581",
-            "version": "==1.0.0"
+            "hash": "sha256:dac4b6782ae55a5e7bb03cfc51e76e71e6cc7a4deb3bd1303c6b6cdc510387e8",
+            "version": "==1.0.1"
         },
         "attrs": {
             "hash": "sha256:c59426b15b45e39a7bc408eb6ba7e7188d9532764f873cc691199ddd975c97ef",
