@@ -259,8 +259,8 @@
             "version": "==1.9.3"
         },
         "gunicorn": {
-            "hash": "sha256:7b48e797990b7972862bf93c7eec637efb391217485920e6fa5f509376d94727",
-            "version": "==19.7.0"
+            "hash": "sha256:75af03c99389535f218cc596c7de74df4763803f7b63eb09d77e92b3956b36c6",
+            "version": "==19.7.1"
         },
         "incremental": {
             "hash": "sha256:cc00a35f9e9621ddec0a5e7d17271f3f26244873c4aec67eda06f2db8302e04b",
