@@ -57,8 +57,8 @@
             "version": "==16.3.0"
         },
         "autobahn": {
-            "hash": "sha256:ccdd617129967ad7f9bdf2334685fc8121d414a9bdb3fdd5650481456bf8a0f4",
-            "version": "==0.17.2"
+            "hash": "sha256:eb20745a70b3087f38d916f80b58ef8ff3f09ac1e89f6b6ceb731b2ab2d6a09e",
+            "version": "==0.18.1"
         },
         "billiard": {
             "hash": "sha256:03f669755f1d6b7dbe528fe615a3164b0d8efca095382c514dd7026dfb79a9c6",
@@ -101,8 +101,8 @@
             "version": "==1.7.7"
         },
         "django-filter": {
-            "hash": "sha256:7cca9dab22c72df734ba24fb81ca018fdb6d2020c840e758d473dcedd341aa7b",
-            "version": "==1.0.1"
+            "hash": "sha256:a6a1b59fc7c9c5da17af1c5c98490f89d2df26b9501934a54d814414af9ee1ac",
+            "version": "==1.0.2"
         },
         "django-guardian": {
             "hash": "sha256:aa0979b1955f07fc37fea96be7ee16ef4a42ac3423e64847cbbf8a36aa80ca6b",
@@ -173,8 +173,8 @@
             "version": "==0.1.2"
         },
         "setuptools": {
-            "hash": "sha256:6483f8412313ec787fa71379147a4605d3b1cc303c3648d02542a9160d3db72b",
-            "version": "==34.3.2"
+            "hash": "sha256:e436d8c9dcf67ea8902bfa7cce1ef698f36bf303f13b4f62a5668891ecd380dd",
+            "version": "==34.3.3"
         },
         "simplejson": {
             "hash": "sha256:953be622e88323c6f43fad61ffd05bebe73b9fd9863a46d68b052d2aa7d71ce2",
@@ -235,8 +235,8 @@
             "version": "==16.3.0"
         },
         "autobahn": {
-            "hash": "sha256:ccdd617129967ad7f9bdf2334685fc8121d414a9bdb3fdd5650481456bf8a0f4",
-            "version": "==0.17.2"
+            "hash": "sha256:eb20745a70b3087f38d916f80b58ef8ff3f09ac1e89f6b6ceb731b2ab2d6a09e",
+            "version": "==0.18.1"
         },
         "constantly": {
             "hash": "sha256:dd2fa9d6b1a51a83f0d7dd76293d734046aa176e384bf6e33b7e44880eb37c5d",
@@ -291,8 +291,8 @@
             "version": "==0.4.0"
         },
         "prompt_toolkit": {
-            "hash": "sha256:7deb7d6efb3e59cdfa28afe6deb50243ac881a2c40da92cc3d29f69284da5796",
-            "version": "==1.0.13"
+            "hash": "sha256:7281b5199235adaef6980942840c43753e4ab20dfe41338da634fb41c194f9d8",
+            "version": "==1.0.14"
         },
         "ptyprocess": {
             "hash": "sha256:464cb76f7a7122743dd25507650db89cd447c51f38e4671602b3eaa2e38e05ae",
@@ -307,8 +307,8 @@
             "version": "==2.2.0"
         },
         "setuptools": {
-            "hash": "sha256:6483f8412313ec787fa71379147a4605d3b1cc303c3648d02542a9160d3db72b",
-            "version": "==34.3.2"
+            "hash": "sha256:e436d8c9dcf67ea8902bfa7cce1ef698f36bf303f13b4f62a5668891ecd380dd",
+            "version": "==34.3.3"
         },
         "simplegeneric": {
             "hash": "sha256:dc972e06094b9af5b855b3df4a646395e43d1c9d0d39ed345b7393560d0b9173",
