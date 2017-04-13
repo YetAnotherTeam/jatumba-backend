@@ -45,8 +45,8 @@
             "version": "==1.4.3"
         },
         "asgi_redis": {
-            "hash": "sha256:95d4fd42246e8b4d2fe8c28570e7407d25cb467507bf42168e6289e888a2f256",
-            "version": "==1.2.1"
+            "hash": "sha256:d84635a088250f43e124258c5aa5a8454f398acdd3760b6e0039d4ad522544af",
+            "version": "==1.3.0"
         },
         "asgiref": {
             "hash": "sha256:aaf199524607300b7e3489bc0b3ca9391d9e055c7fd7bcb60147f46aa2742450",
@@ -69,8 +69,8 @@
             "version": "==4.0.2"
         },
         "channels": {
-            "hash": "sha256:4ffd81edb1fd12cd4a37742c3065903e5f0a476631a595da5e9c323c6130f972",
-            "version": "==1.1.2"
+            "hash": "sha256:bc55512163d0d3cb4e0cb8e1d1b8164916576befcae57fc54d0f355a3649d55b",
+            "version": "==1.1.3"
         },
         "constantly": {
             "hash": "sha256:dd2fa9d6b1a51a83f0d7dd76293d734046aa176e384bf6e33b7e44880eb37c5d",
@@ -173,8 +173,8 @@
             "version": "==0.1.2"
         },
         "setuptools": {
-            "hash": "sha256:e436d8c9dcf67ea8902bfa7cce1ef698f36bf303f13b4f62a5668891ecd380dd",
-            "version": "==34.3.3"
+            "hash": "sha256:1f7aac8b778446406ec5dcd5cc9305b375e7935e38f2fd3b1b70168c21a079d0",
+            "version": "==34.4.1"
         },
         "simplejson": {
             "hash": "sha256:953be622e88323c6f43fad61ffd05bebe73b9fd9863a46d68b052d2aa7d71ce2",
@@ -311,8 +311,8 @@
             "version": "==2017.2"
         },
         "setuptools": {
-            "hash": "sha256:e436d8c9dcf67ea8902bfa7cce1ef698f36bf303f13b4f62a5668891ecd380dd",
-            "version": "==34.3.3"
+            "hash": "sha256:1f7aac8b778446406ec5dcd5cc9305b375e7935e38f2fd3b1b70168c21a079d0",
+            "version": "==34.4.1"
         },
         "simplegeneric": {
             "hash": "sha256:dc972e06094b9af5b855b3df4a646395e43d1c9d0d39ed345b7393560d0b9173",
@@ -327,8 +327,8 @@
             "version": "==0.2.3"
         },
         "tox": {
-            "hash": "sha256:0001379c6dc21e69902e0279e7f91d420857bbb70901203564fb9e118c376dab",
-            "version": "==2.6.0"
+            "hash": "sha256:0f37ea637ead4a5bbae91531b0bf8fd327c7152e20255e5960ee180598228d21",
+            "version": "==2.7.0"
         },
         "traitlets": {
             "hash": "sha256:c6cb5e6f57c5a9bdaa40fa71ce7b4af30298fbab9ece9815b5d995ab6217c7d9",
