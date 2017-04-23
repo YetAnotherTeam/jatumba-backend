@@ -57,8 +57,8 @@
             "version": "==16.3.0"
         },
         "autobahn": {
-            "hash": "sha256:eb20745a70b3087f38d916f80b58ef8ff3f09ac1e89f6b6ceb731b2ab2d6a09e",
-            "version": "==0.18.1"
+            "hash": "sha256:71c92fa92fc106acc9b03160a7b59aa61ea3bac467a10b31da9bab85cc7a96ce",
+            "version": "==0.18.2"
         },
         "billiard": {
             "hash": "sha256:03f669755f1d6b7dbe528fe615a3164b0d8efca095382c514dd7026dfb79a9c6",
@@ -173,8 +173,8 @@
             "version": "==0.1.2"
         },
         "setuptools": {
-            "hash": "sha256:1f7aac8b778446406ec5dcd5cc9305b375e7935e38f2fd3b1b70168c21a079d0",
-            "version": "==34.4.1"
+            "hash": "sha256:33a7b7910651bea57164c6c6dd66a2b1c5196c0f78ee2ff7319ce7bd031714c0",
+            "version": "==35.0.1"
         },
         "simplejson": {
             "hash": "sha256:953be622e88323c6f43fad61ffd05bebe73b9fd9863a46d68b052d2aa7d71ce2",
@@ -185,8 +185,8 @@
             "version": "==1.10.0"
         },
         "txaio": {
-            "hash": "sha256:eedb045f5bd1f3caf6dd0b28dbc675efe1eee8d454469890f6c7c09259766711",
-            "version": "==2.6.2"
+            "hash": "sha256:7c70db6aaeaceca7c61894d03d411f13fded5ce26dfb6ce3af3a87c40fe16d32",
+            "version": "==2.7.0"
         },
         "ujson": {
             "hash": "sha256:f66073e5506e91d204ab0c614a148d5aa938bdbf104751be66f8ad7a222f5f86",
@@ -201,8 +201,8 @@
             "version": "==1.1.3"
         },
         "zope.interface": {
-            "hash": "sha256:8780ef68ca8c3fe1abb30c058a59015129d6e04a6b02c2e56b9c7de6078dfa88",
-            "version": "==4.3.3"
+            "hash": "sha256:774553ada822a432617ceee7330330e2364afdb25c8c5b7e9b0d1676aef6d4de",
+            "version": "==4.4.0"
         }
     },
     "develop": {
@@ -235,8 +235,8 @@
             "version": "==16.3.0"
         },
         "autobahn": {
-            "hash": "sha256:eb20745a70b3087f38d916f80b58ef8ff3f09ac1e89f6b6ceb731b2ab2d6a09e",
-            "version": "==0.18.1"
+            "hash": "sha256:71c92fa92fc106acc9b03160a7b59aa61ea3bac467a10b31da9bab85cc7a96ce",
+            "version": "==0.18.2"
         },
         "constantly": {
             "hash": "sha256:dd2fa9d6b1a51a83f0d7dd76293d734046aa176e384bf6e33b7e44880eb37c5d",
@@ -255,8 +255,8 @@
             "version": "==1.7"
         },
         "django-dynamic-fixture": {
-            "hash": "sha256:edfcc5e0d2c2ba31e22a8e34b9de5acd137659d31ff01a0ac3d1b9a21e720932",
-            "version": "==1.9.3"
+            "hash": "sha256:c35ad37e4bc35766b7af9822beb230b56d6fb7e26b27cf0f53275a94314450e6",
+            "version": "==1.9.4"
         },
         "gunicorn": {
             "hash": "sha256:75af03c99389535f218cc596c7de74df4763803f7b63eb09d77e92b3956b36c6",
@@ -267,12 +267,16 @@
             "version": "==16.10.1"
         },
         "ipython": {
-            "hash": "sha256:54d2ec3ba66ae2e0a34b2b48c85c4818d8ca040edd36ffe81f1e460dd5e03ae5",
-            "version": "==5.3.0"
+            "hash": "sha256:9cdbfa1af3a92cf019d1a592646e27159b3cac1ab9f2be7643d5e3bc413d3b5c",
+            "version": "==6.0.0"
         },
         "ipython_genutils": {
             "hash": "sha256:72dd37233799e619666c9f639a9da83c34013a73e8bbc79a7a6348d93c61fab8",
             "version": "==0.2.0"
+        },
+        "jedi": {
+            "hash": "sha256:96678411f2ffa444da3a5e7fdd4adc513b728a4a4617b30308be5c950722424b",
+            "version": "==0.10.2"
         },
         "packaging": {
             "hash": "sha256:99276dc6e3a7851f32027a68f1095cd3f77c148091b092ea867a351811cfe388",
@@ -311,8 +315,8 @@
             "version": "==2017.2"
         },
         "setuptools": {
-            "hash": "sha256:1f7aac8b778446406ec5dcd5cc9305b375e7935e38f2fd3b1b70168c21a079d0",
-            "version": "==34.4.1"
+            "hash": "sha256:33a7b7910651bea57164c6c6dd66a2b1c5196c0f78ee2ff7319ce7bd031714c0",
+            "version": "==35.0.1"
         },
         "simplegeneric": {
             "hash": "sha256:dc972e06094b9af5b855b3df4a646395e43d1c9d0d39ed345b7393560d0b9173",
@@ -335,8 +339,8 @@
             "version": "==4.3.2"
         },
         "txaio": {
-            "hash": "sha256:eedb045f5bd1f3caf6dd0b28dbc675efe1eee8d454469890f6c7c09259766711",
-            "version": "==2.6.2"
+            "hash": "sha256:7c70db6aaeaceca7c61894d03d411f13fded5ce26dfb6ce3af3a87c40fe16d32",
+            "version": "==2.7.0"
         },
         "virtualenv": {
             "hash": "sha256:39d88b533b422825d644087a21e78c45cf5af0ef7a99a1fc9fbb7b481e5c85b0",
@@ -347,8 +351,8 @@
             "version": "==0.1.7"
         },
         "zope.interface": {
-            "hash": "sha256:8780ef68ca8c3fe1abb30c058a59015129d6e04a6b02c2e56b9c7de6078dfa88",
-            "version": "==4.3.3"
+            "hash": "sha256:774553ada822a432617ceee7330330e2364afdb25c8c5b7e9b0d1676aef6d4de",
+            "version": "==4.4.0"
         }
     }
 }
