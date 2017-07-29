@@ -13,7 +13,7 @@
     },
     "default": {
         "amqp": {
-            "version": "==2.1.4"
+            "version": "==2.2.1"
         },
         "asgi-redis": {
             "version": "==1.4.2"
@@ -25,19 +25,19 @@
             "version": "==17.2.0"
         },
         "autobahn": {
-            "version": "==17.6.2"
+            "version": "==17.7.1"
         },
         "automat": {
             "version": "==0.6.0"
         },
         "billiard": {
-            "version": "==3.5.0.2"
+            "version": "==3.5.0.3"
         },
         "celery": {
-            "version": "==4.0.2"
+            "version": "==4.1.0"
         },
         "certifi": {
-            "version": "==2017.4.17"
+            "version": "==2017.7.27.1"
         },
         "channels": {
             "version": "==1.1.6"
@@ -85,7 +85,7 @@
             "version": "==1.2"
         },
         "hyperlink": {
-            "version": "==17.2.1"
+            "version": "==17.3.0"
         },
         "idna": {
             "version": "==2.5"
@@ -100,7 +100,7 @@
             "version": "==2.9.6"
         },
         "kombu": {
-            "version": "==4.0.2"
+            "version": "==4.1.0"
         },
         "markupsafe": {
             "version": "==1.0"
@@ -112,13 +112,13 @@
             "version": "==0.44"
         },
         "openapi-codec": {
-            "version": "==1.3.1"
+            "version": "==1.3.2"
         },
         "pillow": {
-            "version": "==4.2.0"
+            "version": "==4.2.1"
         },
         "psycopg2": {
-            "version": "==2.7.1"
+            "version": "==2.7.3"
         },
         "pytz": {
             "version": "==2017.2"
@@ -127,13 +127,13 @@
             "version": "==2.10.5"
         },
         "requests": {
-            "version": "==2.18.1"
+            "version": "==2.18.2"
         },
         "rest-channels": {
             "version": "==0.1.2"
         },
         "setuptools": {
-            "version": "==36.0.1"
+            "version": "==36.2.4"
         },
         "simplejson": {
             "version": "==3.11.1"
@@ -145,7 +145,7 @@
             "version": "==17.5.0"
         },
         "txaio": {
-            "version": "==2.8.0"
+            "version": "==2.8.1"
         },
         "ujson": {
             "version": "==1.35"
@@ -154,19 +154,16 @@
             "version": "==3.0.0"
         },
         "urllib3": {
-            "version": "==1.21.1"
+            "version": "==1.22"
         },
         "vine": {
-            "version": "==1.1.3"
+            "version": "==1.1.4"
         },
         "zope.interface": {
             "version": "==4.4.2"
         }
     },
     "develop": {
-        "appnope": {
-            "version": "==0.1.0"
-        },
         "asgiref": {
             "version": "==1.1.2"
         },
@@ -174,7 +171,7 @@
             "version": "==17.2.0"
         },
         "autobahn": {
-            "version": "==17.6.2"
+            "version": "==17.7.1"
         },
         "automat": {
             "version": "==0.6.0"
@@ -186,7 +183,7 @@
             "version": "==1.3.0"
         },
         "decorator": {
-            "version": "==4.0.11"
+            "version": "==4.1.2"
         },
         "django": {
             "version": "==1.11.3"
@@ -201,7 +198,7 @@
             "version": "==19.7.1"
         },
         "hyperlink": {
-            "version": "==17.2.1"
+            "version": "==17.3.0"
         },
         "incremental": {
             "version": "==17.5.0"
@@ -225,7 +222,7 @@
             "version": "==0.4.0"
         },
         "prompt-toolkit": {
-            "version": "==1.0.14"
+            "version": "==1.0.15"
         },
         "ptyprocess": {
             "version": "==0.5.2"
@@ -240,7 +237,7 @@
             "version": "==2017.2"
         },
         "setuptools": {
-            "version": "==36.0.1"
+            "version": "==36.2.4"
         },
         "simplegeneric": {
             "version": "==0.8.1"
@@ -261,7 +258,7 @@
             "version": "==17.5.0"
         },
         "txaio": {
-            "version": "==2.8.0"
+            "version": "==2.8.1"
         },
         "virtualenv": {
             "version": "==15.1.0"
