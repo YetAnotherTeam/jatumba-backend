@@ -14,8 +14,7 @@ Pygments = "*"
 
 [packages]
 channels = ">=1.0.3"
-# django-audiofield = ">=0.8.3"
-django-audiofield = { git = "https://github.com/KhasanovBI/django-audiofield.git" }
+django-audiofield = ">=0.10.0"
 django-extensions = "*"
 django-filter = ">=1.0.1"
 django-guardian = ">=1.4.6"
