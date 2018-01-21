@@ -8,7 +8,6 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /jatumba-backend
 COPY Pipfile* ./
 RUN pip install pipenv && \
-    pipenv lock -r > requirements.txt && \
-    pip install -r requirements.txt
+    pipenv install --system
 
 COPY . .
