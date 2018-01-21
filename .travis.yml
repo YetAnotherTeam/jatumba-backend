@@ -5,6 +5,7 @@ services:
 
 script:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    set -e;
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
 
     export BASE_REPO=$DOCKER_USERNAME/jatumba-backend-base;
@@ -28,3 +29,7 @@ script:
     docker push $DJANGO_REPO:latest;
     docker push $WORKER_REPO:latest;
     fi
+
+branches:
+  only:
+  - master
