@@ -1,5 +1,5 @@
 # Пришлось установить версию с гита, потому что в Pypi стоит устаревшая версия с багой
 git+https://github.com/circus-tent/circus-web
 circus==0.14.0
-PyYAML==3.12
+PyYAML==5.1
 redis==2.10.5
